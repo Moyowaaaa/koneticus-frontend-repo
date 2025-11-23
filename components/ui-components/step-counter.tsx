@@ -27,9 +27,12 @@ const StepCounter = ({ stepCount, steps, setStep }: stepCounterProps) => {
       {steps?.map((_, index) => {
         const variant = getVariant(index);
         return (
-          <div key={index} className="flex items-center">
+          <div
+            key={index}
+            onClick={() => setStep(index)}
+            className="flex items-center"
+          >
             <div
-              onClick={() => setStep(index)}
               className={`flex h-[1.25rem] w-[1.25rem] mx-2 items-center justify-center rounded-full 
                 ${variant === "done" ? "bg-[#6155F5]" : ""}
                 ${variant === "inactive" ? "bg-[#E9E9E9E9]" : ""}
