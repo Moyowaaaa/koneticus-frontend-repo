@@ -44,6 +44,8 @@ export default function AuthLayout({
             src={
               pathname === "/auth/sign-up"
                 ? "/images/auth-bg-signup.webp"
+                : pathname === "/auth/forgot-password"
+                ? "/images/auth-bg-forgot.webp"
                 : "/images/auth-bg-login.webp"
             }
             fill
@@ -55,6 +57,8 @@ export default function AuthLayout({
             <h1 className="text-[3rem] leading-[3rem] text-white max-w-[45rem] font-normal">
               {pathname === "/auth/sign-up"
                 ? "Collaborate With Top-Tier Creative Talent"
+                : pathname === "/auth/forgot-password"
+                ? "Let’s help you get back in."
                 : "Join a Community of High-Performing Creatives"}
             </h1>
             <p
@@ -64,6 +68,8 @@ export default function AuthLayout({
             >
               {pathname === "/auth/sign-up"
                 ? "Find collaborators who share your passion, vision, and commitment to creating meaningful, high-quality work."
+                : pathname === "/auth/forgot-password"
+                ? "Type in your email address and we’ll send you a secure reset link in a moment."
                 : "Meet experienced collaborators who are passionate about working together to build original, impactful projects."}
             </p>
           </div>

@@ -23,15 +23,18 @@ const LogInPage = () => {
             type="password"
             showPasswordToggle={true}
           />
-          <div className="w-full text-right ">
-            <p
-              className="text-sm 
+
+          <Link href="/auth/forgot-password" className="text-primary">
+            <div className="w-full text-right ">
+              <p
+                className="text-sm 
           text-brand-black
           "
-            >
-              Forgot password?
-            </p>
-          </div>
+              >
+                Forgot password?
+              </p>
+            </div>
+          </Link>
         </div>
 
         <ButtonV2

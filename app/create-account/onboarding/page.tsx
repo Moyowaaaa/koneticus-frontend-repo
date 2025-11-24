@@ -10,6 +10,7 @@ import CustomFormInput from "@/components/ui-components/custom-form-input";
 import ButtonV2 from "@/components/ui-components/button";
 import StepCounter from "@/components/ui-components/step-counter";
 import SignUpFlow from "@/components/auth/sign-up-flow";
+import OnBoardingFlow from "@/components/onboarding";
 
 const STEP_TITLES = ["Information", "Roles", "Profile"];
 const TOTAL_STEPS = STEP_TITLES.length + 1; // include initial email capture step
@@ -171,7 +172,9 @@ const OnboardingPage = () => {
         Logo
       </div>
 
-      <SignUpFlow />
+      {/* <SignUpFlow /> */}
+
+      <OnBoardingFlow />
 
       <div className="w-full max-w-full mx-auto absolute bottom-2 flex items-center justify-center text-[#211E1E] font-semibold text-[0.875rem] font-sora">
         &copy; KoLabs {new Date().getFullYear()}

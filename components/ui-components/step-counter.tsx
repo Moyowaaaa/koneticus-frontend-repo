@@ -1,3 +1,4 @@
+import { ArrowLeft } from "iconsax-reactjs";
 import { Check } from "lucide-react";
 import React from "react";
 
@@ -23,31 +24,38 @@ const StepCounter = ({ stepCount, steps, setStep }: stepCounterProps) => {
   };
 
   return (
-    <div className="flex items-center justify-center w-full max-w-[800px] relative">
-      {steps?.map((_, index) => {
-        const variant = getVariant(index);
-        return (
-          <div
-            key={index}
-            onClick={() => setStep(index)}
-            className="flex items-center"
-          >
+    <div className="flex items-center gap-1">
+      <ArrowLeft
+        size={20}
+        className={`${stepCount === 0 ? "hidden" : ""}`}
+        onClick={() => setStep(stepCount - 1)}
+      />
+      <div className="flex items-center justify-center w-full max-w-[30rem] relative">
+        {steps?.map((_, index) => {
+          const variant = getVariant(index);
+          return (
             <div
-              className={`flex h-[1.25rem] w-[1.25rem] mx-2 items-center justify-center rounded-full 
+              key={index}
+              onClick={() => setStep(index)}
+              className="flex items-center"
+            >
+              <div
+                className={`flex h-[1.25rem] w-[1.25rem] mx-2 items-center justify-center rounded-full 
                 ${variant === "done" ? "bg-[#6155F5]" : ""}
                 ${variant === "inactive" ? "bg-[#E9E9E9E9]" : ""}
                 ${variant === "current" ? "bg-[#827AE1]" : ""}
 
                 `}
-            >
-              <Check color={"white"} size={12} />
+              >
+                <Check color={"white"} size={12} />
+              </div>
+              {index !== steps.length - 1 && (
+                <div className="w-[4rem] h-[1px] bg-[#D0D5DD]"></div>
+              )}
             </div>
-            {index !== steps.length - 1 && (
-              <div className="w-[4rem] h-[1px] bg-[#D0D5DD]"></div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };

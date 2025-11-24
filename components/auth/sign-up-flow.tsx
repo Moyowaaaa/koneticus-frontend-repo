@@ -1,69 +1,24 @@
 "use client";
 
 import { useMemo, useState, KeyboardEvent } from "react";
-import Link from "next/link";
-import Image from "next/image";
+
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, Plus, X } from "lucide-react";
+import { ArrowRight, Plus, X } from "lucide-react";
 
 import CustomFormInput from "@/components/ui-components/custom-form-input";
 import ButtonV2 from "@/components/ui-components/button";
 import StepCounter from "@/components/ui-components/step-counter";
 import { GalleryEdit } from "iconsax-reactjs";
-import { Textarea } from "../ui/textarea";
-
-const STEP_TITLES = ["Information", "Roles", "Profile"];
-const TOTAL_STEPS = STEP_TITLES.length + 1; // include initial email capture step
-const LAST_STEP_INDEX = TOTAL_STEPS - 1;
-
-const clampStepValue = (value: number) =>
-  Math.min(Math.max(Number.isNaN(value) ? 0 : value, 0), LAST_STEP_INDEX);
-
-const SOCIAL_PROVIDERS = [
-  { label: "Continue with Google", icon: "/images/google.svg" },
-  { label: "Continue with Github", icon: "/images/github.svg" },
-  { label: "Continue with Microsoft", icon: "/images/microsoft.svg" },
-];
-
-const ROLE_SUGGESTIONS = [
-  "UI/UX Designer",
-  "Writer",
-  "Print Designer",
-  "3D Artist",
-  "Illustrator",
-];
-
-const PORTFOLIO_FIELDS = [
-  { key: "website", label: "Website" },
-  { key: "behance", label: "Behance" },
-  { key: "dribbble", label: "Dribbble" },
-] as const;
+import { clampStepValue } from "@/utils";
+import {
+  LAST_STEP_INDEX,
+  PORTFOLIO_FIELDS,
+  ROLE_SUGGESTIONS,
+  STEP_TITLES,
+} from "@/types/data";
+import { INITIAL_STATE, SignUpFormData } from "@/types";
 
 type PortfolioLinks = Record<(typeof PORTFOLIO_FIELDS)[number]["key"], string>;
-
-type SignUpFormData = {
-  email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  roles: string[];
-  bio: string;
-  portfolio: PortfolioLinks;
-};
-
-const INITIAL_STATE: SignUpFormData = {
-  email: "",
-  firstName: "",
-  lastName: "",
-  password: "",
-  roles: [],
-  bio: "",
-  portfolio: {
-    website: "",
-    behance: "",
-    dribbble: "",
-  },
-};
 
 const SignUpFlow = () => {
   const router = useRouter();
@@ -72,7 +27,7 @@ const SignUpFlow = () => {
 
   const [currentStep, setCurrentStep] = useState(() => {
     const stepParam = searchParams.get("step");
-    return clampStepValue(stepParam ? Number(stepParam) : 0);
+    return clampStepValue(stepParam ? Number(stepParam) : 0, LAST_STEP_INDEX);
   });
   const [formData, setFormData] = useState<SignUpFormData>(INITIAL_STATE);
 
@@ -80,7 +35,7 @@ const SignUpFlow = () => {
   const [error, setError] = useState<string | null>(null);
 
   const setStepWithUrl = (nextStep: number) => {
-    const clamped = clampStepValue(nextStep);
+    const clamped = clampStepValue(nextStep, LAST_STEP_INDEX);
     setCurrentStep(clamped);
 
     const params = new URLSearchParams(searchParams.toString());
@@ -97,38 +52,38 @@ const SignUpFlow = () => {
 
   const isLastStep = currentStep === LAST_STEP_INDEX;
 
-  const validateStep = () => {
-    switch (currentStep) {
-      case 0:
-        if (!formData.email) {
-          setError("Please add your email to continue");
-          return false;
-        }
-        break;
-      case 1:
-        if (!formData.firstName || !formData.lastName || !formData.password) {
-          setError("Fill in every field before continuing");
-          return false;
-        }
-        break;
-      case 2:
-        if (!formData.roles.length) {
-          setError("Add at least one role to showcase your expertise");
-          return false;
-        }
-        break;
-      case 3:
-        if (formData.bio.trim().length < 150) {
-          setError("Tell us a bit more (min. 150 characters)");
-          return false;
-        }
-        break;
-      default:
-        break;
-    }
-    setError(null);
-    return true;
-  };
+  // const validateStep = () => {
+  //   switch (currentStep) {
+  //     case 0:
+  //       if (!formData.email) {
+  //         setError("Please add your email to continue");
+  //         return false;
+  //       }
+  //       break;
+  //     case 1:
+  //       if (!formData.firstName || !formData.lastName || !formData.password) {
+  //         setError("Fill in every field before continuing");
+  //         return false;
+  //       }
+  //       break;
+  //     case 2:
+  //       if (!formData.roles.length) {
+  //         setError("Add at least one role to showcase your expertise");
+  //         return false;
+  //       }
+  //       break;
+  //     case 3:
+  //       if (formData.bio.trim().length < 150) {
+  //         setError("Tell us a bit more (min. 150 characters)");
+  //         return false;
+  //       }
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  //   setError(null);
+  //   return true;
+  // };
 
   const handlePrimaryAction = () => {
     // if (!validateStep()) return;
@@ -141,10 +96,10 @@ const SignUpFlow = () => {
     setStepWithUrl(currentStep + 1);
   };
 
-  const handleBack = () => {
-    setError(null);
-    setStepWithUrl(currentStep - 1);
-  };
+  // const handleBack = () => {
+  //   setError(null);
+  //   setStepWithUrl(currentStep - 1);
+  // };
 
   const updateField = (field: keyof SignUpFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -355,7 +310,7 @@ const SignUpFlow = () => {
                   <h1 className="font-semibold text-[1.125rem] text-center ">
                     Provide us a link to your portfolio
                   </h1>
-                  {PORTFOLIO_FIELDS.map((field) => (
+                  {/* {PORTFOLIO_FIELDS.map((field) => (
                     <div
                       key={field.key}
                       className="flex items-center gap-3 rounded-[1.875rem] border border-[#E9E9E9] bg-white px-5 py-3"
@@ -372,7 +327,7 @@ const SignUpFlow = () => {
                         }
                       />
                     </div>
-                  ))}
+                  ))} */}
                 </div>
 
                 <ButtonV2
@@ -400,12 +355,12 @@ const SignUpFlow = () => {
               Back
             </button> */}
 
-          {currentStep > 2 && (
+          {currentStep < 2 && (
             <ButtonV2
               IconPlacement="right"
               Icon={<ArrowRight size={24} color="white" />}
               onClick={handlePrimaryAction}
-              className={`mx-auto ${isLastStep ? "w-75" : "w-[30rem]"}`}
+              className={`mx-auto w-75`}
             >
               {isLastStep ? "Submit" : "Next"}
             </ButtonV2>
