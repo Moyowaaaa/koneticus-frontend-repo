@@ -38,7 +38,11 @@ const OnBoardingFlow = () => {
   };
 
   const handlePrimaryAction = () => {
-    setStepWithUrl(currentStep + 1);
+    if (currentStep === 2) {
+      router.push("/dashboard");
+    } else {
+      setStepWithUrl(currentStep + 1);
+    }
   };
 
   return (

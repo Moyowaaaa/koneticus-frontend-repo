@@ -16,7 +16,7 @@ const simulateRequest = () =>
 
 const ForgotPasswordFlow = () => {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

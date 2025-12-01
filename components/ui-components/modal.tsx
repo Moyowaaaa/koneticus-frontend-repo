@@ -53,7 +53,7 @@ const Modal = ({
           {title && (
             <h2
               className={cn(
-                "text-lg font-semibold text-center",
+                "text-lg font-semibold text-center pb-2 border-b border-b-[#E9E9E9E9]",
                 titleClassname
               )}
             >
@@ -63,7 +63,7 @@ const Modal = ({
         </div>
 
         {/* Content */}
-        <div className="px-6 pt-6">{children}</div>
+        <div className="px-6 py-2">{children}</div>
 
         {/* Actions */}
         {(primaryAction || secondaryAction) && (
@@ -100,7 +100,7 @@ const Modal = ({
         showCloseButton={false}
       >
         {/* Custom Close Button - positioned in top-right corner */}
-        <DialogClose className="absolute -top-2 -right-12 z-50 h-10 w-10 max-h-10 max-w-10 rounded-[0.625rem] border-none bg-[#666666] hover:bg-[#555555] p-2 transition-colors flex items-center justify-center">
+        <DialogClose className="glass-icon-button absolute -top-2 -right-12 z-50 h-10 w-10 max-h-10 max-w-10 rounded-[0.625rem] border-none bg-[#666666] hover:bg-[#555555] p-2 transition-colors flex items-center justify-center">
           <X className="h-[1rem] w-[1rem] text-white" />
           <span className="sr-only">Close</span>
         </DialogClose>

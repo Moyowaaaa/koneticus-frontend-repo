@@ -37,12 +37,15 @@ const LogInPage = () => {
           </Link>
         </div>
 
-        <ButtonV2
-          IconPlacement="right"
-          Icon={<ArrowRight size="32" color="white" />}
-        >
-          Continue
-        </ButtonV2>
+        <Link href={"/dashboard"}>
+          <ButtonV2
+            IconPlacement="right"
+            Icon={<ArrowRight size="32" color="white" />}
+            className="w-full"
+          >
+            Continue
+          </ButtonV2>
+        </Link>
 
         <div className="flex items-center gap-6 w-full">
           <div className="w-full border border-[#E9E9E9]"></div>

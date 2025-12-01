@@ -3,6 +3,7 @@ import React, { KeyboardEvent, useState } from "react";
 import { SignUpFormData } from "@/types";
 import { LAST_STEP_INDEX, ROLE_SUGGESTIONS } from "@/types/data";
 import ButtonV2 from "@/components/ui-components/button";
+import { useRouter } from "next/navigation";
 
 const RoleStep = ({
   formData,

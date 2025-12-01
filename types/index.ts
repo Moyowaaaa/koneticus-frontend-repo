@@ -1,3 +1,4 @@
+import React from "react";
 import { PORTFOLIO_FIELDS } from "./data";
 
 export type PortfolioLinks = Record<
@@ -27,4 +28,11 @@ export const INITIAL_STATE: SignUpFormData = {
     behance: "",
     github: "",
   },
+};
+
+export type sideBarRoute = {
+  title: string;
+  icon: React.ElementType;
+  route: string;
+  comingSoon?: boolean;
 };
