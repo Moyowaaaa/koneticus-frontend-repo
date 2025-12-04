@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Head from "next/head";
 import NavigationProgressBar from "@/components/ui-components/navigation-progress-bar";
+import NewIdeaModal from "@/components/dashboard/modals/new-post-modal";
+import ShowInterestModal from "@/components/dashboard/modals/show-interest-modal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +32,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NavigationProgressBar />
-
+        <NewIdeaModal />
+        <ShowInterestModal />
         {children}
       </body>
     </html>

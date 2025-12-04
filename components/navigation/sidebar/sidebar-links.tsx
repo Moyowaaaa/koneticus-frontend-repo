@@ -7,7 +7,7 @@ const SidebarLinks = ({ route }: { route: sideBarRoute }) => {
 
   return (
     <Link href={route.route}>
-      <div className="group flex cursor-pointer gap-6 items-center justify-between rounded-[0.625rem] px-3 py-4 transition-colors duration-200 hover:bg-lavender">
+      <div className="group flex cursor-pointer gap-6 items-center justify-between rounded-[6.25rem] px-3 py-4 transition-colors duration-200 hover:bg-lavender">
         <div className="flex items-center gap-2 text-grey transition-colors duration-200 group-hover:text-primary">
           <Icon
             size="16"

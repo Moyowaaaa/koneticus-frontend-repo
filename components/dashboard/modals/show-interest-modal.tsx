@@ -1,3 +1,5 @@
+"use client";
+
 import ButtonV2 from "@/components/ui-components/button";
 import Modal from "@/components/ui-components/modal";
 import { Textarea } from "@/components/ui/textarea";

@@ -36,3 +36,16 @@ export type sideBarRoute = {
   route: string;
   comingSoon?: boolean;
 };
+
+export type ProjectStatus = "pending" | "ongoing";
+
+export type Project = {
+  id: string;
+  title: string;
+  description: string;
+  status: ProjectStatus;
+  image: string;
+  collaborators?: string[];
+  createdAt: string;
+  updatedAt: string;
+};

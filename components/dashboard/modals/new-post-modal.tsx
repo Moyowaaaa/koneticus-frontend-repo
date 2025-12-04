@@ -1,3 +1,5 @@
+"use client";
+
 import ButtonV2 from "@/components/ui-components/button";
 import Modal from "@/components/ui-components/modal";
 import { Input } from "@/components/ui/input";
@@ -58,7 +60,7 @@ const NewIdeaModal = () => {
       <Modal
         open={showNewIdeaModal}
         onOpenChange={handleModalClose}
-        title="New Post"
+        title="New Idea"
         className="flex flex-col gap-4"
       >
         <div className="flex flex-col gap-4">
@@ -80,7 +82,7 @@ const NewIdeaModal = () => {
 
           <div className="w-full items-center flex justify-between ">
             <ButtonV2
-              className="h-[40px]"
+              className="h-10"
               onClick={handleSubmit}
               disabled={isSubmitting || !title.trim() || !description.trim()}
             >

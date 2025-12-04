@@ -54,7 +54,7 @@ const Sidebar = () => {
       <div className="rounded-2xl bg-white/80   ">
         <ButtonV2
           IconPlacement="left"
-          className="h-[2.625rem] w-full min-w-[12rem] rounded-[0.625rem] border-none bg-brand-black outline-none"
+          className="h-[2.625rem] w-full min-w-[12rem] rounded-[6.25rem] border-none bg-brand-black outline-none"
           Icon={<AddCircle size="13" color="white" variant="Bold" />}
           onClick={toggleNewIdeaModal}
         >
