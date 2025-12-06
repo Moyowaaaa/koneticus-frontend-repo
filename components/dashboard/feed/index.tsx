@@ -1,6 +1,5 @@
 import React from "react";
 import FeedEmptyState from "./feed-empty-state";
-import FeedItemComponent from "./feed-item";
 import { useFeedStore } from "@/store/useFeedStore";
 import FeedIdeaCard from "./feed-idea-card";
 

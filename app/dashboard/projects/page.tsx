@@ -7,7 +7,7 @@ import { Project, ProjectStatus } from "@/types";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const ProjectsdPage = () => {
+const ProjectsPage = () => {
   const router = useRouter();
 
   // Mock data for counts - replace with actual data fetching
@@ -76,4 +76,4 @@ const ProjectsdPage = () => {
   );
 };
 
-export default ProjectsdPage;
+export default ProjectsPage;

@@ -6,6 +6,13 @@ export type PortfolioLinks = Record<
   string
 >;
 
+export type user = {
+  firstName: string;
+  lastName: string;
+  profile_photo: string;
+  email: string;
+};
+
 export type SignUpFormData = {
   email: string;
   firstName: string;
@@ -45,7 +52,14 @@ export type Project = {
   description: string;
   status: ProjectStatus;
   image: string;
-  collaborators?: string[];
+  collaborators?: (string | Collaborator)[];
   createdAt: string;
   updatedAt: string;
+};
+
+export type Collaborator = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: "Creator" | "Collaborator";
 };
