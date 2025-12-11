@@ -8,19 +8,27 @@ import React from "react";
 import Feed from ".";
 import SpotlightFeed from "./spotlight-feed";
 import MessagesFeed from "./messages-feed";
+import SearchModal from "../modals/search-modal";
+import { useSearchStore } from "@/store/useSearchStore";
 
 const FeedClient = () => {
   const { toggleNewIdeaModal } = useGeneralStateStore();
+  const { setShowSearch } = useSearchStore();
 
   return (
     <>
+      <SearchModal />
       <div className=" w-full  flex items-start gap-10 pt-6">
         <div className="relative h-full w-8/12 flex flex-col gap-3">
           <TopBar className="flex items-center w-full justify-between">
             <h1 className="text-[1.875rem] font-bold">Welcome Oba,</h1>
 
             <div className="flex items-center gap-2">
-              <SearchNormal size="24" color="#211E1E" />
+              <SearchNormal
+                onClick={() => setShowSearch(true)}
+                size="24"
+                color="#211E1E"
+              />
               <ButtonV2
                 type="submit"
                 className="w-max h-max !px-6 border-none"

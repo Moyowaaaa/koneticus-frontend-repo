@@ -20,7 +20,7 @@ const OngoingProjectsClient = () => {
           <ButtonV2
             onClick={router.back}
             type="submit"
-            className="w-max h-max !px-6 border-none"
+            className="w-max h-max min-h-max! py-3 !px-4 border-none"
             IconPlacement="left"
             Icon={
               <Image src="/images/back.svg" alt="back" width={13} height={13} />

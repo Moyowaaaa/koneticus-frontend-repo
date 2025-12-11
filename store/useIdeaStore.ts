@@ -41,7 +41,7 @@ const dummyIdeas: ExtendedProject[] = [
     description:
       "Love is a fundamental human experience that enriches our lives in countless ways. It fosters connection, understanding, and compassion, allowing us to build meaningful relationships. Love motivates us to care for others, enhances our emotional well-being, and provides a sense of belonging. In times of hardship, love can be a source of strength and resilience, reminding us that we are not alone. Ultimately, love is what makes life truly fulfilling.",
     status: "pending",
-    image: "/images/project.png",
+    image: "/images/project2.png",
     createdAt: "2024-09-26",
     updatedAt: "2024-09-26",
     collaborators: dummyUsers,

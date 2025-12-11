@@ -168,10 +168,6 @@ const OnboardingPage = () => {
 
   return (
     <div className="h-screen w-full flex items-center justify-center flex-col">
-      <div className="w-full max-w-full mx-auto absolute top-2 flex items-center justify-center text-[#211E1E] font-semibold text-[0.875rem] font-sora">
-        Logo
-      </div>
-
       {/* <SignUpFlow /> */}
 
       <OnBoardingFlow />

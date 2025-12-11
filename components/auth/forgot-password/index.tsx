@@ -105,7 +105,7 @@ const ForgotPasswordFlow = () => {
 
   return (
     <section className="flex w-9/12 mx-auto  flex-col items-center gap-10 ">
-      <div className="flex w-full  flex-col gap-6 text-center">
+      <div className="flex w-full  flex-col gap-6 text-center pt-16">
         <div className="space-y-2">
           <h1 className="text-[1.875rem] font-bold">Reset Your Password</h1>
         </div>

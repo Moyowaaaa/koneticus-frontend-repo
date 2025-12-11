@@ -6,6 +6,7 @@ import { InformationStep } from "./steps/info";
 import { INITIAL_STATE, SignUpFormData } from "@/types";
 import RoleStep from "./steps/role";
 import BioStep from "./steps/bio";
+import Image from "next/image";
 
 const STEP_TITLES = ["Information", "Roles", "Profile"];
 const TOTAL_STEPS = STEP_TITLES.length + 1; // include initial email capture step
@@ -48,8 +49,17 @@ const OnBoardingFlow = () => {
   return (
     <>
       <div className="relative flex w-full flex-col items-center gap-8 py-10  h-full ">
-        <div className="  space-y-6 flex flex-col gap-10   w-max">
-          <div className="w-[18.75rem] mx-auto pt-16">
+        <div className="  space-y-6 flex flex-col gap-4   w-max">
+          <div className="relative h-[2.5rem] w-[2.5rem] mx-auto">
+            <Image
+              src={"/images/purple_logo.png"}
+              alt=""
+              fill
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <div className="w-[18.75rem] mx-auto pt-4">
             <StepCounter
               steps={STEP_TITLES}
               stepCount={currentStep}

@@ -8,6 +8,7 @@ import { Trash2 } from "lucide-react";
 import ButtonV2 from "@/components/ui-components/button";
 import { useRouter } from "next/navigation";
 import { useIdeaStore } from "@/store/useIdeaStore";
+import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
 
 interface ProjectCardProps {
   project: Project;
@@ -24,17 +25,18 @@ const ProjectCard = ({
 }: ProjectCardProps) => {
   const router = useRouter();
   const { deleteIdea } = useIdeaStore();
+  const openEditModal = useEditIdeaModalStore((state) => state.openModal);
 
   const handleAction = () => {
-    // if (project.status === "pending" && onEdit) {
-    //   onEdit(project);
-    // } else if (project.status === "ongoing" && onOpen) {
-    //   // onOpen(project);
-    // }
+    if (project.status === "pending") {
+      openEditModal(project.id);
+      onEdit?.(project);
+      return;
+    }
+
+    onOpen?.(project);
     router.push(`/dashboard/projects/ongoing/${project.id}`);
   };
-
-  console.log(project.id);
 
   return (
     <div className="flex flex-col     bg-white ">

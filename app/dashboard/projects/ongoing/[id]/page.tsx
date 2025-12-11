@@ -1,8 +1,13 @@
 "use client";
 
+import ChatInput from "@/components/chat/chat-input";
+import ChatMessages from "@/components/chat/chat-messages";
 import ButtonV2 from "@/components/ui-components/button";
+import CustomFormInput from "@/components/ui-components/custom-form-input";
 import TopBar from "@/components/ui-components/top-bar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -20,7 +25,7 @@ const ProjectDetailsPage = () => {
           <ButtonV2
             onClick={router.back}
             type="submit"
-            className="w-max h-max  !px-6 border-none"
+            className="w-max h-max min-h-max! py-3 !px-4 border-none"
             IconPlacement="left"
             Icon={
               <Image src="/images/back.svg" alt="back" width={13} height={13} />
@@ -52,7 +57,7 @@ const ProjectDetailsPage = () => {
 
               {project?.collaborators?.map((c, index) => (
                 <div
-                  className="relative py-2 flex items-center gap-2 w-[25rem]  "
+                  className="relative py-2 flex items-center gap-2 min-w-100 max-w-100"
                   key={index}
                 >
                   <div className="relative h-[1.5rem] w-[1.5rem]">
@@ -88,7 +93,24 @@ const ProjectDetailsPage = () => {
             </div>
           </div>
 
-          <div className=" w-5/12 "></div>
+          <div
+            className=" relative w-[30rem] h-[40rem] border p-6 rounded-[1.875rem]
+          
+          
+          "
+          >
+            <div className="flex items-center justify-between w-full border-b border-#E9E9E9E9] pb-2 bg-[white] z-5">
+              <h1 className="text-brand-black font-semibold text-[1.25rem]">
+                Team chat
+              </h1>
+            </div>
+
+            <ScrollArea className="max-h-[31rem] h-full pr-2">
+              <ChatMessages />
+            </ScrollArea>
+
+            <ChatInput />
+          </div>
         </div>
       </div>
     </>

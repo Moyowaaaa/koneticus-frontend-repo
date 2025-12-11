@@ -20,7 +20,7 @@ import { X } from "lucide-react";
 
 interface CustomModalProps {
   children: ReactNode;
-  title: string;
+  title?: string;
   trigger?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -29,6 +29,7 @@ interface CustomModalProps {
   secondaryAction?: React.ReactNode;
   className?: string;
   containerClassname?: string;
+  childrenClassName?: string;
 }
 
 const Modal = ({
@@ -42,6 +43,7 @@ const Modal = ({
   secondaryAction,
   className,
   containerClassname,
+  childrenClassName,
 }: CustomModalProps) => {
   const isMobile = useIsMobile();
 
@@ -49,8 +51,8 @@ const Modal = ({
     <div className="flex flex-col text-[#1E1E1E]">
       <div className="">
         {/* Title Section */}
-        <div className="px-6 pb-4 ">
-          {title && (
+        {title && (
+          <div className="px-6 pb-4 ">
             <h2
               className={cn(
                 "text-lg font-semibold text-center pb-2 border-b border-b-[#E9E9E9E9]",
@@ -59,11 +61,11 @@ const Modal = ({
             >
               {title}
             </h2>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Content */}
-        <div className="px-6 py-2">{children}</div>
+        <div className={cn("px-6 py-2", childrenClassName)}>{children}</div>
 
         {/* Actions */}
         {(primaryAction || secondaryAction) && (

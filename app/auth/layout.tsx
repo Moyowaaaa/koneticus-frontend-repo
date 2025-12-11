@@ -26,8 +26,15 @@ export default function AuthLayout({
         }`}
       >
         <div className="relative w-full h-full flex flex-col ">
-          <div className="w-full    absolute top-2 flex items-center justify-start text-[#211E1E] font-semibold text-[0.875rem] font-sora">
-            Logo
+          <div className="w-full  absolute top-24 flex items-center justify-center">
+            <div className="relative h-[2.5rem] w-[2.5rem]">
+              <Image
+                src={"/images/purple_logo.png"}
+                alt=""
+                fill
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
 
           {children}
