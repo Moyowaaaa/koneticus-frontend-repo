@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, KeyboardEvent } from "react";
+import { useMemo, useState, KeyboardEvent, Suspense } from "react";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Plus, X } from "lucide-react";
@@ -20,7 +20,7 @@ import { INITIAL_STATE, SignUpFormData } from "@/types";
 
 type PortfolioLinks = Record<(typeof PORTFOLIO_FIELDS)[number]["key"], string>;
 
-const SignUpFlow = () => {
+function SignUpFlowContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -52,42 +52,7 @@ const SignUpFlow = () => {
 
   const isLastStep = currentStep === LAST_STEP_INDEX;
 
-  // const validateStep = () => {
-  //   switch (currentStep) {
-  //     case 0:
-  //       if (!formData.email) {
-  //         setError("Please add your email to continue");
-  //         return false;
-  //       }
-  //       break;
-  //     case 1:
-  //       if (!formData.firstName || !formData.lastName || !formData.password) {
-  //         setError("Fill in every field before continuing");
-  //         return false;
-  //       }
-  //       break;
-  //     case 2:
-  //       if (!formData.roles.length) {
-  //         setError("Add at least one role to showcase your expertise");
-  //         return false;
-  //       }
-  //       break;
-  //     case 3:
-  //       if (formData.bio.trim().length < 150) {
-  //         setError("Tell us a bit more (min. 150 characters)");
-  //         return false;
-  //       }
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  //   setError(null);
-  //   return true;
-  // };
-
   const handlePrimaryAction = () => {
-    // if (!validateStep()) return;
-
     if (isLastStep) {
       console.log("Submit payload", formData);
       return;
@@ -95,11 +60,6 @@ const SignUpFlow = () => {
 
     setStepWithUrl(currentStep + 1);
   };
-
-  // const handleBack = () => {
-  //   setError(null);
-  //   setStepWithUrl(currentStep - 1);
-  // };
 
   const updateField = (field: keyof SignUpFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -150,7 +110,7 @@ const SignUpFlow = () => {
       case 0:
         return {
           headline: "Fill in your information",
-          description: "Well personalize the workspace for you.",
+          description: "We'll personalize the workspace for you.",
         };
       case 1:
         return {
@@ -310,24 +270,6 @@ const SignUpFlow = () => {
                   <h1 className="font-semibold text-[1.125rem] text-center ">
                     Provide us a link to your portfolio
                   </h1>
-                  {/* {PORTFOLIO_FIELDS.map((field) => (
-                    <div
-                      key={field.key}
-                      className="flex items-center gap-3 rounded-[1.875rem] border border-[#E9E9E9] bg-white px-5 py-3"
-                    >
-                      <span className="text-sm font-semibold text-grey">
-                        {field.label}
-                      </span>
-                      <input
-                        className="flex-1 bg-transparent text-sm outline-none"
-                        placeholder={`Add ${field.label} link`}
-                        value={formData.portfolio[field.key]}
-                        onChange={(event) =>
-                          updatePortfolio(field.key, event.target.value)
-                        }
-                      />
-                    </div>
-                  ))} */}
                 </div>
 
                 <ButtonV2
@@ -345,16 +287,7 @@ const SignUpFlow = () => {
 
         {error && <p className="text-sm font-medium text-red-500">{error}</p>}
 
-        {/* {currentStep === 0 && ( */}
         <div className="flex items-center justify-between pt-2">
-          {/* <button
-              type="button"
-              onClick={handleBack}
-              className="text-sm font-semibold text-grey transition hover:text-brand-black"
-            >
-              Back
-            </button> */}
-
           {currentStep < 2 && (
             <ButtonV2
               IconPlacement="right"
@@ -366,9 +299,28 @@ const SignUpFlow = () => {
             </ButtonV2>
           )}
         </div>
-        {/* )} */}
       </div>
     </div>
+  );
+}
+
+function SignUpFlowFallback() {
+  return (
+    <div className="relative flex w-full flex-col items-center justify-center gap-8 py-10 h-full">
+      <div className="space-y-6 flex flex-col gap-2 w-[25rem]">
+        <div className="w-[18.75rem] mx-auto">
+          <div className="animate-pulse bg-muted h-8 rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const SignUpFlow = () => {
+  return (
+    <Suspense fallback={<SignUpFlowFallback />}>
+      <SignUpFlowContent />
+    </Suspense>
   );
 };
 
