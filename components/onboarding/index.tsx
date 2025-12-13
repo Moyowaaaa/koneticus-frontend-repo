@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, Suspense } from "react";
 import StepCounter from "../ui-components/step-counter";
 import { clampStepValue } from "@/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -12,7 +14,7 @@ const STEP_TITLES = ["Information", "Roles", "Profile"];
 const TOTAL_STEPS = STEP_TITLES.length + 1; // include initial email capture step
 const LAST_STEP_INDEX = TOTAL_STEPS - 1;
 
-const OnBoardingFlow = () => {
+function OnBoardingFlowContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -96,6 +98,34 @@ const OnBoardingFlow = () => {
         </div>
       </div>
     </>
+  );
+}
+
+function OnBoardingFlowFallback() {
+  return (
+    <div className="relative flex w-full flex-col items-center gap-8 py-10 h-full">
+      <div className="space-y-6 flex flex-col gap-4 w-max">
+        <div className="relative h-[2.5rem] w-[2.5rem] mx-auto">
+          <Image
+            src={"/images/purple_logo.png"}
+            alt=""
+            fill
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="w-[18.75rem] mx-auto pt-4">
+          <div className="animate-pulse bg-muted h-8 rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const OnBoardingFlow = () => {
+  return (
+    <Suspense fallback={<OnBoardingFlowFallback />}>
+      <OnBoardingFlowContent />
+    </Suspense>
   );
 };
 
