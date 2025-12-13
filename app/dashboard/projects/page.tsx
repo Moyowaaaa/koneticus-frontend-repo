@@ -6,9 +6,11 @@ import TopBar from "@/components/ui-components/top-bar";
 import { Project, ProjectStatus } from "@/types";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { useDummyStore } from "@/store/useDummyStore";
 
 const ProjectsPage = () => {
   const router = useRouter();
+  const { useDummyData } = useDummyStore();
 
   // Mock data for counts - replace with actual data fetching
   const mockProjects: Project[] = [
@@ -45,8 +47,10 @@ const ProjectsPage = () => {
     },
   ];
 
-  const pendingProjects = mockProjects.filter((p) => p.status === "pending");
-  const ongoingProjects = mockProjects.filter((p) => p.status === "ongoing");
+  const projects = !useDummyData ? [] : mockProjects;
+
+  const pendingProjects = projects.filter((p) => p.status === "pending");
+  const ongoingProjects = projects.filter((p) => p.status === "ongoing");
 
   const handleFilterChange = (filter: ProjectStatus | "all") => {
     if (filter !== "all") {

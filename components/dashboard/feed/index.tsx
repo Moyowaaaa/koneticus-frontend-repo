@@ -2,9 +2,13 @@ import React from "react";
 import FeedEmptyState from "./feed-empty-state";
 import { useFeedStore } from "@/store/useFeedStore";
 import FeedIdeaCard from "./feed-idea-card";
+import { useDummyStore } from "@/store/useDummyStore";
 
 const Feed = () => {
   const { feedItems, isLoading } = useFeedStore();
+  const { useDummyData } = useDummyStore();
+
+  const data = !useDummyData ? [] : feedItems;
 
   return (
     <>
@@ -17,9 +21,9 @@ const Feed = () => {
           <div className="flex items-center justify-center min-h-80">
             <div className="text-gray-500">Loading...</div>
           </div>
-        ) : feedItems.length > 0 ? (
+        ) : data.length > 0 ? (
           <div className="space-y-6">
-            {feedItems.map((item) => (
+            {data.map((item) => (
               <FeedIdeaCard key={item.id} idea={item} />
             ))}
           </div>

@@ -34,42 +34,42 @@ interface FeedStore {
 }
 
 const dummyFeedData: FeedItem[] = [
-  //   {
-  //     id: "1",
-  //     user: {
-  //       name: "Anita Baker",
-  //       avatar: "/images/avatar-1.jpg",
-  //     },
-  //     timeAgo: "24 ago",
-  //     title: "TITLE OF THE IDEA",
-  //     description:
-  //       "A monthly subscription box that delivers unique, locally-sourced snacks from around the world each month, allowing customers to explore different cultures through their taste buds.",
-  //     tags: ["UI/UX Designer"],
-  //   },
-  //   {
-  //     id: "2",
-  //     user: {
-  //       name: "Lana Del Rey",
-  //       avatar: "/images/avatar-2.jpg",
-  //     },
-  //     timeAgo: "7 hrs ago",
-  //     title: "Innovative Concept Title",
-  //     description:
-  //       "A monthly subscription box that brings you a selection of extraordinary snacks sourced from local artisans worldwide, inviting customers to savor and celebrate diverse cultures.",
-  //     tags: ["Frontend", "Web Designer"],
-  //   },
-  //   {
-  //     id: "3",
-  //     user: {
-  //       name: "Lana Del Rey",
-  //       avatar: "/images/avatar-2.jpg",
-  //     },
-  //     timeAgo: "7 hrs ago",
-  //     title: "Innovative Concept Title",
-  //     description:
-  //       "A monthly subscription box that brings you a selection of extraordinary snacks sourced from local artisans worldwide, inviting customers to savor and celebrate diverse cultures.",
-  //     tags: ["Frontend"],
-  //   },
+  {
+    id: "1",
+    user: {
+      name: "Anita Baker",
+      avatar: "/images/avatar-1.jpg",
+    },
+    timeAgo: "24 ago",
+    title: "TITLE OF THE IDEA",
+    description:
+      "A monthly subscription box that delivers unique, locally-sourced snacks from around the world each month, allowing customers to explore different cultures through their taste buds.",
+    tags: ["UI/UX Designer"],
+  },
+  {
+    id: "2",
+    user: {
+      name: "Lana Del Rey",
+      avatar: "/images/avatar-2.jpg",
+    },
+    timeAgo: "7 hrs ago",
+    title: "Innovative Concept Title",
+    description:
+      "A monthly subscription box that brings you a selection of extraordinary snacks sourced from local artisans worldwide, inviting customers to savor and celebrate diverse cultures.",
+    tags: ["Frontend", "Web Designer"],
+  },
+  {
+    id: "3",
+    user: {
+      name: "Lana Del Rey",
+      avatar: "/images/avatar-2.jpg",
+    },
+    timeAgo: "7 hrs ago",
+    title: "Innovative Concept Title",
+    description:
+      "A monthly subscription box that brings you a selection of extraordinary snacks sourced from local artisans worldwide, inviting customers to savor and celebrate diverse cultures.",
+    tags: ["Frontend"],
+  },
 ];
 
 const dummyMessageFeedData: MessageFeedItem[] = [

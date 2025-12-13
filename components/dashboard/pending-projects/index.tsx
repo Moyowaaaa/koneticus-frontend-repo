@@ -8,11 +8,15 @@ import React from "react";
 import ProjectCard from "../projects/project-card";
 import EditIdeaModal from "../modals/edit-idea-modal";
 import { useIdeaStore } from "@/store/useIdeaStore";
+import { useDummyStore } from "@/store/useDummyStore";
 
 const PendingProjectsClient = () => {
   const router = useRouter();
   const { ideas } = useIdeaStore();
-  const pendingProjects = ideas.filter((p) => p.status === "pending");
+  const { useDummyData } = useDummyStore();
+  const pendingProjects = !useDummyData
+    ? []
+    : ideas.filter((p) => p.status === "pending");
 
   return (
     <>

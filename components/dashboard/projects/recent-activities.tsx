@@ -1,4 +1,5 @@
 import TopBar from "@/components/ui-components/top-bar";
+import { useDummyStore } from "@/store/useDummyStore";
 import React from "react";
 
 export const RecentActivitiesEmptyState = () => {
@@ -38,6 +39,10 @@ const RecentActivities = () => {
     },
   ];
 
+  const { useDummyData } = useDummyStore();
+
+  const data = !useDummyData ? [] : dummyActivities;
+
   return (
     <>
       <div className="flex flex-col gap-10 w-full pt-6 ">
@@ -47,10 +52,10 @@ const RecentActivities = () => {
           </h1>
         </TopBar>
 
-        {/* <RecentActivitiesEmptyState /> */}
+        {data.length === 0 && <RecentActivitiesEmptyState />}
 
         <>
-          {dummyActivities.map((activity) => (
+          {data.map((activity) => (
             <div
               className="flex w-full  items-center justify-between font-[sora-light] text-[0.875rem] text-brand-black"
               key={activity.id}

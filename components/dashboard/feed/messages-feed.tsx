@@ -1,3 +1,4 @@
+import { useDummyStore } from "@/store/useDummyStore";
 import Image from "next/image";
 import React from "react";
 
@@ -12,7 +13,35 @@ export const MessagesEmptyState = () => {
   );
 };
 
+type messageFeed = {
+  senderName: string;
+  message: string;
+  time: string;
+};
+
 const MessagesFeed = () => {
+  const messages: messageFeed[] = [
+    {
+      senderName: "Andrea Smith",
+      message: "Here is my message to you today",
+      time: "2: 00pm",
+    },
+    {
+      senderName: "Andrea Smith",
+      message: "Here is my message to you today",
+      time: "2: 00pm",
+    },
+    {
+      senderName: "Andrea Smith",
+      message: "Here is my message to you today",
+      time: "2: 00pm",
+    },
+  ];
+
+  const { useDummyData } = useDummyStore();
+
+  const messageItems = !useDummyData ? [] : messages;
+
   return (
     <>
       <div className="relative w-full h-[20rem] border rounded-[1.875rem] p-4 flex flex-col border-[#E9E9E9E9]">
@@ -21,7 +50,36 @@ const MessagesFeed = () => {
           <p className="text-primary font-semibold text-[0.875rem]">See all</p>
         </div>
 
-        <MessagesEmptyState />
+        {messageItems?.length === 0 ? (
+          <MessagesEmptyState />
+        ) : (
+          <div className="flex flex-col gap-2 py-4">
+            {messageItems?.map((item, index) => (
+              <div className="flex items-start justify-between" key={index}>
+                <div className="flex items-start gap-2">
+                  <div className="relative h-[1.875rem] w-[1.875rem]">
+                    <Image
+                      src={"/images/dummy-avatar.svg"}
+                      alt={``}
+                      fill
+                      className="rounded-full object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <h1 className="text-base">{item.senderName}</h1>
+                    <p className="font-[sora-light] text-brand-black">
+                      {item.message}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="font-[sora-light] text-brand-black text-sm">
+                  2:00 pm
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

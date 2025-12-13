@@ -11,6 +11,8 @@ export type user = {
   lastName: string;
   profile_photo: string;
   email: string;
+  links: PortfolioLinks;
+  bio?: string;
 };
 
 export type SignUpFormData = {
@@ -62,4 +64,5 @@ export type Collaborator = {
   lastName: string;
   email: string;
   role: "Creator" | "Collaborator";
+  portfolio: PortfolioLinks;
 };

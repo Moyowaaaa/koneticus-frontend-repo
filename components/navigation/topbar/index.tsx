@@ -1,8 +1,13 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { useDummyStore } from "@/store/useDummyStore";
 import { Bell } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
 const TopNavBar = () => {
+  const { toggleDummyData, useDummyData } = useDummyStore();
   return (
     <>
       <nav className="fixed left-0 right-0 top-0 z-50 hidden h-[5rem] w-full border-b border-border/60 bg-background/80 backdrop-blur md:block">
@@ -21,6 +26,9 @@ const TopNavBar = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <Button onClick={() => toggleDummyData()}>
+              {useDummyData ? "Disable Dummy data" : "Enable Dummy data"}
+            </Button>
             <Bell size={20} className="text-black" />
 
             <div className="relative h-[2.5rem] w-[2.5rem]">

@@ -66,17 +66,32 @@ export const dummyUsers: Collaborator[] = [
     lastName: "Doe",
     email: "john.doe@example.com",
     role: "Creator",
+    portfolio: {
+      github: "github/johndoe",
+      behance: "behance/johndoe",
+      website: "website/johndoe",
+    },
   },
   {
     firstName: "Durodoluwa",
     lastName: "Jade",
     email: "jade.durodoluwa@example.com",
     role: "Collaborator",
+    portfolio: {
+      github: "github/durodoluwa",
+      behance: "behance/durodoluwa",
+      website: "website/durodoluwa",
+    },
   },
   {
     firstName: "Sandra",
     lastName: "Johnson",
     email: " sandra.johnson@example.com",
     role: "Creator",
+    portfolio: {
+      github: "github/sandra",
+      behance: "behance/sandra",
+      website: "website/sandra",
+    },
   },
 ];

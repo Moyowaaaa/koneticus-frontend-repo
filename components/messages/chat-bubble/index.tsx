@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import { cn } from "@/lib/utils";
+import ProposalMessage from "../proposal-message";
 
 interface ChatBubbleProps {
   message: string;
@@ -9,7 +10,16 @@ interface ChatBubbleProps {
   senderAvatar?: string;
   timestamp?: string;
   showAvatar?: boolean;
-  isGrouped?: boolean; // For consecutive messages from same sender
+  isGrouped?: boolean;
+  messageType?: "text" | "proposal";
+  proposalData?: {
+    title: string;
+    content: string;
+    type: "proposal" | "request";
+    onViewProfile?: () => void;
+    onCollaborate?: () => void;
+    onReject?: () => void;
+  };
 }
 
 const formatTime = (timestamp?: string) => {
@@ -32,6 +42,8 @@ const ChatBubble = ({
   timestamp,
   showAvatar = true,
   isGrouped = false,
+  messageType = "text",
+  proposalData,
 }: ChatBubbleProps) => {
   return (
     <div
@@ -68,18 +80,34 @@ const ChatBubble = ({
         )}
 
         {/* Message bubble */}
-        <div
-          className={cn(
-            "relative rounded-2xl px-4 py-3 text-sm leading-relaxed",
-            isCurrentUser
-              ? "bg-lavender text-brand-black"
-              : "bg-gray-100 text-brand-black",
-            // Tail positioning
-            isCurrentUser ? "rounded-br-md" : "rounded-bl-md"
-          )}
-        >
-          <p className="wrap-break-word">{message}</p>
-        </div>
+        {messageType === "proposal" && proposalData ? (
+          <ProposalMessage
+            senderName={senderName || "Unknown User"}
+            senderAvatar={senderAvatar}
+            title={proposalData.title}
+            content={proposalData.content}
+            type={proposalData.type}
+            onViewProfile={proposalData.onViewProfile}
+            onCollaborate={proposalData.onCollaborate}
+            onReject={proposalData.onReject}
+            className="max-w-[400px]"
+          />
+        ) : (
+          <div
+            className={cn(
+              "relative  px-4 py-3 text-sm leading-relaxed",
+              isCurrentUser
+                ? "bg-lavender text-brand-black"
+                : "bg-gray-100 text-brand-black",
+              // Tail positioning
+              isCurrentUser
+                ? "rounded-tt-md rounded-br-md rounded-l-md"
+                : "rounded-bl-md rounded-br-md rounded-r-md"
+            )}
+          >
+            <p className="wrap-break-word">{message}</p>
+          </div>
+        )}
 
         {/* Timestamp */}
         {timestamp && (

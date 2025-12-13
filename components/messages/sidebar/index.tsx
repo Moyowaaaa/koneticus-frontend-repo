@@ -1,8 +1,10 @@
 import React from "react";
 import ConversationItem from "./conversation-item";
 import { useChatStore } from "@/store/useChatStore";
+import { useDummyStore } from "@/store/useDummyStore";
 
 const MessagesSidebar = () => {
+  const { useDummyData } = useDummyStore();
   const conversations = useChatStore((state) => state.conversations);
   const users = useChatStore((state) => state.users);
   const currentConversationId = useChatStore(
@@ -12,13 +14,16 @@ const MessagesSidebar = () => {
     (state) => state.setCurrentConversation
   );
 
+  const conversationUsers = !useDummyData ? [] : users;
+  const conversationConversations = !useDummyData ? [] : conversations;
+
   //   const conversations = [];
 
   return (
-    <div className="relative w-[30rem] border-r border-[#e9e9e9e9] pt-6 md:h-[calc(100dvh-200px)]">
-      {conversations.length === 0 ? (
+    <div className="relative w-[30rem] border-r border-[#e9e9e9e9] pt-6 md:h-[calc(100dvh-200px)] pr-4">
+      {conversationConversations.length === 0 ? (
         <>
-          {conversations.length === 0 && (
+          {conversationConversations.length === 0 && (
             <div
               className={`w-full flex items-start justify-between gap-3 rounded-[0.9375rem] p-4 text-left transition-all bg-lavender `}
             >
@@ -38,7 +43,7 @@ const MessagesSidebar = () => {
         </>
       ) : (
         <div className="flex h-full w-full flex-col gap-2 pr-4">
-          {conversations.map((conversation) => {
+          {conversationConversations.map((conversation) => {
             const participantId = conversation.participants.find(
               (id) => id !== "current_user"
             );

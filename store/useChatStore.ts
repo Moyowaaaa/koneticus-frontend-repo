@@ -2,9 +2,11 @@
 
 import { create } from "zustand";
 import { devtools, persist, createJSONStorage } from "zustand/middleware";
+import { useDummyStore } from "./useDummyStore";
+import { user } from "@/types";
 
 // Types based on your provided definitions
-export interface ChatUser {
+export interface ChatUser extends Partial<user> {
   id: string;
   first_name: string;
   last_name: string;
@@ -107,6 +109,12 @@ const dummyUsers: ChatUser[] = [
     username: "andrea_smith",
     profile_photo: "/images/dummy-avatar.svg",
     status: "online",
+    links: {
+      behance: "behance.com/andrea",
+      github: "github.com/andrea",
+      website: "andrea.com",
+    },
+    bio: "Andrea is a passionate designer with a keen eye for detail. She enjoys creating visually stunning and user-friendly interfaces that enhance the user experience.",
   },
   {
     id: "2",
@@ -115,6 +123,12 @@ const dummyUsers: ChatUser[] = [
     username: "john_doe",
     profile_photo: "/images/dummy-avatar.svg",
     status: "online",
+    links: {
+      behance: "behance.com/john",
+      github: "github.com/john",
+      website: "john.com",
+    },
+    bio: "John is a skilled developer with a strong passion for creating innovative and user-friendly applications. He enjoys building scalable and efficient systems that deliver exceptional results.",
   },
   {
     id: "3",
@@ -123,6 +137,12 @@ const dummyUsers: ChatUser[] = [
     username: "sarah_johnson",
     profile_photo: "/images/dummy-avatar.svg",
     status: "offline",
+    links: {
+      behance: "behance.com/sarah",
+      github: "github.com/sarah",
+      website: "sarah.com",
+    },
+    bio: "Sarah is a talented marketer with a proven track record of driving successful campaigns. She enjoys creating engaging and effective marketing strategies that help businesses achieve their goals.",
   },
   {
     id: "4",
@@ -131,6 +151,12 @@ const dummyUsers: ChatUser[] = [
     username: "mike_wilson",
     profile_photo: "/images/dummy-avatar.svg",
     status: "away",
+    links: {
+      behance: "behance.com/mike",
+      github: "github.com/mike",
+      website: "mike.com",
+    },
+    bio: "Mike is a creative director with a proven track record of leading successful projects. He enjoys working with talented teams to deliver innovative and impactful results.",
   },
   {
     id: "5",
@@ -139,6 +165,12 @@ const dummyUsers: ChatUser[] = [
     username: "emma_davis",
     profile_photo: "/images/dummy-avatar.svg",
     status: "online",
+    links: {
+      behance: "behance.com/emma",
+      github: "github.com/emma",
+      website: "emma.com",
+    },
+    bio: "Emma is a marketing analyst with a proven track record of analyzing market trends and identifying opportunities. She enjoys creating data-driven marketing strategies that help businesses succeed.",
   },
   {
     id: "current_user",
@@ -147,6 +179,12 @@ const dummyUsers: ChatUser[] = [
     username: "current_user",
     profile_photo: "/images/dummy-avatar.svg",
     status: "online",
+    links: {
+      behance: "behance.com/you",
+      github: "github.com/you",
+      website: "you.com",
+    },
+    bio: "I am a dummy user",
   },
 ];
 
@@ -252,6 +290,17 @@ const createDummyMessages = (): Record<string, ChatMessage[]> => {
         text: "Here is my mess....",
         timestamp: getTodayAtTime(14, 0),
         type: "text",
+        isRead: false,
+      },
+      {
+        id: "msg_4",
+        conversationId: "conv_1",
+        senderId: "1",
+        content:
+          "Dear Jordan,\n\nI am excited to apply for the position at your company. With my skills and experience, I am confident I can contribute effectively to your team. I look forward to discussing how I can add value to your organization.\n\nThank you for considering my application.\n\nBest regards,\n\n[Your Name]",
+        text: "Dear Jordan, I am excited to apply for the position at your company...",
+        timestamp: getTodayAtTime(14, 15),
+        type: "proposal",
         isRead: false,
       },
     ],

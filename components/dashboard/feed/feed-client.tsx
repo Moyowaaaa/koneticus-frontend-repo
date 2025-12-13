@@ -10,6 +10,7 @@ import SpotlightFeed from "./spotlight-feed";
 import MessagesFeed from "./messages-feed";
 import SearchModal from "../modals/search-modal";
 import { useSearchStore } from "@/store/useSearchStore";
+import { useDummyStore } from "@/store/useDummyStore";
 
 const FeedClient = () => {
   const { toggleNewIdeaModal } = useGeneralStateStore();

@@ -7,11 +7,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 import ProjectCard from "../projects/project-card";
+import { useDummyStore } from "@/store/useDummyStore";
 
 const OngoingProjectsClient = () => {
   const router = useRouter();
   const { ideas } = useIdeaStore();
-  const ongoingProjects = ideas.filter((p) => p.status === "ongoing");
+  const { useDummyData } = useDummyStore();
+
+  const ongoingProjects = !useDummyData
+    ? []
+    : ideas.filter((p) => p.status === "ongoing");
 
   return (
     <>

@@ -1,17 +1,22 @@
 import ChatInput from "@/components/chat/chat-input";
 import Image from "next/image";
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useChatStore } from "@/store/useChatStore";
 import MessagesInput from "../input";
 import { Messages } from "iconsax-reactjs";
 import { MesssagesBox } from "../messages-box/messages-box";
+import { useDummyStore } from "@/store/useDummyStore";
 
 const MessagesChatbox = () => {
-  const illustrationRef = React.useRef<HTMLDivElement>(null);
-  const messageRef = React.useRef<HTMLParagraphElement>(null);
+  const illustrationRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLParagraphElement>(null);
+  const { useDummyData } = useDummyStore();
   const conversations = useChatStore((state) => state.conversations);
-  React.useEffect(() => {
+
+  const MessagesAndConversations = !useDummyData ? [] : conversations;
+
+  useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         illustrationRef.current,
@@ -49,8 +54,8 @@ const MessagesChatbox = () => {
   }, []);
 
   return (
-    <div className="relative h-full w-full p-6 md:h-[calc(100dvh-200px)] ">
-      {/* {conversations.length !== 0 && (
+    <div className="relative h-full w-full p-6 md:h-[calc(100dvh-190px)] ">
+      {MessagesAndConversations.length === 0 ? (
         <div className="flex h-full w-full min-h-[30rem] flex-col items-center justify-center gap-6 text-center">
           <div
             ref={illustrationRef}
@@ -70,10 +75,11 @@ const MessagesChatbox = () => {
             There are no messages
           </p>
         </div>
-      )} */}
-
-      <MesssagesBox />
-
+      ) : (
+        <div className="w-full flex flex-col relative h-full">
+          <MesssagesBox />
+        </div>
+      )}
       <MessagesInput />
     </div>
   );
