@@ -29,12 +29,22 @@ const ChatMessages = () => {
         lastName: "Smith",
         role: "Creator",
         email: "andrea@kolabs.app",
+        portfolio: {
+          github: "",
+          behance: "",
+          website: "",
+        },
       },
       sandra: {
         firstName: "Sandra",
         lastName: "Johnson",
         role: "Collaborator",
         email: "sandra@kolabs.app",
+        portfolio: {
+          github: "",
+          behance: "",
+          website: "",
+        },
       },
     }),
     []
