@@ -1,11 +1,8 @@
+import SettingsComponent from "@/components/settings";
 import React from "react";
 
 const SettingsPage = () => {
-  return (
-    <>
-      <div>SettingsPage</div>
-    </>
-  );
+  return <SettingsComponent />;
 };
 
 export default SettingsPage;
