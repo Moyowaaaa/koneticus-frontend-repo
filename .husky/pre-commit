@@ -1,0 +1,2 @@
+# Run lint-staged for incremental linting on staged files
+npx lint-staged

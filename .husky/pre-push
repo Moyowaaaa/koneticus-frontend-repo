@@ -1,0 +1,2 @@
+# Run build before pushing to ensure project compiles
+npm run build
