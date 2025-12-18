@@ -4,8 +4,6 @@ import React from "react";
 import Image from "next/image";
 import { useProfileModalStore } from "@/store/useProfileModalStore";
 import Modal from "@/components/ui-components/modal";
-import { Button } from "@/components/ui/button";
-import { MessageCircle, UserPlus, MoreHorizontal } from "lucide-react";
 import { PORTFOLIO_FIELDS } from "@/types/data";
 
 const UserProfileModal = () => {

@@ -1,6 +1,5 @@
 import { ArrowLeft } from "iconsax-reactjs";
 import { Check } from "lucide-react";
-import React from "react";
 
 type stepCounterProps = {
   steps: string[];
