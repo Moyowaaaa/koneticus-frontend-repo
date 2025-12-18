@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import EmailStep from "./steps/email";
 import NewPasswordStep from "./steps/new-password";
 import ConfirmedStep from "./steps/confirmed";
-import StepCounter from "@/components/ui-components/step-counter";
 
 const STEP_TITLES = ["Email", "Security", "Done"] as const;
 const LAST_STEP_INDEX = STEP_TITLES.length - 1;

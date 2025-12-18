@@ -1,4 +1,3 @@
-import React from "react";
 import ConversationItem from "./conversation-item";
 import { useChatStore } from "@/store/useChatStore";
 import { useDummyStore } from "@/store/useDummyStore";

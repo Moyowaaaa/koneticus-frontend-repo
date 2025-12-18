@@ -1,7 +1,3 @@
-import React from "react";
-
-import ButtonV2 from "@/components/ui-components/button";
-
 type ConfirmedStepProps = {
   email: string;
   onNavigateToLogin: () => void;

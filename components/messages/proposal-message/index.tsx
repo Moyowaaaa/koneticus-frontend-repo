@@ -1,7 +1,5 @@
-import React from "react";
 import Image from "next/image";
 import ButtonV2 from "@/components/ui-components/button";
-import { cn } from "@/lib/utils";
 
 interface ProposalMessageProps {
   senderName: string;
