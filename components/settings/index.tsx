@@ -7,6 +7,7 @@ import ProfileSettings from "./profile-settings";
 import SecuritySettings from "./security-settings";
 import SubscriptionSettings from "./subscription-settings";
 import PostHistory from "./post-history";
+import Image from "next/image";
 
 const SettingsComponent = () => {
   const [activeTab, setActiveTab] = useState("personal");
@@ -19,30 +20,73 @@ const SettingsComponent = () => {
         </TopBar>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-transparent p-0 h-auto gap-1 border-b border-border/30 rounded-none w-full justify-start">
+          <TabsList className="bg-transparent p-0 h-auto gap-3 border-b border-border/30 rounded-none w-full justify-start">
             <TabsTrigger
               value="personal"
-              className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=inactive]:text-muted-foreground rounded-none px-4 py-3 text-sm font-medium transition-colors hover:text-foreground"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none
+              data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary 
+              flex items-center gap-2
+              w-max
+              data-[state=inactive]:text-muted-foreground rounded-none  py-3 text-sm font-medium transition-colors hover:text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
             >
-              Personal Information
+              <Image
+                src="/images/settings/personal.svg"
+                width={10}
+                height={10}
+                alt="Personal Information"
+              />
+              <p>Personal Information</p>
             </TabsTrigger>
             <TabsTrigger
               value="security"
-              className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=inactive]:text-muted-foreground rounded-none px-4 py-3 text-sm font-medium transition-colors hover:text-foreground"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none
+              data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary 
+              flex items-center gap-2
+              w-max
+              data-[state=inactive]:text-muted-foreground rounded-none  py-3 text-sm font-medium transition-colors hover:text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
             >
-              Security
+              <Image
+                src="/images/settings/security.svg"
+                width={10}
+                height={10}
+                alt="Security"
+              />
+
+              <p>Security</p>
             </TabsTrigger>
             <TabsTrigger
               value="subscription"
-              className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=inactive]:text-muted-foreground rounded-none px-4 py-3 text-sm font-medium transition-colors hover:text-foreground"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none
+              data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary 
+              flex items-center gap-2
+              w-max
+              data-[state=inactive]:text-muted-foreground rounded-none  py-3 text-sm font-medium transition-colors hover:text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
             >
-              Plans & Subscriptions
+              <Image
+                src="/images/settings/plans.svg"
+                width={10}
+                height={10}
+                alt="Security"
+              />
+
+              <p>Plans & Subscriptions</p>
             </TabsTrigger>
             <TabsTrigger
               value="history"
-              className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=inactive]:text-muted-foreground rounded-none px-4 py-3 text-sm font-medium transition-colors hover:text-foreground"
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none
+              data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-b-primary 
+              flex items-center gap-2
+              w-max
+              data-[state=inactive]:text-muted-foreground rounded-none  py-3 text-sm font-medium transition-colors hover:text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
             >
-              History
+              <Image
+                src="/images/settings/history.svg"
+                width={10}
+                height={10}
+                alt="Security"
+              />
+
+              <p>History</p>
             </TabsTrigger>
           </TabsList>
 

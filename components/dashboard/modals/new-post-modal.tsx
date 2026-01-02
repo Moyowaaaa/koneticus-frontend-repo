@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 import { useFeedStore } from "@/store/useFeedStore";
-import { Clock } from "iconsax-reactjs";
+import { Clock, Image as ImageIcon, CloseCircle } from "iconsax-reactjs";
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 const NewIdeaModal = () => {
   const { showNewIdeaModal, setShowNewIdeaModal } = useGeneralStateStore();
@@ -15,9 +16,36 @@ const NewIdeaModal = () => {
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreviewUrl(previewUrl);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+      setImagePreviewUrl(null);
+    }
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
+  };
+
+  const handleImageButtonClick = () => {
+    imageInputRef.current?.click();
+  };
 
   useEffect(() => {
     if (showNewIdeaModal) {
@@ -54,12 +82,18 @@ const NewIdeaModal = () => {
     setIsSubmitting(true);
 
     try {
-      // Add the new idea to the feed
-      addNewIdea(title.trim(), description.trim());
+      // Add the new idea to the feed (pass image URL if one was selected)
+      addNewIdea(
+        title.trim(),
+        description.trim(),
+        [],
+        imagePreviewUrl || undefined
+      );
 
       // Reset form
       setTitle("");
       setDescription("");
+      handleRemoveImage();
 
       // Close modal
       setShowNewIdeaModal(false);
@@ -78,6 +112,7 @@ const NewIdeaModal = () => {
         // Reset form when modal closes
         setTitle("");
         setDescription("");
+        handleRemoveImage();
       }
     }
   };
@@ -118,16 +153,73 @@ const NewIdeaModal = () => {
             />
           </label>
 
+          {/* Image Preview Section */}
+          {imagePreviewUrl && (
+            <div className="relative w-full">
+              <div className="relative w-full h-40 rounded-lg overflow-hidden border border-[#E9E9E9]">
+                <Image
+                  src={imagePreviewUrl}
+                  alt="Selected image preview"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 transition-colors"
+                aria-label="Remove selected image"
+              >
+                <CloseCircle
+                  size={20}
+                  className="text-red-500"
+                  variant="Bold"
+                />
+              </button>
+            </div>
+          )}
+
+          {/* Hidden file input for image selection */}
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+            aria-hidden="true"
+          />
+
           <div className="w-full items-center flex justify-between">
-            <ButtonV2
-              className="h-10"
-              type="submit"
-              disabled={isSubmitting || !title.trim() || !description.trim()}
-            >
-              <p className="text-[0.875rem]">
-                {isSubmitting ? "Sharing..." : "Share your idea"}
-              </p>
-            </ButtonV2>
+            <div className="flex items-center gap-4">
+              <ButtonV2
+                className="h-10"
+                type="submit"
+                disabled={isSubmitting || !title.trim() || !description.trim()}
+              >
+                <p className="text-[0.875rem]">
+                  {isSubmitting ? "Sharing..." : "Share your idea"}
+                </p>
+              </ButtonV2>
+
+              <button
+                type="button"
+                onClick={handleImageButtonClick}
+                disabled={isSubmitting}
+                className="h-[2rem] w-[2rem] 
+                  border-2 border-brand-black
+                  rounded-[0.375rem]
+                  flex flex-col items-center justify-center
+                  cursor-pointer hover:bg-gray-100 transition-colors
+                  disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Add image to your idea"
+              >
+                <ImageIcon
+                  size={16}
+                  className="text-brand-black"
+                  fontWeight={"bold"}
+                />
+              </button>
+            </div>
 
             <div className="flex items-center gap-1" aria-live="polite">
               <Clock size={13} className="text-brand-grey" />

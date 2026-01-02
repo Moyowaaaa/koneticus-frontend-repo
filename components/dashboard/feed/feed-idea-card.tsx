@@ -51,6 +51,18 @@ const FeedIdeaCard = ({ idea }: { idea?: FeedItem }) => {
               </div>
             ))}
           </div>
+
+          {/* Display image if present */}
+          {idea?.image && (
+            <div className="w-full h-[200px] mt-2 rounded-xl overflow-hidden relative">
+              <Image
+                src={idea.image}
+                alt={`Image for ${idea.title}`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          )}
         </div>
       </div>
     </>

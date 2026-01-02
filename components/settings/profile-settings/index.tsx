@@ -3,6 +3,25 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import CustomFormInput from "@/components/ui-components/custom-form-input";
+import ButtonV2 from "@/components/ui-components/button";
+import { PORTFOLIO_FIELDS } from "@/types/data";
+import Image from "next/image";
+import { Plus, X } from "lucide-react";
+
+// Role suggestions for the role selection feature
+const ROLE_SUGGESTIONS = [
+  "Content Creator",
+  "Photographer",
+  "Videographer",
+  "Graphic Designer",
+  "Social Media Manager",
+  "Influencer",
+  "Writer",
+  "Blogger",
+  "Podcaster",
+  "Brand Ambassador",
+];
 
 // Icons as inline SVG components
 const PencilIcon = ({ className }: { className?: string }) => (
@@ -293,7 +312,10 @@ const ProfileSettings = () => {
     gender: "",
     city: "",
     country: "",
+    roles: [] as string[],
   });
+
+  const [roleInput, setRoleInput] = useState("");
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -321,9 +343,178 @@ const ProfileSettings = () => {
     // Handle social link addition here
   };
 
+  const handleRoleAdd = (role?: string) => {
+    const newRole = role || roleInput.trim();
+    if (newRole && !formData.roles.includes(newRole)) {
+      setFormData((prev) => ({
+        ...prev,
+        roles: [...prev.roles, newRole],
+      }));
+      setRoleInput("");
+    }
+  };
+
+  const handleRoleRemove = (roleToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      roles: prev.roles.filter((role) => role !== roleToRemove),
+    }));
+  };
+
   return (
     <div className="w-full space-y-8">
-      <div className="flex flex-col gap-10 w-full pt-4 px-6 border-2 border-[red]"></div>
+      <div className="flex flex-col gap-10 w-full pt-4  ">
+        <div className="flex flex-col">
+          <h1 className="text-brand-black text-[1.125rem] font-normal">
+            Personal Information
+          </h1>
+          <p className="text-brand-grey text-[0.875rem] font-normal">
+            Introducing Jamie Sky, an enthusiastic travel enthusiast and thrill-
+          </p>
+        </div>
+
+        <div className="flex items-start justify-between pr-16">
+          <div className="flex flex-col gap-2">
+            <Image
+              src={"/images/dummy-avatar.svg"}
+              alt="dummy"
+              width={124}
+              height={124}
+            />
+
+            <p className="text-brand-black text-[0.875rem] underline font-[sora-light]">
+              Change profile picture
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4 w-[39.5rem] ">
+            <div className="grid grid-cols-2 gap-4">
+              <CustomFormInput
+                label="First name *"
+
+                // value={formData.firstName}
+                // onChange={(event) => updateField("firstName", event.target.value)}
+              />
+              <CustomFormInput
+                label="Last name *"
+                // value={formData.lastName}
+                // onChange={(event) => updateField("lastName", event.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-6 w-full ">
+              <div className="relative h-[12.5rem] w-full border rounded-[1.875rem] border-[#E9E9E9E9] min-h-[12.5rem]">
+                <textarea
+                  placeholder="Type here..."
+                  value={formData.bio}
+                  onChange={(event) => updateField("bio", event.target.value)}
+                  className="p-4 w-full h-full text-[#808080] placeholder:text-[#808080] text-base font-[sora-light] resize-none outline-none border-none focus:ring-0  focus:border-none focus:outline-none"
+                />
+
+                <p className="text-brand-black text-xs absolute bottom-4 right-4">
+                  {formData.bio.length === 0 && `Min`}{" "}
+                  {150 - formData.bio.length}
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h1 className="font-semibold text-[1.125rem] text-center "></h1>
+                {PORTFOLIO_FIELDS.map((field) => (
+                  <div
+                    key={field.key}
+                    className="flex
+                  min-h-[3.5rem]
+                  items-center gap-3 rounded-[1.875rem] border border-[#E9E9E9] bg-white px-5 py-3"
+                  >
+                    <div className="relative h-6 w-6 ">
+                      <Image src={field.logo} alt={field.key} fill />
+                    </div>
+                    <div className="h-5 border border-[#808080]" />
+                    <input
+                      className="flex-1 bg-transparent text-sm outline-none"
+                      placeholder={`Add link..`}
+                      // value={formData.portfolio[field.key]}
+                      // onChange={(event) =>
+                      //   updatePortfolio(field.key, event.target.value)
+                      // }
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex border-t border-[#E9E9E9E9] pt-[2.5rem] items-start justify-between pr-16">
+          <div className="flex flex-col gap-4">
+            <h1 className="text-brand-black text-[1.125rem] font-normal">
+              Roles
+            </h1>
+            <p className="text-brand-grey text-[0.875rem] font-normal">
+              Manage the role you perform
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4 w-[39.5rem] ">
+            <div className="flex items-center gap-2 rounded-[1.875rem] border border-[#E9E9E9] px-4 py-3">
+              <input
+                className="flex-1 bg-transparent text-sm outline-none"
+                placeholder="Select roles"
+                value={roleInput}
+                onChange={(e) => setRoleInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleRoleAdd();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => handleRoleAdd()}
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
+              >
+                <Plus size={16} />
+                Add
+              </button>
+            </div>
+
+            {!!formData.roles.length && (
+              <div className="flex flex-wrap gap-2 cursor-pointer justify-center w-[25rem]">
+                {formData.roles.map((role) => (
+                  <span
+                    key={role}
+                    className="inline-flex items-center gap-1 rounded-full min-h-[2.125rem]  bg-purple-light px-3 py-1 text-sm text-brand-black"
+                  >
+                    {role}
+                    <button
+                      type="button"
+                      onClick={() => handleRoleRemove(role)}
+                      className="text-primary/70"
+                    >
+                      <X size={14} className="text-[#211E1E]" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2 text-xs text-grey justify-center">
+              {ROLE_SUGGESTIONS?.filter(
+                (suggestion) => !formData.roles.includes(suggestion)
+              ).map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => handleRoleAdd(suggestion)}
+                  className="rounded-full border border-[#E9E9E9] px-3 py-1 text-sm transition hover:border-primary hover:text-primary"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Profile Avatar Section */}
       {/* <div className="flex items-center gap-6">
         <div className="relative">

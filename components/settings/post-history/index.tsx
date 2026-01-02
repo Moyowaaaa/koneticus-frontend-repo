@@ -89,16 +89,21 @@ interface PostCardProps {
 }
 
 const PostCard = ({ title, content, onDelete }: PostCardProps) => (
-  <div className="relative flex flex-col p-6 rounded-xl border border-purple-light/50 bg-lavender/30 min-h-[250px]">
-    <div className="flex-1 space-y-3">
-      {title && <p className="text-sm font-medium text-foreground">{title}</p>}
-      <p className="text-sm text-foreground/80 leading-relaxed">{content}</p>
+  <div className="flex flex-col gap-4">
+    <div className="relative flex flex-col p-6 rounded-2xl border border-transparent bg-[#F4F3FF] min-h-[250px]">
+      <div className="flex-1 space-y-3">
+        {title && (
+          <p className="text-sm font-semibold text-foreground">{title}</p>
+        )}
+        <p className="text-sm text-brand-black leading-relaxed whitespace-pre-wrap">
+          {content}
+        </p>
+      </div>
     </div>
-    <div className="mt-4">
+    <div>
       <Button
         onClick={onDelete}
-        variant="destructive"
-        className="px-6 py-2 rounded-lg text-sm"
+        className="px-6 py-2 rounded-full text-sm bg-[#D85C5C] hover:bg-[#C44B4B] text-white border-none shadow-none"
       >
         Delete
       </Button>
