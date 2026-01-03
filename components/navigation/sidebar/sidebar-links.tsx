@@ -18,7 +18,11 @@ const SidebarLinks = ({ route }: { route: sideBarRoute }) => {
         </div>
 
         {route.comingSoon && (
-          <div className="rounded-[1.25rem] bg-primary px-2 py-1 text-xs  text-white">
+          <div
+            className="rounded-[1.25rem] bg-primary px-2 py-1 text-xs 
+          dark:bg-[#6155F5]
+          text-white"
+          >
             Coming soon
           </div>
         )}

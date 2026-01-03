@@ -110,13 +110,15 @@ const Modal = ({
         <ScrollArea className="max-h-[80vh] mt-10 shadow-[none] ">
           <div
             className={cn(
-              "flex flex-col gap-2 h-full w-full bg-[white] pb-4 pt-2 rounded-[1.875rem]",
+              "flex flex-col gap-2 h-full w-full bg-[white] dark:bg-[#211E1E]  pb-4 pt-2 rounded-[1.875rem]",
               containerClassname
             )}
           >
             {title && (
               <DialogHeader>
-                <DialogTitle className="sr-only">{title}</DialogTitle>
+                <DialogTitle className="sr-only dark:text-white!">
+                  {title}
+                </DialogTitle>
               </DialogHeader>
             )}
             {content}

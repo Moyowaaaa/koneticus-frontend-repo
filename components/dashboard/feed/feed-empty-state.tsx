@@ -11,7 +11,7 @@ const FeedEmptyState = () => {
       <div className="w-full flex items-center justify-center min-h-[30rem] flex flex-col gap-4">
         <ButtonV2
           type="submit"
-          className="w-max h-max !px-6 border-none"
+          className="w-max h-max !px-6 border-none dark:bg-[#6155F5]"
           IconPlacement="left"
           Icon={<AddCircle size="13" color="white" variant="Bold" />}
           // disabled={isLoading}
@@ -21,7 +21,11 @@ const FeedEmptyState = () => {
           New Idea
         </ButtonV2>
 
-        <h1 className="text-[0.875rem] text-[#211E1E] mx-auto text-center max-w-[15rem]">
+        <h1
+          className="text-[0.875rem] text-[#211E1E]
+        dark:text-[#E9E9E9E9]
+        mx-auto text-center max-w-[15rem]"
+        >
           Post your idea and get a friend to collaborate with!
         </h1>
       </div>

@@ -5,6 +5,7 @@ import Head from "next/head";
 import NavigationProgressBar from "@/components/ui-components/navigation-progress-bar";
 import NewIdeaModal from "@/components/dashboard/modals/new-post-modal";
 import ShowInterestModal from "@/components/dashboard/modals/show-interest-modal";
+import ThemeProvider from "@/components/ui-components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,14 +28,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NavigationProgressBar />
-        <NewIdeaModal />
-        <ShowInterestModal />
-        {children}
+        <ThemeProvider>
+          <NavigationProgressBar />
+          <NewIdeaModal />
+          <ShowInterestModal />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

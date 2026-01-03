@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useDummyStore } from "@/store/useDummyStore";
+import ThemeToggle from "@/components/ui-components/theme-toggle";
 import { Bell } from "lucide-react";
 import Image from "next/image";
 import React from "react";
@@ -29,7 +30,8 @@ const TopNavBar = () => {
             <Button onClick={() => toggleDummyData()}>
               {useDummyData ? "Disable Dummy data" : "Enable Dummy data"}
             </Button>
-            <Bell size={20} className="text-black" />
+            <ThemeToggle />
+            <Bell size={20} className="text-foreground" />
 
             <div className="relative h-[2.5rem] w-[2.5rem]">
               <Image

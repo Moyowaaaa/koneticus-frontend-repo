@@ -138,7 +138,9 @@ const NewIdeaModal = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               disabled={isSubmitting}
-              className="h-12 outline-none text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9]"
+              className="h-12 outline-none 
+              dark:bg-[#211E1E]
+              text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9] dark:border-b-[#80808026]"
             />
           </label>
 
@@ -149,7 +151,10 @@ const NewIdeaModal = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={isSubmitting}
-              className="resize-none h-40 outline-none border-none ring-0  shadow-none    text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9]"
+              className="resize-none h-40
+              
+              dark:bg-[#211E1E]
+              outline-none border-none ring-0  shadow-none    text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9]"
             />
           </label>
 
