@@ -9,7 +9,11 @@ interface FeedItemProps {
 
 const FeedItemComponent: React.FC<FeedItemProps> = ({ item }) => {
   return (
-    <div className="w-full bg-white border border-gray-100 rounded-lg p-6 mb-4 shadow-sm">
+    <div
+      className="w-full bg-white border
+    
+    border-gray-100 rounded-lg p-6 mb-4 shadow-sm"
+    >
       {/* User Info Header */}
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">

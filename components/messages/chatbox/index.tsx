@@ -61,7 +61,7 @@ const MessagesChatbox = () => {
             ref={illustrationRef}
             className="relative flex h-36 w-36 items-center justify-center rounded-4xl bg-linear-to-b from-lavender/50 to-white "
           >
-            <div className="absolute inset-3 rounded-[1.7rem] bg-white/70 blur-xl" />
+            <div className="absolute inset-3 rounded-[1.7rem] bg-white/70 dark:bg-[#80808026] blur-xl" />
             <Image
               src={"/images/messages-empty-state.svg"}
               alt="empty conversation illustration"
@@ -71,7 +71,10 @@ const MessagesChatbox = () => {
             />
           </div>
 
-          <p ref={messageRef} className="text-sm leading-5 text-brand-black">
+          <p
+            ref={messageRef}
+            className="text-sm leading-5 text-brand-black dark:text-white"
+          >
             There are no messages
           </p>
         </div>

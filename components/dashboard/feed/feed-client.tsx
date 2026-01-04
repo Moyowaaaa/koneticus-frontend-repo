@@ -28,11 +28,11 @@ const FeedClient = () => {
               <SearchNormal
                 onClick={() => setShowSearch(true)}
                 size="24"
-                color="#211E1E"
+                className="text-[#211E1E] dark:text-[#E9E9E9E9]"
               />
               <ButtonV2
                 type="submit"
-                className="w-max h-max !px-6 border-none"
+                className="w-max h-max !px-6 border-none dark:bg-[#6155F5]"
                 IconPlacement="left"
                 Icon={<AddCircle size="13" color="white" variant="Bold" />}
                 onClick={toggleNewIdeaModal}
@@ -44,10 +44,6 @@ const FeedClient = () => {
           </TopBar>
 
           <Feed />
-        </div>
-        <div className="relative h-full w-4/12 flex flex-col gap-4">
-          <SpotlightFeed />
-          <MessagesFeed />
         </div>
       </div>
     </>

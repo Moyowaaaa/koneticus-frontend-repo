@@ -1,3 +1,5 @@
+"use client";
+
 import { useDummyStore } from "@/store/useDummyStore";
 import Image from "next/image";
 import React from "react";
@@ -44,9 +46,19 @@ const MessagesFeed = () => {
 
   return (
     <>
-      <div className="relative w-full h-[20rem] border rounded-[1.875rem] p-4 flex flex-col border-[#E9E9E9E9]">
+      <div
+        className="relative w-full h-[20rem] border rounded-[1.875rem] p-4 flex flex-col border-[#E9E9E9E9]
+      dark:bg-[#80808026]
+          dark:border-[#80808026]
+
+      
+      "
+      >
         <div className="flex items-center justify-between w-full border-b border-#E9E9E9E9] pb-2">
-          <h1 className="text-black text-[1.25rem]"> Messages</h1>
+          <h1 className="text-black text-[1.25rem] dark:text-[#FFFFFF]">
+            {" "}
+            Messages
+          </h1>
           <p className="text-primary font-semibold text-[0.875rem]">See all</p>
         </div>
 
@@ -67,13 +79,13 @@ const MessagesFeed = () => {
                   </div>
                   <div className="flex flex-col gap-2">
                     <h1 className="text-base">{item.senderName}</h1>
-                    <p className="font-[sora-light] text-brand-black">
+                    <p className="font-[sora-light] text-brand-black dark:text-[#E9E9E9E9]">
                       {item.message}
                     </p>
                   </div>
                 </div>
 
-                <p className="font-[sora-light] text-brand-black text-sm">
+                <p className="font-[sora-light] text-brand-black text-sm dark:text-[#E9E9E9E9]">
                   2:00 pm
                 </p>
               </div>

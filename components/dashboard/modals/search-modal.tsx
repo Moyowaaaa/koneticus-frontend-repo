@@ -16,11 +16,17 @@ const SearchModal = () => {
     >
       {/* <div>SearchModal</div> */}
 
-      <div className="relative bg-white p-4 rounded-[1.875rem] border-2 border-primary">
+      <div
+        className="relative bg-white p-4 
+            dark:bg-[#151515]
+      
+      rounded-[1.875rem] border-2 border-primary"
+      >
         {/* <div className="rounded-full bg-gradient-to-r from-[#7F5CFF] via-[#6A7BFF] to-[#5FE0FF] shadow-[0_0_30px_rgba(111,102,255,0.45)]"> */}
         <div
           className="
           
+            dark:bg-[#151515]
           flex items-center gap-3 rounded-full bg-white "
         >
           <SearchNormal size={20} color="#8C8C8C" />
@@ -28,7 +34,9 @@ const SearchModal = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search"
-            className="border-none shadow-none focus-visible:ring-0 text-base text-brand-black placeholder:text-brand-grey"
+            className="border-none shadow-none focus-visible:ring-0 text-base text-brand-black dark:text-white
+            dark:bg-[#151515]
+            placeholder:text-brand-grey"
           />
         </div>
         {/* </div> */}
@@ -36,11 +44,21 @@ const SearchModal = () => {
           className="absolute
             border-2 
           shadow-[0_0_30px_rgba(111,102,255,0.45)]
-          inset-0 blur-3xl bg-gradient-to-r from-[#7F5CFF]/30 via-transparent to-[#5FE0FF]/20 pointer-events-none"
+          dark:shadow-[none]
+          inset-0 blur-3xl bg-gradient-to-r from-[#7F5CFF]/30 via-transparent to-[#5FE0FF]/20
+          
+          
+          dark:bg-[#151515]
+          pointer-events-none"
         />
       </div>
 
-      <div className="w-full h-[30rem] bg-white rounded-[1.875rem]  relative  mt-10"></div>
+      <div
+        className="w-full h-[30rem] bg-white rounded-[1.875rem]  
+            dark:bg-[#151515]
+      
+      relative  mt-10"
+      ></div>
     </Modal>
   );
 };

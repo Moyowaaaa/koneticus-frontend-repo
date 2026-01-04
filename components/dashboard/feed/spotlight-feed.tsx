@@ -1,3 +1,5 @@
+"use client";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDummyStore } from "@/store/useDummyStore";
 import Image from "next/image";
@@ -6,7 +8,7 @@ import React from "react";
 export const SpotlightEmptyState = () => {
   return (
     <div className="relative  h-full w-full  flex flex-col gap-2 items-center justify-center">
-      <div className="absolute h-88 w-full -top-6 -left-2">
+      <div className="absolute h-88 w-full top-0 -left-2">
         <Image
           src={"/images/spotlights-feed-empty.svg"}
           alt=""
@@ -55,13 +57,21 @@ const SpotlightFeed = () => {
       <div
         className="relative flex 
         rounded-[1.875rem] p-4  flex-col border-[#E9E9E9E9]
+          dark:border-[#80808026]
+
         w-full border 
-      h-112
+      h-[32rem]
       overflow-hidden
+      dark:bg-[#80808026]
       "
       >
-        <div className="flex items-center justify-between w-full border-b border-#E9E9E9E9] pb-2 bg-[white] z-5">
-          <h1 className="text-black text-[1.25rem]">
+        <div
+          className="flex items-center justify-between w-full border-b border-#E9E9E9E9] pb-2 bg-[white] 
+dark:border-[#80808026]
+        dark:bg-[transparent]
+        z-5 mb-4"
+        >
+          <h1 className="text-black text-[1.25rem] dark:text-[#FFFFFF]">
             {" "}
             This week&apos;s spotlight
           </h1>
@@ -70,10 +80,15 @@ const SpotlightFeed = () => {
         {items.length === 0 ? (
           <SpotlightEmptyState />
         ) : (
-          <ScrollArea className="max-h-105 pb-10">
+          <ScrollArea className="max-h-105 ">
             {items?.map((item, index) => (
               <div className="flex py-2 flex-col gap-2" key={index}>
-                <div className="px-4 py-4 bg-[#CDC9FF] flex flex-col gap-4 rounded-[1.25rem]">
+                <div
+                  className="px-4 py-4 bg-[#CDC9FF]
+                
+                dark:bg-[#151515]
+                flex flex-col gap-4 rounded-[1.25rem]"
+                >
                   <div className="flex items-center justify-between w=-full">
                     <h1>{item?.title}</h1>
 
@@ -92,7 +107,9 @@ const SpotlightFeed = () => {
                     </div>
                   </div>
 
-                  <p>{item?.content}</p>
+                  <p className="dark:text-[#E9E9E9E9] duration-300">
+                    {item?.content}
+                  </p>
                 </div>
               </div>
             ))}

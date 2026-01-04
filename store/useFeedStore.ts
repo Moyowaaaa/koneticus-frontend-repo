@@ -13,6 +13,7 @@ export interface FeedItem {
   title: string;
   description: string;
   tags: string[];
+  image?: string; // Optional image URL for the idea
 }
 
 export interface MessageFeedItem {
@@ -30,7 +31,12 @@ interface FeedStore {
   isLoading: boolean;
   setFeedItems: (items: FeedItem[]) => void;
   setLoading: (loading: boolean) => void;
-  addNewIdea: (title: string, description: string, tags?: string[]) => void;
+  addNewIdea: (
+    title: string,
+    description: string,
+    tags?: string[],
+    image?: string
+  ) => void;
 }
 
 const dummyFeedData: FeedItem[] = [
@@ -113,7 +119,8 @@ export const useFeedStore = create<FeedStore>()(
         addNewIdea: (
           title: string,
           description: string,
-          tags: string[] = []
+          tags: string[] = [],
+          image?: string
         ) => {
           const newIdea: FeedItem = {
             id: Date.now().toString(), // Simple ID generation
@@ -125,6 +132,7 @@ export const useFeedStore = create<FeedStore>()(
             title,
             description,
             tags,
+            ...(image && { image }), // Only include image if provided
           };
 
           const currentItems = get().feedItems;

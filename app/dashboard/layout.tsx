@@ -1,6 +1,7 @@
 import React from "react";
 import TopNavBar from "@/components/navigation/topbar";
 import Sidebar from "@/components/navigation/sidebar";
+import DashboardRightSidebar from "@/components/dashboard/dashboard-right-sidebar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -23,11 +24,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0">
+        <main className="flex-1 min-w-0 w-full pr-12 pl-4">
           {children}
           {/* {modal} */}
           {/* <SharePost /> */}
         </main>
+
+        <DashboardRightSidebar />
 
         {/* Placeholder for future right rail */}
         {/* <div className="hidden w-[20rem] shrink-0 xl:block" aria-hidden /> */}

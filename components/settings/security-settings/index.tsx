@@ -91,8 +91,14 @@ const PasswordInput = ({
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      <label className="text-sm font-medium text-foreground">{label}</label>
-      <div className="relative flex items-center w-full rounded-xl border border-border/50 bg-card/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+      <label className="text-base text-brand-black leading-[162%] font-medium text-foreground">
+        {label}
+      </label>
+      <div
+        className="
+      min-h-[3.5rem] max-h-[3.5rem]
+      relative flex items-center w-full rounded-[1.875rem] border border-border/50 bg-card/50 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all"
+      >
         <Input
           type={showPassword ? "text" : "password"}
           value={value}
@@ -131,7 +137,7 @@ const TwoFactorOption = ({
   enabled,
   onToggle,
 }: TwoFactorOptionProps) => (
-  <div className="flex items-start justify-between py-4">
+  <div className="flex items-start justify-between py-4 w-[23.125rem]">
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-foreground">{title}</span>
@@ -141,7 +147,9 @@ const TwoFactorOption = ({
           </span>
         )}
       </div>
-      <p className="text-sm text-muted-foreground">{description}</p>
+      <p className="text-sm text-muted-foreground max-w-[15rem]">
+        {description}
+      </p>
     </div>
     <button
       onClick={onToggle}
@@ -180,83 +188,79 @@ const SecuritySettings = () => {
     <div className="w-full space-y-8">
       {/* Security Header */}
       <div className="space-y-2">
-        <h2 className="text-xl font-semibold text-foreground">Security</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-[1.125rem] font-normal text-foreground">
+          Security
+        </h2>
+        <p className="text-sm text-muted-foreground font-[sora-light]">
           Manage your account security settings
         </p>
       </div>
 
-      {/* Password Section */}
-      <div className="space-y-6 pb-8 border-b border-dashed border-border/50">
-        <h3 className="text-lg font-semibold text-foreground">Password</h3>
+      <div className="w-full flex items-start  justify-between ">
+        <h3 className="text-lg  text-brand-black">Password</h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="lg:col-span-1" />
-          <div className="space-y-4">
+        <div className="flex items-end gap-4">
+          <div className="flex  flex-col gap-4 w-[18.75rem]">
             <PasswordInput
               label="Current password"
               value={passwords.current}
               onChange={(v) =>
                 setPasswords((prev) => ({ ...prev, current: v }))
               }
-              placeholder="Enter current password"
             />
 
-            <div className="flex items-end gap-4">
-              <PasswordInput
-                label="New password"
-                value={passwords.new}
-                onChange={(v) => setPasswords((prev) => ({ ...prev, new: v }))}
-                placeholder="Enter new password"
-                className="flex-1"
-              />
-              <Button
-                onClick={handleSavePassword}
-                className="px-6 py-2 h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap"
-              >
-                Save new password
-              </Button>
-            </div>
+            <PasswordInput
+              label="Current password"
+              value={passwords.current}
+              onChange={(v) =>
+                setPasswords((prev) => ({ ...prev, current: v }))
+              }
+            />
           </div>
+          <Button
+            onClick={handleSavePassword}
+            className="
+            
+            h-[40px] rounded-[1.5rem] 
+            flex items-center justify-center
+            bg-primary hover:bg-primary/90 text-white
+            w-[10.375rem]
+            whitespace-nowrap"
+          >
+            Save new password
+          </Button>
         </div>
       </div>
 
-      {/* Two Factor Authentication Section */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">
-              Two factor authentication
-            </h3>
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Select your preferred option for receiving one time passwords
-              (OTPs)
-            </p>
+      <div className="w-full flex items-start  justify-between border-t border-[#E9E9E9E9] pt-6">
+        <h3 className="text-lg  text-brand-black">Two factor authentication</h3>
 
-            <div className="divide-y divide-border/30">
-              <TwoFactorOption
-                title="Email address"
-                description="Use email to receive verification codes for added protection"
-                isRecommended
-                enabled={twoFactorSettings.email}
-                onToggle={() =>
-                  setTwoFactorSettings((prev) => ({
-                    ...prev,
-                    email: !prev.email,
-                  }))
-                }
-              />
-              <TwoFactorOption
-                title="Authentication App"
-                description="Download Google authenticator to secure your account"
-                enabled={twoFactorSettings.app}
-                onToggle={() =>
-                  setTwoFactorSettings((prev) => ({ ...prev, app: !prev.app }))
-                }
-              />
-            </div>
+        <div>
+          <p className="text-sm text-[#737373] mb-4 font-[sora-light] max-w-[18rem]">
+            Select your preferred option for receiving one time passwords (OTPs)
+          </p>
+
+          <div className="divide-y divide-border/30">
+            <TwoFactorOption
+              title="Email address"
+              description="Use email to receive verification codes for added protection"
+              isRecommended
+              enabled={twoFactorSettings.email}
+              onToggle={() =>
+                setTwoFactorSettings((prev) => ({
+                  ...prev,
+                  email: !prev.email,
+                }))
+              }
+            />
+            <TwoFactorOption
+              title="Authentication App"
+              description="Download Google authenticator to secure your account"
+              enabled={twoFactorSettings.app}
+              onToggle={() =>
+                setTwoFactorSettings((prev) => ({ ...prev, app: !prev.app }))
+              }
+            />
           </div>
         </div>
       </div>

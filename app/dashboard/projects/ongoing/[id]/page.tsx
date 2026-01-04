@@ -40,18 +40,30 @@ const ProjectDetailsPage = () => {
 
         <div className="flex items items-start w-full  justify-between ">
           <div className=" w-6/12  flex flex-col gap-4">
-            <h1 className="font-semibold text-[1.125rem]  text-brand-black">
+            <h1
+              className="font-semibold text-[1.125rem]  text-brand-black
+            dark:text-white
+            "
+            >
               Project Description
             </h1>
 
-            <div className="p-4 bg-lavender rounded-[1.875rem] w-max">
-              <p className="text-sm  font-[sora-light] text-brand-black max-w-[35rem]">
+            <div className="p-4 bg-lavender rounded-[1.875rem] w-max dark:bg-[#80808026]">
+              <p
+                className="text-sm  font-[sora-light] text-brand-black
+              dark:text-white
+              max-w-[35rem]"
+              >
                 {project?.description}
               </p>
             </div>
 
             <div className="flex flex-col gap-2 mt-4">
-              <h1 className="font-semibold text-brand-black text-[1.125rem]">
+              <h1
+                className="font-semibold text-brand-black text-[1.125rem]
+              dark:text-white
+              "
+              >
                 Team Members
               </h1>
 
@@ -69,7 +81,7 @@ const ProjectDetailsPage = () => {
                     />
                   </div>
 
-                  <p className="text-brand-black">
+                  <p className="text-brand-black dark:text-white">
                     {c?.firstName} {c?.lastName}
                   </p>
                   <p className="text-[#808080] text-sm">( {c?.role} )</p>
@@ -95,12 +107,14 @@ const ProjectDetailsPage = () => {
 
           <div
             className=" relative w-[30rem] h-[40rem] border p-6 rounded-[1.875rem]
+
+            dark:bg-[#80808026]
           
           
           "
           >
-            <div className="flex items-center justify-between w-full border-b border-#E9E9E9E9] pb-2 bg-[white] z-5">
-              <h1 className="text-brand-black font-semibold text-[1.25rem]">
+            <div className="flex items-center justify-between w-full border-b border-#E9E9E9E9] pb-2  z-5">
+              <h1 className="text-brand-black font-semibold text-[1.25rem] dark:text-white">
                 Team chat
               </h1>
             </div>

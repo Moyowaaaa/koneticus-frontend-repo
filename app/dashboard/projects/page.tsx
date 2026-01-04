@@ -63,7 +63,7 @@ const ProjectsPage = () => {
     <>
       <div className="flex flex-col gap-10 w-full pt-6 px-6">
         <TopBar>
-          <h1 className="text-[2rem] font-semibold text-brand-black">
+          <h1 className="text-[2rem] font-semibold text-brand-black dark:text-[#FFFFFF]">
             Projects
           </h1>
         </TopBar>
