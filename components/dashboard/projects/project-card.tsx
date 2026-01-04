@@ -39,7 +39,7 @@ const ProjectCard = ({
   };
 
   return (
-    <div className="flex flex-col     bg-white ">
+    <div className="flex flex-col     ">
       {/* Project Image */}
       <div className="relative w-full h-[15rem]  rounded-t-[1.25rem] overflow-hidden">
         <Image
@@ -52,15 +52,16 @@ const ProjectCard = ({
 
       <div
         className="
-        border border-[#E9E9E9E9]
+        border border-[#E9E9E9E9] dark:border-[#80808026]
       hover:shadow-sm transition-shadow
+      bg-white dark:bg-[#80808026]
       min-h-[11rem]  p-4 rounded-b-[1.25rem] w-full flex flex-col justify-between"
       >
         <div className="flex flex-col gap-2">
-          <h3 className="font-semibold text-brand-black text-[0.875rem] line-clamp-1">
+          <h3 className="font-semibold text-brand-black dark:text-[#FFFFFF] text-[0.875rem] line-clamp-1">
             {project.title}
           </h3>
-          <p className="text-sm text-brand-grey line-clamp-2 leading-relaxed">
+          <p className="text-sm text-brand-grey dark:text-[#808080] line-clamp-2 leading-relaxed">
             {project.description}
           </p>
         </div>

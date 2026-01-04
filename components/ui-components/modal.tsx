@@ -55,7 +55,7 @@ const Modal = ({
           <div className="px-6 pb-4 ">
             <h2
               className={cn(
-                "text-lg font-semibold text-center pb-2 border-b border-b-[#E9E9E9E9]",
+                "text-lg font-semibold text-center pb-2 border-b border-b-[#E9E9E9E9] dark:text-white",
                 titleClassname
               )}
             >

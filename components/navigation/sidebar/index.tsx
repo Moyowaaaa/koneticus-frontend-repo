@@ -49,7 +49,7 @@ const Sidebar = () => {
   return (
     <div
       // className="flex h-[calc(100vh-9rem)] flex-col gap-4 border-r border-[#E9E9E9] pr-4"
-      className="flex h-[83vh] flex-col gap-4 border-r border-[#E9E9E9] pr-2 pt-8"
+      className="flex h-[calc(100vh-5rem)] flex-col gap-4 border-r border-[#E9E9E9] dark:border-[#80808026] pr-2 pt-8"
     >
       <div className="rounded-2xl bg-white/80  dark:bg-[#151515] ">
         <ButtonV2

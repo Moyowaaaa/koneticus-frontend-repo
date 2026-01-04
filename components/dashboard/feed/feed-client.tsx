@@ -45,10 +45,6 @@ const FeedClient = () => {
 
           <Feed />
         </div>
-        <div className="relative h-full w-4/12 flex flex-col gap-4">
-          <SpotlightFeed />
-          <MessagesFeed />
-        </div>
       </div>
     </>
   );

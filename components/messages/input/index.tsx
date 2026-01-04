@@ -36,7 +36,10 @@ const MessagesInput = () => {
       <div
         className="
       w-10/12
-      relative flex items-center rounded-[1.875rem] border border-[#E9E9E9] bg-white p-1 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+      relative flex items-center rounded-[1.875rem] border border-[#E9E9E9] bg-white p-1 transition-all focus-within:border-primary
+             dark:border-[#80808026]
+      dark:bg-[#151515]
+      focus-within:ring-2 focus-within:ring-primary/20"
       >
         <Input
           placeholder="Write a message.."
@@ -45,7 +48,8 @@ const MessagesInput = () => {
           onKeyPress={handleKeyPress}
           className="w-full
                   placeholder:text-brand-grey
-                  bg-transparent text-base text-brand-black placeholder:text-grey outline-none border-none "
+                  dark:placeholder:text-[#808080]
+                  bg-transparent dark:bg-transparent text-base text-brand-black dark:text-white placeholder:text-grey outline-none border-none"
         />
         <ButtonV2
           variant="default"

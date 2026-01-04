@@ -29,7 +29,7 @@ const ChatBubble = ({ message, sender }: ChatBubbleProps) => {
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <p className={`text-sm  ${nameColor}`}>
+          <p className={`text-sm  ${nameColor} dark:text-white`}>
             {sender
               ? `${sender.firstName} ${sender.lastName}`
               : "Unknown Member"}
@@ -37,7 +37,11 @@ const ChatBubble = ({ message, sender }: ChatBubbleProps) => {
           {sender?.role && (
             <span
               className={`text-xs  font-medium
-            ${sender.role === "Creator" ? "text-[#AEA8F7]" : "text-brand-grey"}
+            ${
+              sender.role === "Creator"
+                ? "text-[#AEA8F7]"
+                : "text-brand-grey hidden"
+            }
             `}
             >
               ({sender.role})

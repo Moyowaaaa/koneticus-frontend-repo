@@ -1,3 +1,5 @@
+"use client";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDummyStore } from "@/store/useDummyStore";
 import Image from "next/image";
