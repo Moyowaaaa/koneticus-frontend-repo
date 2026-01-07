@@ -7,10 +7,15 @@ import { Project, ProjectStatus } from "@/types";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useDummyStore } from "@/store/useDummyStore";
+import ProjectCard from "@/components/dashboard/projects/project-card";
+import ButtonV2 from "@/components/ui-components/button";
+import { ArrowRight } from "iconsax-reactjs";
+import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 
 const ProjectsPage = () => {
   const router = useRouter();
   const { useDummyData } = useDummyStore();
+  const { toggleNewIdeaModal } = useGeneralStateStore();
 
   // Mock data for counts - replace with actual data fetching
   const mockProjects: Project[] = [
@@ -40,7 +45,7 @@ const ProjectsPage = () => {
       description:
         "Developing a mobile application for creative collaboration...",
       status: "ongoing",
-      image: "/images/project-placeholder-3.jpg",
+      image: "/images/project-placeholder-1.jpg",
       collaborators: ["John", "Sarah", "Mike", "Anna"],
       createdAt: "2024-09-20",
       updatedAt: "2024-09-26",
@@ -67,14 +72,30 @@ const ProjectsPage = () => {
             Projects
           </h1>
         </TopBar>
-
-        <ProjectFilter
-          activeFilter="all"
-          onFilterChange={handleFilterChange}
-          pendingCount={pendingProjects.length}
-          ongoingCount={ongoingProjects.length}
-        />
-        <RecentActivities />
+        {ongoingProjects.length ? (
+          <div className="grid grid-cols-4 gap-4">
+            {ongoingProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-12 text-center text-brand-black flex flex-col items-center gap-[1.5rem]">
+            <p className="text-sm">There are no ideas yet. Share your idea</p>
+            <ButtonV2
+              type="submit"
+              className="w-max h-max !px-6 border-none dark:bg-[#6155F5]"
+              IconPlacement="right"
+              Icon={<ArrowRight size="13" />}
+              onClick={() => {
+                toggleNewIdeaModal();
+                router.push("/dashboard");
+              }}
+              variant="dark"
+            >
+              Go Home
+            </ButtonV2>
+          </div>
+        )}
       </div>
     </>
   );

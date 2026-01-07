@@ -8,7 +8,7 @@ import React from "react";
 export const SpotlightEmptyState = () => {
   return (
     <div className="relative  h-full w-full  flex flex-col gap-2 items-center justify-center">
-      <div className="absolute h-88 w-full top-0 -left-2">
+      <div className="absolute h-88 w-full -top-4 -left-2">
         <Image
           src={"/images/spotlights-feed-empty.svg"}
           alt=""
