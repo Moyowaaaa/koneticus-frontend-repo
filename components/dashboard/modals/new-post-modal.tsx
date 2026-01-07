@@ -2,6 +2,7 @@
 
 import ButtonV2 from "@/components/ui-components/button";
 import Modal from "@/components/ui-components/modal";
+import TagInput from "@/components/ui-components/tag-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
@@ -22,6 +23,9 @@ const NewIdeaModal = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  // Role selection state
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -86,13 +90,14 @@ const NewIdeaModal = () => {
       addNewIdea(
         title.trim(),
         description.trim(),
-        [],
+        selectedRoles,
         imagePreviewUrl || undefined
       );
 
       // Reset form
       setTitle("");
       setDescription("");
+      setSelectedRoles([]);
       handleRemoveImage();
 
       // Close modal
@@ -112,6 +117,7 @@ const NewIdeaModal = () => {
         // Reset form when modal closes
         setTitle("");
         setDescription("");
+        setSelectedRoles([]);
         handleRemoveImage();
       }
     }
@@ -194,10 +200,19 @@ const NewIdeaModal = () => {
             aria-hidden="true"
           />
 
+          <TagInput
+            selectedTags={selectedRoles}
+            onTagsChange={setSelectedRoles}
+            placeholder="Enter tags e.g Designer"
+            disabled={isSubmitting}
+          />
+
           <div className="w-full items-center flex justify-between">
             <div className="flex items-center gap-4">
               <ButtonV2
-                className="h-10"
+                className="h-[2.5rem] 
+                min-h-[2.5rem]
+                max-h-[2.5rem]! max-w-[8.625rem]! w-[8.625rem]!"
                 type="submit"
                 disabled={isSubmitting || !title.trim() || !description.trim()}
               >
