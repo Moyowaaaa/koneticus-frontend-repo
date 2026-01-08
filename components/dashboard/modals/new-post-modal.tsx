@@ -7,9 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 import { useFeedStore } from "@/store/useFeedStore";
-import { Clock, Image as ImageIcon, CloseCircle } from "iconsax-reactjs";
+import {
+  Clock,
+  Image as ImageIcon,
+  CloseCircle,
+  People,
+} from "iconsax-reactjs";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import ImageUploadModal from "./image-upload-modal";
 
 const NewIdeaModal = () => {
   const { showNewIdeaModal, setShowNewIdeaModal } = useGeneralStateStore();
@@ -26,6 +32,14 @@ const NewIdeaModal = () => {
 
   // Role selection state
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+
+  // Team size selection state
+  const [teamSize, setTeamSize] = useState<number>(1);
+  const [isTeamSizeOpen, setIsTeamSizeOpen] = useState(false);
+  const teamSizeOptions = [1, 2, 3, 4, 5];
+
+  // Image upload modal state
+  const [showImageUploadModal, setShowImageUploadModal] = useState(false);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -48,7 +62,12 @@ const NewIdeaModal = () => {
   };
 
   const handleImageButtonClick = () => {
-    imageInputRef.current?.click();
+    setShowImageUploadModal(true);
+  };
+
+  const handleImageFromModal = (imageUrl: string, file: File) => {
+    setSelectedImage(file);
+    setImagePreviewUrl(imageUrl);
   };
 
   useEffect(() => {
@@ -91,6 +110,7 @@ const NewIdeaModal = () => {
         title.trim(),
         description.trim(),
         selectedRoles,
+        teamSize,
         imagePreviewUrl || undefined
       );
 
@@ -98,6 +118,9 @@ const NewIdeaModal = () => {
       setTitle("");
       setDescription("");
       setSelectedRoles([]);
+      setTeamSize(1);
+      setIsTeamSizeOpen(false);
+      setShowImageUploadModal(false);
       handleRemoveImage();
 
       // Close modal
@@ -118,6 +141,9 @@ const NewIdeaModal = () => {
         setTitle("");
         setDescription("");
         setSelectedRoles([]);
+        setTeamSize(1);
+        setIsTeamSizeOpen(false);
+        setShowImageUploadModal(false);
         handleRemoveImage();
       }
     }
@@ -239,6 +265,82 @@ const NewIdeaModal = () => {
                   fontWeight={"bold"}
                 />
               </button>
+
+              {/* Team Size Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsTeamSizeOpen(!isTeamSizeOpen)}
+                  disabled={isSubmitting}
+                  className="h-[2rem] px-3
+                    border border-[#E9E9E9] dark:border-[#80808026]
+                    rounded-full
+                    flex items-center gap-2
+                    cursor-pointer hover:bg-gray-50 dark:hover:bg-[#2a2727] transition-colors
+                    disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Select team size"
+                  aria-expanded={isTeamSizeOpen}
+                  aria-haspopup="listbox"
+                >
+                  <People
+                    size={16}
+                    className="text-brand-black dark:text-white"
+                  />
+                  <span className="text-[0.875rem] text-brand-black dark:text-white">
+                    Team ({teamSize})
+                  </span>
+                  <svg
+                    className={`w-3 h-3 transition-transform ${
+                      isTeamSizeOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {isTeamSizeOpen && (
+                  <div
+                    className="absolute bottom-full mb-2 left-0 bg-white dark:bg-[#211E1E]
+                      border border-[#E9E9E9] dark:border-[#80808026] rounded-[1.25rem] shadow-lg
+                      py-1 min-w-[78px]
+                      flex flex-col items-center
+                      max-w-[78px] z-50"
+                    role="listbox"
+                    aria-label="Team size options"
+                  >
+                    {teamSizeOptions.map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => {
+                          setTeamSize(size);
+                          setIsTeamSizeOpen(false);
+                        }}
+                        className={`w-full px-4 py-2 text-left text-[0.875rem]
+                            flex flex-col items-center
+                          hover:bg-gray-100 dark:hover:bg-[#2a2727] transition-colors
+                          ${
+                            teamSize === size
+                              ? "text-brand-purple font-medium"
+                              : "text-brand-black dark:text-white"
+                          }`}
+                        role="option"
+                        aria-selected={teamSize === size}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-1" aria-live="polite">
@@ -250,6 +352,14 @@ const NewIdeaModal = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Image Upload Modal */}
+      <ImageUploadModal
+        open={showImageUploadModal}
+        onOpenChange={setShowImageUploadModal}
+        onImageSelect={handleImageFromModal}
+        initialImage={imagePreviewUrl}
+      />
     </>
   );
 };

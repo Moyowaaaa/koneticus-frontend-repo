@@ -13,6 +13,7 @@ export interface FeedItem {
   title: string;
   description: string;
   tags: string[];
+  teamSize: number;
   image?: string; // Optional image URL for the idea
 }
 
@@ -35,6 +36,7 @@ interface FeedStore {
     title: string,
     description: string,
     tags?: string[],
+    teamSize?: number,
     image?: string
   ) => void;
 }
@@ -51,6 +53,7 @@ const dummyFeedData: FeedItem[] = [
     description:
       "A monthly subscription box that delivers unique, locally-sourced snacks from around the world each month, allowing customers to explore different cultures through their taste buds.",
     tags: ["UI/UX Designer"],
+    teamSize: 2,
   },
   {
     id: "2",
@@ -63,6 +66,7 @@ const dummyFeedData: FeedItem[] = [
     description:
       "A monthly subscription box that brings you a selection of extraordinary snacks sourced from local artisans worldwide, inviting customers to savor and celebrate diverse cultures.",
     tags: ["Frontend", "Web Designer"],
+    teamSize: 3,
   },
   {
     id: "3",
@@ -75,6 +79,7 @@ const dummyFeedData: FeedItem[] = [
     description:
       "A monthly subscription box that brings you a selection of extraordinary snacks sourced from local artisans worldwide, inviting customers to savor and celebrate diverse cultures.",
     tags: ["Frontend"],
+    teamSize: 1,
   },
 ];
 
@@ -120,6 +125,7 @@ export const useFeedStore = create<FeedStore>()(
           title: string,
           description: string,
           tags: string[] = [],
+          teamSize: number = 1,
           image?: string
         ) => {
           const newIdea: FeedItem = {
@@ -132,6 +138,7 @@ export const useFeedStore = create<FeedStore>()(
             title,
             description,
             tags,
+            teamSize,
             ...(image && { image }), // Only include image if provided
           };
 
