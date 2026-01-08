@@ -45,6 +45,7 @@ const SearchModal = () => {
             border-2 
           shadow-[0_0_30px_rgba(111,102,255,0.45)]
           dark:shadow-[none]
+          dark:hidden
           inset-0 blur-3xl bg-gradient-to-r from-[#7F5CFF]/30 via-transparent to-[#5FE0FF]/20
           
           

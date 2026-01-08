@@ -12,6 +12,7 @@ import {
 } from "iconsax-reactjs";
 import SidebarLinks from "./sidebar-links";
 import { sideBarRoute } from "@/types";
+import { Lightbulb } from "lucide-react";
 
 const Sidebar = () => {
   const { toggleNewIdeaModal } = useGeneralStateStore();
@@ -23,10 +24,16 @@ const Sidebar = () => {
       route: "/dashboard",
     },
     {
+      title: "Ideas",
+      icon: Lightbulb,
+      route: "/dashboard/ideas",
+    },
+    {
       title: "Projects",
       icon: Folder,
       route: "/dashboard/projects",
     },
+
     {
       title: "Messages",
       icon: Message,
