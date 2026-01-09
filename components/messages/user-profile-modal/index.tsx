@@ -45,7 +45,7 @@ const UserProfileModal = () => {
 
         {/* User Info */}
         <div className="text-center space-y-2">
-          <h3 className="text-xl font-semibold text-brand-black">
+          <h3 className="text-xl font-semibold text-brand-black dark:text-white">
             {user.first_name} {user.last_name}
           </h3>
           {/* <p className="text-sm text-brand-grey">@{user.username}</p>
@@ -54,7 +54,7 @@ const UserProfileModal = () => {
           </p> */}
         </div>
 
-        <div className="w-full min-h-[8rem] p-6 text-base font-[sora-light] border rounded-[1.875rem]">
+        <div className="w-full min-h-[8rem] p-6 text-base font-[sora-light] border rounded-[1.875rem] dark:text-white">
           {user?.bio}
         </div>
 
@@ -64,14 +64,14 @@ const UserProfileModal = () => {
               key={field.key}
               className="flex
                           min-h-[3.5rem]
-                          items-center gap-3 rounded-[1.875rem] border border-[#E9E9E9] bg-white px-5 py-3"
+                          items-center gap-3 rounded-[1.875rem] border border-[#E9E9E9] bg-white dark:bg-[#80808026] px-5 py-3"
             >
               <div className="relative h-6 w-6 ">
                 <Image src={field.logo} alt={field.key} fill />
               </div>
               <div className="h-5 border border-[#808080]" />
               <input
-                className="flex-1 bg-transparent text-sm outline-none"
+                className="flex-1 bg-transparent text-sm outline-none dark:text-white"
                 placeholder={`Add link..`}
                 readOnly
                 value={user?.links && user.links[field.key]}

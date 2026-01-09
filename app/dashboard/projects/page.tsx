@@ -79,7 +79,11 @@ const ProjectsPage = () => {
             ))}
           </div>
         ) : (
-          <div className="py-12 text-center text-brand-black flex flex-col items-center gap-[1.5rem]">
+          <div
+            className="py-12 text-center text-brand-black 
+          dark:text-white
+          flex flex-col items-center gap-[1.5rem]"
+          >
             <p className="text-sm">There are no ideas yet. Share your idea</p>
             <ButtonV2
               type="submit"

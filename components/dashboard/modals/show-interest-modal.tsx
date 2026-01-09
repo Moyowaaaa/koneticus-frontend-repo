@@ -22,15 +22,20 @@ const ShowInterestModal = () => {
       >
         <div className="flex flex-col gap-4">
           <Textarea
-            placeholder="Convince project owner......."
+            placeholder="Convince project owner..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="resize-none h-55 outline-none border-none ring-0  shadow-none    text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9]"
+            className="resize-none h-55 outline-none border-none ring-0  
+            
+            dark:bg-[#211E1E]
+            shadow-none    text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9]"
           />
 
           <div className="w-full items-center flex justify-between ">
             <ButtonV2
-              className="h-[40px]"
+              className="h-[2.5rem] 
+                min-h-[2.5rem]
+                max-h-[2.5rem]!"
               //   onClick={handleSubmit}
               //   disabled={isSubmitting || !title.trim() || !description.trim()}
             >
@@ -43,8 +48,8 @@ const ShowInterestModal = () => {
             <div className="flex items-center gap-1">
               <Clock size={13} className="text-brand-grey" />
               <p className="text-[0.875rem] text-brand-grey">
-                <span className="text-brand-black">3</span> requests left this
-                month
+                <span className="text-brand-black dark:text-white">3</span>{" "}
+                requests left this month
               </p>
             </div>
           </div>

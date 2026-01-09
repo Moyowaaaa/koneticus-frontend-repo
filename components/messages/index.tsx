@@ -10,7 +10,11 @@ const MessagesClient = () => {
     <>
       <div className="relative flex flex-col  w-full pt-4 px-6">
         <TopBar>
-          <h1 className="text-[2rem] font-semibold text-brand-black">
+          <h1
+            className="text-[2rem] font-semibold text-brand-black
+          dark:text-white
+          "
+          >
             Messages
           </h1>
         </TopBar>

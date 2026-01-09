@@ -53,7 +53,7 @@ const ConversationItem = ({
       type="button"
       onClick={onClick}
       className={`w-full flex items-center justify-between gap-3 rounded-[0.9375rem] p-4 text-left transition-all hover:bg-lavender ${
-        isActive ? "bg-lavender" : ""
+        isActive ? "bg-lavender dark:bg-[#80808026]" : ""
       }`}
     >
       <div className="flex items-start gap-3">
@@ -78,7 +78,11 @@ const ConversationItem = ({
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-base font-semibold text-brand-black line-clamp-1">
+            <h1
+              className="text-base font-semibold text-brand-black 
+            dark:text-white
+            line-clamp-1"
+            >
               {name}
             </h1>
             {isMessageRequest && (

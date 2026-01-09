@@ -19,24 +19,28 @@ const MessagesSidebar = () => {
   //   const conversations = [];
 
   return (
-    <div className="relative w-[30rem] border-r border-[#e9e9e9e9] pt-6 md:h-[calc(100dvh-200px)] pr-4">
+    <div
+      className="relative w-[30rem] border-r border-[#e9e9e9e9] 
+    dark:border-[#80808026]
+    pt-6 md:h-[calc(100dvh-200px)] pr-4"
+    >
       {conversationConversations.length === 0 ? (
         <>
           {conversationConversations.length === 0 && (
             <div
-              className={`w-full flex items-start justify-between gap-3 rounded-[0.9375rem] p-4 text-left transition-all bg-lavender `}
+              className={`w-full flex items-start justify-between gap-3 rounded-[0.9375rem] p-4 text-left transition-all bg-lavender dark:bg-[#80808026] `}
             >
               <div className="flex items-start gap-3">
-                <div className="relative h-10 w-10 min-h-10 min-w-10 rounded-full bg-white"></div>
+                <div className="relative h-10 w-10 min-h-10 min-w-10 rounded-full bg-white dark:bg-[#808080]"></div>
                 <div className="flex flex-col gap-1">
                   <div className="flex flex-col  gap-2 mt-3 ">
-                    <div className="w-[7.125rem] bg-white h-[0.875rem]"></div>
-                    <div className="w-[7.125rem] bg-white h-[0.875rem]"></div>
+                    <div className="w-[7.125rem] bg-white h-[0.875rem] dark:bg-[#808080]"></div>
+                    <div className="w-[7.125rem] bg-white h-[0.875rem] dark:bg-[#808080]"></div>
                   </div>
                 </div>
               </div>
 
-              <div className="w-[3.25rem] bg-white h-[0.875rem] mt-2"></div>
+              <div className="w-[3.25rem] bg-white h-[0.875rem] mt-2 dark:bg-[#808080]"></div>
             </div>
           )}
         </>

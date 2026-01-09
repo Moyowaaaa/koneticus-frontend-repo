@@ -44,8 +44,14 @@ const ProposalMessage = ({
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-brand-black">{senderName}</span>
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 capitalize">
+            <span className="font-medium text-brand-black dark:text-white text-sm">
+              {senderName}
+            </span>
+            <span
+              className="rounded-full bg-gray-100 
+            dark:bg-[transparent] dark:text-[#808080]
+            px-2 py-0.5 text-xs font-medium text-gray-600 capitalize"
+            >
               ({type})
             </span>
           </div>
@@ -53,9 +59,17 @@ const ProposalMessage = ({
       </div>
 
       {/* Content */}
-      <div className="mb-4 flex flex-col gap-4 space-y-2 w-full rounded-r-2xl rounded-bl-2xl border border-gray-200 bg-lavender p-4 shadow-sm">
-        <h4 className="font-medium text-brand-black">{title}</h4>
-        <div className="text-sm leading-relaxed text-gray-700">
+      <div
+        className="mb-4 flex flex-col gap-4 space-y-2 w-full rounded-r-2xl rounded-bl-2xl 
+        border border-gray-200 bg-lavender 
+      dark:border-[#80808026]
+      dark:bg-[#80808026]
+      p-4 shadow-sm"
+      >
+        <h4 className="font-medium text-brand-black dark:text-white">
+          {title}
+        </h4>
+        <div className="text-sm leading-relaxed text-gray-700 dark:text-white">
           {content.split("\n").map((line, index) => (
             <p key={index} className="mb-1">
               {line}
@@ -66,7 +80,9 @@ const ProposalMessage = ({
           <ButtonV2
             variant="outline"
             onClick={onViewProfile}
-            className="min-h-8 h-8 px-3 text-xs"
+            className="min-h-8 h-8 px-3 text-xs
+            dark:bg-[#808080] dark:border-[#808080]
+            "
           >
             View profile
           </ButtonV2>

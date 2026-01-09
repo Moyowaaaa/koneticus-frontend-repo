@@ -76,7 +76,13 @@ const ChatBubble = ({
       >
         {/* Sender name for other users (only show if not grouped) */}
         {!isCurrentUser && senderName && !isGrouped && (
-          <p className="text-xs font-medium text-brand-black">{senderName}</p>
+          <p
+            className="text-xs font-medium text-brand-black
+          dark:text-white
+          "
+          >
+            {senderName}
+          </p>
         )}
 
         {/* Message bubble */}
@@ -97,8 +103,8 @@ const ChatBubble = ({
             className={cn(
               "relative  px-4 py-3 text-sm leading-relaxed",
               isCurrentUser
-                ? "bg-lavender text-brand-black"
-                : "bg-gray-100 text-brand-black",
+                ? "bg-lavender text-brand-black "
+                : "bg-gray-100 text-brand-black dark:bg-[#80808026] text-white",
               // Tail positioning
               isCurrentUser
                 ? "rounded-tt-md rounded-br-md rounded-l-md"
