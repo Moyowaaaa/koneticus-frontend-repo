@@ -19,7 +19,6 @@ const UserProfileModal = () => {
 
   const handleConnect = () => {
     // TODO: Implement connect functionality
-    console.log("Connect with:", user.username);
     closeModal();
   };
 
