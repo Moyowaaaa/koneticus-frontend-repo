@@ -97,7 +97,7 @@ const ConversationItem = ({
         </div>
       </div>
 
-      <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-col items-end gap-2 min-w-max">
         {timestampLabel && (
           <p className="text-xs text-brand-grey">{timestampLabel}</p>
         )}

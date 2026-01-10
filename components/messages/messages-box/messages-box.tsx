@@ -59,7 +59,7 @@ export const MesssagesBox = () => {
             className="relative "
           />
         </div>
-        <p className="text-sm leading-5 text-brand-black">
+        <p className="text-sm leading-5 text-brand-black dark:text-white">
           Select a conversation to start messaging
         </p>
       </div>

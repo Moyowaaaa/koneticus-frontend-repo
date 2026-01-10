@@ -103,8 +103,8 @@ const ChatBubble = ({
             className={cn(
               "relative  px-4 py-3 text-sm leading-relaxed",
               isCurrentUser
-                ? "bg-lavender text-brand-black "
-                : "bg-gray-100 text-brand-black dark:bg-[#80808026] text-white",
+                ? "bg-lavender text-brand-black"
+                : "bg-gray-100 text-brand-black dark:bg-[#80808026] dark:text-white",
               // Tail positioning
               isCurrentUser
                 ? "rounded-tt-md rounded-br-md rounded-l-md"
