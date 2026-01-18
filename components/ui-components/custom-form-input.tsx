@@ -53,7 +53,7 @@ const CustomFormInput = React.forwardRef<
         {label && (
           <Label
             htmlFor={inputId}
-            className="text-sm font-normal text-brand-black"
+            className="text-sm font-normal text-brand-black dark:text-white"
           >
             {label}
           </Label>
@@ -61,7 +61,7 @@ const CustomFormInput = React.forwardRef<
 
         <div
           className={cn(
-            "group relative flex items-center rounded-[1.875rem] border border-[#E9E9E9] bg-white px-5 py-4 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
+            "group relative flex items-center rounded-[1.875rem] border border-[#E9E9E9] bg-white   dark:bg-[#80808026] px-5 py-4 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
             error && "border-destructive focus-within:border-destructive",
             className
           )}
@@ -73,7 +73,9 @@ const CustomFormInput = React.forwardRef<
             value={value}
             onChange={onChange}
             ref={ref}
-            className="w-full bg-transparent text-base text-brand-black placeholder:text-grey outline-none border-none "
+            className="w-full bg-transparent 
+            dark:bg-transparent
+            text-base text-brand-black dark:text-white placeholder:text-grey outline-none border-none "
             placeholder={placeholder}
             {...props}
           />
@@ -84,13 +86,13 @@ const CustomFormInput = React.forwardRef<
                 <Eye
                   size="24"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="cursor-pointer  text-brand-black"
+                  className="cursor-pointer  text-brand-black dark:text-white"
                 />
               ) : (
                 <EyeSlash
                   size="24"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="cursor-pointer  text-brand-black"
+                  className="cursor-pointer  text-brand-black dark:text-white"
                 />
               )}
             </>

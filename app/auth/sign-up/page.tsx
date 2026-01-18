@@ -48,6 +48,9 @@ export default function SignUpPage() {
               />
             }
             variant="outline"
+            className="dark:bg-[#151515] dark:text-white 
+            dark:hover:bg-[#6155F5]
+            dark:border-[none]! dark:outline-[none]!"
           >
             Continue with Google
           </ButtonV2>
@@ -61,6 +64,10 @@ export default function SignUpPage() {
               />
             }
             variant="outline"
+            className="dark:bg-[#151515]
+            dark:hover:bg-[#6155F5]
+            
+            dark:text-white dark:border-[none]! dark:outline-[none]!"
           >
             Continue with Github
           </ButtonV2>
@@ -74,6 +81,10 @@ export default function SignUpPage() {
               />
             }
             variant="outline"
+            className="dark:bg-[#151515]
+            
+            dark:hover:bg-[#6155F5]
+            dark:text-white dark:border-[none]! dark:outline-[none]!"
           >
             Continue with Microsoft
           </ButtonV2>

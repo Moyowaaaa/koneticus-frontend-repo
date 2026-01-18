@@ -66,7 +66,12 @@ const BioStep = ({
                   key={field.key}
                   className="flex
                   min-h-[3.5rem]
-                  items-center gap-3 rounded-[1.875rem] border border-[#E9E9E9] bg-white px-5 py-3"
+                  items-center gap-3 rounded-[1.875rem] border border-[#E9E9E9] bg-white px-5 py-3
+                  dark:bg-[#151515]
+            
+            dark:hover:bg-[#6155F5]
+            dark:text-white dark:border-[none]! dark:outline-[none]!
+                  "
                 >
                   <div className="relative h-6 w-6 ">
                     <Image src={field.logo} alt={field.key} fill />

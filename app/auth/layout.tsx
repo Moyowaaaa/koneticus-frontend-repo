@@ -30,7 +30,11 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
 
           {children}
 
-          <div className="w-full left-0 mx-auto absolute bottom-0 flex items-center justify-center text-[#211E1E] font-semibold text-[0.875rem] font-sora">
+          <div
+            className="w-full left-0 mx-auto absolute bottom-0 flex items-center justify-center text-[#211E1E]
+          dark:text-white
+          font-semibold text-[0.875rem] font-sora"
+          >
             &copy; KoLabs {new Date().getFullYear()}
           </div>
         </div>
@@ -93,7 +97,11 @@ function AuthLayoutFallback({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           {children}
-          <div className="w-full left-0 mx-auto absolute bottom-0 flex items-center justify-center text-[#211E1E] font-semibold text-[0.875rem] font-sora">
+          <div
+            className="w-full left-0 mx-auto
+          dark:text-white
+          absolute bottom-0 flex items-center justify-center text-[#211E1E] dark:text-white font-semibold text-[0.875rem] font-sora"
+          >
             &copy; KoLabs {new Date().getFullYear()}
           </div>
         </div>

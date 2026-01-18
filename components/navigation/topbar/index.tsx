@@ -6,9 +6,27 @@ import ThemeToggle from "@/components/ui-components/theme-toggle";
 import { Bell } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import { useLogoutUser } from "@/api/auth/auth.mutations";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const TopNavBar = () => {
+  const router = useRouter();
   const { toggleDummyData, useDummyData } = useDummyStore();
+  const { mutateAsync: logoutUser, isPending } = useLogoutUser();
+  const { clearAuth, user } = useAuthStore();
+
+  const onLogout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+
+    clearAuth();
+    router.push("/auth/log-in");
+  };
+
   return (
     <>
       <nav className="fixed left-0 right-0 top-0 z-50 hidden h-[5rem] w-full border-b border-border/60 bg-background/80 backdrop-blur md:block">
@@ -33,12 +51,15 @@ const TopNavBar = () => {
             <ThemeToggle />
             <Bell size={20} className="text-foreground" />
 
-            <div className="relative h-[2.5rem] w-[2.5rem]">
+            <div
+              onClick={() => onLogout()}
+              className="relative h-[2.5rem] w-[2.5rem] rounded-full"
+            >
               <Image
-                src={"/images/dummy-avatar.svg"}
+                src={user?.profilePicture || "/images/dummy-avatar.svg"}
                 alt="avatar"
                 fill
-                className="object-cover"
+                className="object-cover rounded-full"
               />
             </div>
           </div>
