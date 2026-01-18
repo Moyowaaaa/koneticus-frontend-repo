@@ -21,7 +21,7 @@ export const ROLE_SUGGESTIONS = [
 export const PORTFOLIO_FIELDS = [
   { key: "github", logo: "/images/github.svg" },
   { key: "behance", logo: "/images/behance.svg" },
-
+  { key: "linkedin", logo: "/images/linkedin.svg" },
   { key: "website", logo: "/images/web.svg" },
 ] as const;
 
@@ -70,6 +70,7 @@ export const dummyUsers: Collaborator[] = [
       github: "github/johndoe",
       behance: "behance/johndoe",
       website: "website/johndoe",
+      linkedin: "linkedin/johndoe",
     },
   },
   {
@@ -81,6 +82,7 @@ export const dummyUsers: Collaborator[] = [
       github: "github/durodoluwa",
       behance: "behance/durodoluwa",
       website: "website/durodoluwa",
+      linkedin: "linkedin/durodoluwa",
     },
   },
   {
@@ -92,6 +94,7 @@ export const dummyUsers: Collaborator[] = [
       github: "github/sandra",
       behance: "behance/sandra",
       website: "website/sandra",
+      linkedin: "linkedin/sandra",
     },
   },
 ];

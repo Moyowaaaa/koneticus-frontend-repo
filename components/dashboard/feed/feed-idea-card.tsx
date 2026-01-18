@@ -39,17 +39,22 @@ const FeedIdeaCard = ({ idea }: { idea?: FeedItem }) => {
             onClick={toggleShowInterestModal}
             className="p-2 px-4 flex items-center gap-2 bg-primary
             dark:bg-[#6155F5]
+
+            min-h-[2.5rem]
+            max-h-[2.5rem]
             text-white rounded-[1.25rem]"
           >
-            <CheckCheck size={13} color="white" />
-            <p className="text-[0.875rem] text-white">Show Interest</p>
+            <CheckCheck size={13} className="text-white dark:text-[#151515]" />
+            <p className="text-[0.875rem] text-white dark:text-[#151515]">
+              Show Interest
+            </p>
           </div>
         </section>
 
         <div className="flex flex-col gap-2">
-          <h1 className="text-brand-black">{idea?.title}</h1>
-          <p className="font-[sora-light] font-lightn text-brand-grey">
-            {idea?.description}. More
+          <h1 className="text-brand-black  dark:text-white">{idea?.title}</h1>
+          <p className="font-[sora-light] font-light text-brand-grey dark:text-[#808080]">
+            {idea?.description}. <span className="text-[#6155F5]">More</span>
           </p>
 
           <div className="flex items-center w-full gap-2">

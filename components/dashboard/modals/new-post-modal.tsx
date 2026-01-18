@@ -62,6 +62,7 @@ const NewIdeaModal = () => {
   };
 
   const handleImageButtonClick = () => {
+    setShowNewIdeaModal(false);
     setShowImageUploadModal(true);
   };
 
@@ -253,6 +254,7 @@ const NewIdeaModal = () => {
                 disabled={isSubmitting}
                 className="h-[2rem] w-[2rem] 
                   border-2 border-brand-black
+                  dark:border-[white]
                   rounded-[0.375rem]
                   flex flex-col items-center justify-center
                   cursor-pointer hover:bg-gray-100 transition-colors
@@ -261,7 +263,7 @@ const NewIdeaModal = () => {
               >
                 <ImageIcon
                   size={16}
-                  className="text-brand-black"
+                  className="dark:text-white text-brand-black"
                   fontWeight={"bold"}
                 />
               </button>
@@ -277,7 +279,9 @@ const NewIdeaModal = () => {
                     rounded-full
                     flex items-center gap-2
                     cursor-pointer hover:bg-gray-50 dark:hover:bg-[#2a2727] transition-colors
-                    disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled:opacity-50 
+                    min-h-[3rem] max-h-[3rem]
+                    disabled:cursor-not-allowed"
                   aria-label="Select team size"
                   aria-expanded={isTeamSizeOpen}
                   aria-haspopup="listbox"
@@ -346,7 +350,8 @@ const NewIdeaModal = () => {
             <div className="flex items-center gap-1" aria-live="polite">
               <Clock size={13} className="text-brand-grey" />
               <p className="text-[0.875rem] text-brand-grey">
-                <span className="text-brand-black">3</span> Monthly shares left
+                <span className="text-brand-black dark:text-white">3</span>{" "}
+                Monthly shares left
               </p>
             </div>
           </div>
@@ -356,7 +361,10 @@ const NewIdeaModal = () => {
       {/* Image Upload Modal */}
       <ImageUploadModal
         open={showImageUploadModal}
-        onOpenChange={setShowImageUploadModal}
+        onOpenChange={() => {
+          setShowImageUploadModal(false);
+          setShowNewIdeaModal(true);
+        }}
         onImageSelect={handleImageFromModal}
         initialImage={imagePreviewUrl}
       />

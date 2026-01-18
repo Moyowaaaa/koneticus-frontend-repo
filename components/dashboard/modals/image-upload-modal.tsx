@@ -434,20 +434,20 @@ const ImageUploadModal = ({
                   setOriginalImageUrl(imagePreviewUrl);
                   setView("edit");
                 }}
-                className="w-10 h-10 rounded-full bg-[#F0EEFF] flex items-center justify-center
+                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
                   hover:bg-[#E0DDFF] transition-colors"
                 aria-label="Edit image"
               >
-                <Edit2 size={18} className="text-brand-purple" />
+                <Edit2 size={18} variant="Bold" className="text-[#6155F5]" />
               </button>
               <button
                 type="button"
                 onClick={handleDelete}
-                className="w-10 h-10 rounded-full bg-[#F0EEFF] flex items-center justify-center
+                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
                   hover:bg-[#E0DDFF] transition-colors"
                 aria-label="Delete image"
               >
-                <Trash size={18} className="text-brand-purple" />
+                <Trash size={18} variant="Bold" className="text-[#6155F5]" />
               </button>
             </div>
           </div>
@@ -542,31 +542,31 @@ const ImageUploadModal = ({
             </div>
 
             {/* Edit Tools */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center  gap-[1rem]">
               <button
                 type="button"
                 onClick={handleRotateLeft}
-                className="w-10 h-10 rounded-full bg-[#F0EEFF] flex items-center justify-center
+                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
                   hover:bg-[#E0DDFF] transition-colors"
                 aria-label="Rotate left"
               >
-                <RotateLeft size={18} className="text-brand-purple" />
+                <RotateLeft size={18} className="text-[#6155F5]" />
               </button>
-              <button
+              {/* <button
                 type="button"
                 className="w-10 h-10 rounded-full bg-brand-purple flex items-center justify-center"
                 aria-label="Crop (active)"
               >
-                <Crop size={18} className="text-white" />
-              </button>
+                <Crop size={18} className="text-[#6155F5]" />
+              </button> */}
               <button
                 type="button"
                 onClick={handleRotateRight}
-                className="w-10 h-10 rounded-full bg-[#F0EEFF] flex items-center justify-center
+                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
                   hover:bg-[#E0DDFF] transition-colors"
                 aria-label="Rotate right"
               >
-                <RotateRight size={18} className="text-brand-purple" />
+                <RotateRight size={18} className="text-[#6155F5]" />
               </button>
             </div>
           </div>

@@ -59,7 +59,7 @@ export const MesssagesBox = () => {
             className="relative "
           />
         </div>
-        <p className="text-sm leading-5 text-brand-black">
+        <p className="text-sm leading-5 text-brand-black dark:text-white">
           Select a conversation to start messaging
         </p>
       </div>
@@ -72,7 +72,7 @@ export const MesssagesBox = () => {
       {/* Conversation Header */}
 
       {otherParticipant && (
-        <div className="flex items-center gap-3 border-b border-gray-100 p-4">
+        <div className="flex items-center gap-3 border-b border-gray-100 p-4 dark:border-[#80808026]">
           <div className="relative h-10 w-10">
             <Image
               src={otherParticipant.profile_photo || "/images/dummy-avatar.svg"}
@@ -93,7 +93,7 @@ export const MesssagesBox = () => {
             )}
           </div>
           <div>
-            <h3 className="font-semibold text-brand-black">
+            <h3 className="font-semibold text-brand-black dark:text-white">
               {otherParticipant.first_name} {otherParticipant.last_name}
             </h3>
             <p className="text-xs text-brand-grey capitalize">

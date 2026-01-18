@@ -6,6 +6,8 @@ import NavigationProgressBar from "@/components/ui-components/navigation-progres
 import NewIdeaModal from "@/components/dashboard/modals/new-post-modal";
 import ShowInterestModal from "@/components/dashboard/modals/show-interest-modal";
 import ThemeProvider from "@/components/ui-components/theme-provider";
+import QueryProvider from "@/components/layer/QueryProvider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,12 +34,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <NavigationProgressBar />
-          <NewIdeaModal />
-          <ShowInterestModal />
-          {children}
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <Toaster position="top-center" richColors />
+            <NavigationProgressBar />
+            <NewIdeaModal />
+            <ShowInterestModal />
+            {children}
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );
