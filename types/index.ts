@@ -23,6 +23,8 @@ export type SignUpFormData = {
   roles: string[];
   bio: string;
   portfolio: PortfolioLinks;
+  profileImageFile: File | null;
+  profileImagePreview: string;
 };
 
 export const INITIAL_STATE: SignUpFormData = {
@@ -31,11 +33,14 @@ export const INITIAL_STATE: SignUpFormData = {
   lastName: "",
   password: "",
   roles: [],
+  profileImageFile: null,
+  profileImagePreview: "",
   bio: "",
   portfolio: {
     website: "",
     behance: "",
     github: "",
+    linkedin: "",
   },
 };
 
