@@ -14,6 +14,7 @@ export interface ILoginUserData {
   roles?: string[];
   profilePicture?: string;
   isVerified?: boolean;
+  isEmailVerified?: boolean;
 }
 
 export interface IAuthResponse {
@@ -33,7 +34,8 @@ export interface ISignupPayload {
   roles: string[];
   bio?: string;
   links?: PortfolioLinks;
-
+  image?: File | null; // Profile image file for multer upload
+  cv?: File | null; // CV file for multer upload (optional)
   // CV data (optional)
   cvLinkedUrl?: string; // External CV link (LinkedIn, portfolio, etc.)
 }
@@ -43,5 +45,9 @@ export interface CheckEmailResponse {
 }
 
 export interface CheckEmailPayload {
+  email: string;
+}
+
+export interface ResendVerificationEmailPayload {
   email: string;
 }

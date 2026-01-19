@@ -5,6 +5,7 @@ import {
   IAuthResponse,
   ISignupPayload,
   LoginPayload,
+  ResendVerificationEmailPayload,
 } from "./auth.model";
 import apiHttp from "../appConfig";
 
@@ -55,11 +56,82 @@ export const useCheckEmail = () =>
 
 //sign up
 const registerUser = async (data: ISignupPayload): Promise<IAuthResponse> => {
-  const response = await apiHttp.post<IAuthResponse>("/auth/sign-up", data);
+  // Build FormData for multipart/form-data (required for file uploads)
+  const formData = new FormData();
+
+  // Required fields
+  formData.append("email", data.email);
+  formData.append("password", data.password);
+  formData.append("firstname", data.firstname);
+  formData.append("lastname", data.lastname);
+  formData.append("roles", JSON.stringify(data.roles));
+
+  // Optional fields
+  if (data.bio) {
+    formData.append("bio", data.bio);
+  }
+
+  if (data.links) {
+    formData.append("links", JSON.stringify(data.links));
+  }
+
+  if (data.cvLinkedUrl) {
+    formData.append("cvLinkedUrl", data.cvLinkedUrl);
+  }
+
+  // File uploads
+  if (data.image) {
+    formData.append("image", data.image);
+  }
+
+  if (data.cv) {
+    formData.append("cv", data.cv);
+  }
+
+  const response = await apiHttp.post<IAuthResponse>(
+    "/auth/sign-up",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
   return response.data;
 };
 
 export const useRegisterUser = () =>
   useMutation({
     mutationFn: registerUser,
+  });
+
+//resend verification email
+const resendVerificationEmail = async (
+  data: ResendVerificationEmailPayload,
+): Promise<{ message: string }> => {
+  const response = await apiHttp.post<{ message: string }>(
+    "/auth/resend-verification",
+    data,
+  );
+  return response.data;
+};
+
+export const useResendVerificationEmail = () =>
+  useMutation({
+    mutationFn: resendVerificationEmail,
+  });
+
+//verify email
+const verifyEmail = async (data: {
+  token: string;
+}): Promise<{ message: string }> => {
+  const response = await apiHttp.get<{ message: string }>(
+    `/auth/verify-email/${data.token}`,
+  );
+  return response.data;
+};
+
+export const useVerifyEmail = () =>
+  useMutation({
+    mutationFn: verifyEmail,
   });
