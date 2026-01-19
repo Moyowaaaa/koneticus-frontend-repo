@@ -6,7 +6,7 @@ import { loginSchemaType } from "@/schemas/auth";
 import { ArrowRight } from "iconsax-reactjs";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/schemas/auth";
@@ -37,7 +37,7 @@ const LogInPage = () => {
       const response = await loginUser(data);
       setAuth(response.data.user);
       // showToast.success(`Welcome back ${response.data.user.firstname || ""}!`);
-      toast.success(`Welcome back ${response.data.user.firstname || ""}!`);
+      showToast.success(`Welcome back ${response.data.user.firstname || ""}!`);
       router.push("/dashboard");
     } catch (error) {
       const errorMessage = getErrorMessage(error);
@@ -47,6 +47,13 @@ const LogInPage = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const didVerify = localStorage.getItem("didVerify");
+    if (didVerify === "true") {
+      toast.success("Email verified successfully, please log in");
+    }
+  }, []);
 
   return (
     <div className="relative flex flex-col gap-4 items-center justify-center top-0 h-full  py-10 h-full relative">
