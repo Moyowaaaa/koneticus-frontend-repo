@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useLoginUser,
-  useResendVerificationEmail,
-  useVerifyEmail,
-} from "@/api/auth/auth.mutations";
-import ButtonV2 from "@/components/ui-components/button";
+import { useLoginUser, useVerifyEmail } from "@/api/auth/auth.mutations";
 import { useGetErrorMessage } from "@/lib/utils";
 import { useOnboardingStore } from "@/store/useOnBoardingStore";
 import { showToast } from "@/utils/toasts";

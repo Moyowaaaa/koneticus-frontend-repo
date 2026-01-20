@@ -44,7 +44,12 @@ const BioStep = ({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateField("profileImage", reader.result as string);
+        // Store both the file (for upload) and preview URL (for display)
+        setFormData((prev) => ({
+          ...prev,
+          profileImageFile: file,
+          profileImagePreview: reader.result as string,
+        }));
       };
       reader.readAsDataURL(file);
     }
@@ -106,9 +111,9 @@ const BioStep = ({
             onClick={handleImageClick}
             className="min-h-28 min-w-28 h-28 w-28 border border-[#e9e9e9] rounded-full flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#827AE1] transition-colors"
           >
-            {formData.profileImage ? (
+            {formData.profileImagePreview ? (
               <Image
-                src={formData.profileImage}
+                src={formData.profileImagePreview}
                 alt="Profile"
                 width={112}
                 height={112}

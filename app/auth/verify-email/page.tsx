@@ -2,12 +2,16 @@
 
 import { useResendVerificationEmail } from "@/api/auth/auth.mutations";
 import ButtonV2 from "@/components/ui-components/button";
+import { useGetErrorMessage } from "@/lib/utils";
 import { useOnboardingStore } from "@/store/useOnBoardingStore";
+import { showToast } from "@/utils/toasts";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const VerifyEmailPage = () => {
   const router = useRouter();
+  const getErrorMessage = useGetErrorMessage();
+
   const { user } = useOnboardingStore();
   const onNavigateToLogin = () => {
     router.push("/auth/log-in");
@@ -16,8 +20,14 @@ const VerifyEmailPage = () => {
   const { mutateAsync: resendVerificationEmail, isPending } =
     useResendVerificationEmail();
 
-  const onResendVerificationEmail = () => {
-    resendVerificationEmail({ email: user.email });
+  const onResendVerificationEmail = async () => {
+    try {
+      await resendVerificationEmail({ email: user.email });
+      showToast.success("Verification email sent successfully");
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      showToast.error(errorMessage);
+    }
   };
 
   return (

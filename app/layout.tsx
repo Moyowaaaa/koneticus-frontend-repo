@@ -36,7 +36,7 @@ export default function RootLayout({
       >
         <QueryProvider>
           <ThemeProvider>
-            <Toaster position="top-center" richColors />
+            <Toaster position="top-center" visibleToasts={1} richColors />
             <NavigationProgressBar />
             <NewIdeaModal />
             <ShowInterestModal />

@@ -27,6 +27,8 @@ const TopNavBar = () => {
     router.push("/auth/log-in");
   };
 
+  console.log({ user });
+
   return (
     <>
       <nav className="fixed left-0 right-0 top-0 z-50 hidden h-[5rem] w-full border-b border-border/60 bg-background/80 backdrop-blur md:block">
