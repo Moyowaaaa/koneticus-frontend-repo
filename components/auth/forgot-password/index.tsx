@@ -1,40 +1,82 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState, Suspense } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 import EmailStep from "./steps/email";
 import NewPasswordStep from "./steps/new-password";
 import ConfirmedStep from "./steps/confirmed";
+import { useResetPassword } from "@/api/auth/auth.mutations";
+import { showToast } from "@/utils/toasts";
 
-const STEP_TITLES = ["Email", "Security", "Done"] as const;
-const LAST_STEP_INDEX = STEP_TITLES.length - 1;
+// String-based step values
+type StepName = "email" | "newPassword" | "confirmed";
+
+const VALID_STEPS: StepName[] = ["email", "newPassword", "confirmed"];
 
 const simulateRequest = () =>
   new Promise<void>((resolve) => setTimeout(resolve, 800));
 
-const ForgotPasswordFlow = () => {
+// Helper to validate step value
+const getValidStep = (step: string | null, defaultStep: StepName): StepName => {
+  if (step && VALID_STEPS.includes(step as StepName)) {
+    return step as StepName;
+  }
+  return defaultStep;
+};
+
+interface ForgotPasswordFlowContentProps {
+  token?: string;
+}
+
+function ForgotPasswordFlowContent({ token }: ForgotPasswordFlowContentProps) {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { mutateAsync: resetPassword, isPending } = useResetPassword();
+  // Initialize step from URL or default based on whether token exists
+  const [currentStep, setCurrentStep] = useState<StepName>(() => {
+    const stepParam = searchParams.get("step");
+    // If token exists, default to newPassword step; otherwise default to email
+    const defaultStep: StepName = token ? "newPassword" : "email";
+    return getValidStep(stepParam, defaultStep);
+  });
+
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Update both state and URL when step changes
+  const setStepWithUrl = (nextStep: StepName) => {
+    setCurrentStep(nextStep);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextStep === "email") {
+      params.delete("step");
+    } else {
+      params.set("step", nextStep);
+    }
+
+    const queryString = params.toString();
+    const target = queryString ? `${pathname}?${queryString}` : pathname;
+    router.replace(target, { scroll: false });
+  };
+
   const headingCopy = useMemo(() => {
     switch (currentStep) {
-      case 0:
+      case "email":
         return {
           title: "Reset your password",
           description: "Enter the email tied to your KoLabs account.",
         };
-      case 1:
+      case "newPassword":
         return {
           title: "Create a new password",
           description: "Make sure it's strong and unique.",
         };
-      default:
+      case "confirmed":
         return {
           title: "Password reset complete",
           description: "You can now sign in with your new password.",
@@ -42,9 +84,13 @@ const ForgotPasswordFlow = () => {
     }
   }, [currentStep]);
 
-  const handleStepSelection = (nextStep: number) => {
-    if (nextStep > currentStep) return;
-    setCurrentStep(nextStep);
+  const handleStepSelection = (nextStep: StepName) => {
+    // Only allow going back, not forward
+    const currentIndex = VALID_STEPS.indexOf(currentStep);
+    const nextIndex = VALID_STEPS.indexOf(nextStep);
+    if (nextIndex > currentIndex) return;
+
+    setStepWithUrl(nextStep);
     setError(null);
   };
 
@@ -54,12 +100,14 @@ const ForgotPasswordFlow = () => {
       return;
     }
 
+    localStorage.setItem("email", email);
+
     setIsSubmitting(true);
     setError(null);
 
     try {
       await simulateRequest();
-      setCurrentStep(1);
+      setStepWithUrl("confirmed");
     } finally {
       setIsSubmitting(false);
     }
@@ -72,7 +120,7 @@ const ForgotPasswordFlow = () => {
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Your passwords don’t match. Double-check and try again.");
+      setError("Your passwords don't match. Double-check and try again.");
       return;
     }
 
@@ -81,7 +129,21 @@ const ForgotPasswordFlow = () => {
 
     try {
       await simulateRequest();
-      setCurrentStep(LAST_STEP_INDEX);
+      // TODO: Call API with token and new password
+      console.log("Reset password with token:", token);
+      await resetPassword({
+        token: token!,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
+      });
+      showToast.success(
+        "Password reset successfully, please login with your new password",
+      );
+      router.push("/auth/log-in");
+    } catch (error) {
+      console.error("Failed to reset password:", error);
+      setError("Failed to reset password. Please try again.");
+      showToast.error("Failed to reset password. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -89,7 +151,7 @@ const ForgotPasswordFlow = () => {
 
   const updatePasswordField = (
     field: "newPassword" | "confirmPassword",
-    value: string
+    value: string,
   ) => {
     if (field === "newPassword") {
       setNewPassword(value);
@@ -109,7 +171,7 @@ const ForgotPasswordFlow = () => {
           <h1 className="text-[1.875rem] font-bold">Reset Your Password</h1>
         </div>
 
-        {currentStep === 0 && (
+        {currentStep === "email" && (
           <EmailStep
             email={email}
             onEmailChange={(value) => {
@@ -122,20 +184,20 @@ const ForgotPasswordFlow = () => {
           />
         )}
 
-        {currentStep === 2 && (
+        {currentStep === "newPassword" && (
           <NewPasswordStep
             email={email}
             newPassword={newPassword}
             confirmPassword={confirmPassword}
             onPasswordChange={updatePasswordField}
             onSubmit={handlePasswordSubmit}
-            onBack={() => handleStepSelection(0)}
+            onBack={() => handleStepSelection("email")}
             isLoading={isSubmitting}
             error={error}
           />
         )}
 
-        {currentStep === 1 && (
+        {currentStep === "confirmed" && (
           <ConfirmedStep
             email={email}
             onNavigateToLogin={handleNavigateToLogin}
@@ -143,6 +205,31 @@ const ForgotPasswordFlow = () => {
         )}
       </div>
     </section>
+  );
+}
+
+function ForgotPasswordFlowFallback() {
+  return (
+    <section className="flex w-9/12 mx-auto flex-col items-center gap-10">
+      <div className="flex w-full flex-col gap-6 text-center pt-16">
+        <div className="space-y-2">
+          <h1 className="text-[1.875rem] font-bold">Reset Your Password</h1>
+        </div>
+        <div className="animate-pulse bg-muted h-32 rounded-lg" />
+      </div>
+    </section>
+  );
+}
+
+interface ForgotPasswordFlowProps {
+  token?: string;
+}
+
+const ForgotPasswordFlow = ({ token }: ForgotPasswordFlowProps) => {
+  return (
+    <Suspense fallback={<ForgotPasswordFlowFallback />}>
+      <ForgotPasswordFlowContent token={token} />
+    </Suspense>
   );
 };
 

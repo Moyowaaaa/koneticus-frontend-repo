@@ -135,3 +135,37 @@ export const useVerifyEmail = () =>
   useMutation({
     mutationFn: verifyEmail,
   });
+
+//forgot Password
+const forgotPassword = async (data: {
+  email: string;
+}): Promise<{ message: string }> => {
+  const response = await apiHttp.post<{ message: string }>(
+    `/auth/forgot-password`,
+    data,
+  );
+  return response.data;
+};
+
+export const useForgotPassword = () =>
+  useMutation({
+    mutationFn: forgotPassword,
+  });
+
+//reset Password
+const resetPassword = async (data: {
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}): Promise<{ message: string }> => {
+  const response = await apiHttp.post<{ message: string }>(
+    `/auth/reset-password/${data.token}`,
+    data,
+  );
+  return response.data;
+};
+
+export const useResetPassword = () =>
+  useMutation({
+    mutationFn: resetPassword,
+  });
