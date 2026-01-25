@@ -6,10 +6,11 @@ import { useDummyStore } from "@/store/useDummyStore";
 import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import ProjectCard from "../projects/project-card";
 import gsap from "gsap";
 import EditIdeaModal from "../modals/edit-idea-modal";
+import { useGetInfiniteUserProjects } from "@/api/projects/projects.queries";
 
 const IdeasClient = () => {
   const router = useRouter();
@@ -43,7 +44,7 @@ const IdeasClient = () => {
         ],
         {
           opacity: 0,
-        }
+        },
       );
       gsap.set(textRef.current, { opacity: 0, y: 20 });
 
@@ -63,7 +64,7 @@ const IdeasClient = () => {
             opacity: 1,
             duration: 0.5,
           },
-          "-=0.4"
+          "-=0.4",
         )
         // Strings pop in with stagger
         .to(
@@ -74,7 +75,7 @@ const IdeasClient = () => {
             stagger: 0.1,
             ease: "back.out(2)",
           },
-          "-=0.3"
+          "-=0.3",
         )
         // Text fades in
         .to(
@@ -84,7 +85,7 @@ const IdeasClient = () => {
             y: 0,
             duration: 0.6,
           },
-          "-=0.2"
+          "-=0.2",
         );
 
       // Shadow pulses
@@ -123,6 +124,37 @@ const IdeasClient = () => {
 
     return () => ctx.revert();
   }, [pendingProjects.length]);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useGetInfiniteUserProjects();
+
+  // Native IntersectionObserver with useCallback ref pattern (no useEffect needed)
+  const loadMoreRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        },
+        { threshold: 0.1 },
+      );
+
+      observer.observe(node);
+
+      // Cleanup on unmount or ref change
+      return () => observer.disconnect();
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
 
   return (
     <>

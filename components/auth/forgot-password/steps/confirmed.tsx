@@ -1,9 +1,4 @@
-type ConfirmedStepProps = {
-  email: string;
-  onNavigateToLogin: () => void;
-};
-
-const ConfirmedStep = ({ email, onNavigateToLogin }: ConfirmedStepProps) => {
+const ConfirmedStep = () => {
   return (
     <div className="flex flex-col gap-6 ">
       <div className="space-y-2  flex items-center justify-center">

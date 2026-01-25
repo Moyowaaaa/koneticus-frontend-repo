@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 import EmailStep from "./steps/email";
@@ -33,7 +33,7 @@ function ForgotPasswordFlowContent({ token }: ForgotPasswordFlowContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { mutateAsync: resetPassword, isPending } = useResetPassword();
+  const { mutateAsync: resetPassword } = useResetPassword();
   // Initialize step from URL or default based on whether token exists
   const [currentStep, setCurrentStep] = useState<StepName>(() => {
     const stepParam = searchParams.get("step");
@@ -63,26 +63,6 @@ function ForgotPasswordFlowContent({ token }: ForgotPasswordFlowContentProps) {
     const target = queryString ? `${pathname}?${queryString}` : pathname;
     router.replace(target, { scroll: false });
   };
-
-  const headingCopy = useMemo(() => {
-    switch (currentStep) {
-      case "email":
-        return {
-          title: "Reset your password",
-          description: "Enter the email tied to your KoLabs account.",
-        };
-      case "newPassword":
-        return {
-          title: "Create a new password",
-          description: "Make sure it's strong and unique.",
-        };
-      case "confirmed":
-        return {
-          title: "Password reset complete",
-          description: "You can now sign in with your new password.",
-        };
-    }
-  }, [currentStep]);
 
   const handleStepSelection = (nextStep: StepName) => {
     // Only allow going back, not forward
@@ -162,8 +142,6 @@ function ForgotPasswordFlowContent({ token }: ForgotPasswordFlowContentProps) {
     if (error) setError(null);
   };
 
-  const handleNavigateToLogin = () => router.push("/auth/log-in");
-
   return (
     <section className="flex w-9/12 mx-auto  flex-col items-center gap-10 ">
       <div className="flex w-full  flex-col gap-6 text-center pt-16">
@@ -184,6 +162,8 @@ function ForgotPasswordFlowContent({ token }: ForgotPasswordFlowContentProps) {
           />
         )}
 
+        {currentStep === "confirmed" && <ConfirmedStep />}
+
         {currentStep === "newPassword" && (
           <NewPasswordStep
             email={email}
@@ -194,13 +174,6 @@ function ForgotPasswordFlowContent({ token }: ForgotPasswordFlowContentProps) {
             onBack={() => handleStepSelection("email")}
             isLoading={isSubmitting}
             error={error}
-          />
-        )}
-
-        {currentStep === "confirmed" && (
-          <ConfirmedStep
-            email={email}
-            onNavigateToLogin={handleNavigateToLogin}
           />
         )}
       </div>

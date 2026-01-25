@@ -28,12 +28,12 @@ const FeedClient = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (!user?.isEmailVerified) {
-      router.push("/auth/verify-email");
-      showToast.info("you need to verify your email");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!user?.isEmailVerified) {
+  //     router.push("/auth/verify-email");
+  //     showToast.info("you need to verify your email");
+  //   }
+  // }, [!user?.isEmailVerified]);
 
   console.log(user?.isEmailVerified);
   return (

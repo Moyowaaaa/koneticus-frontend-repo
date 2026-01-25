@@ -80,7 +80,7 @@ interface ChatState {
   getOtherParticipant: (conversationId?: string) => ChatUser | null;
   addMessage: (
     conversationId: string,
-    message: Omit<ChatMessage, "id" | "timestamp">
+    message: Omit<ChatMessage, "id" | "timestamp">,
   ) => void;
 
   // Search actions
@@ -113,6 +113,7 @@ const dummyUsers: ChatUser[] = [
       behance: "behance.com/andrea",
       github: "github.com/andrea",
       website: "andrea.com",
+      linkedin: "linkedin.com/andrea",
     },
     bio: "Andrea is a passionate designer with a keen eye for detail. She enjoys creating visually stunning and user-friendly interfaces that enhance the user experience.",
   },
@@ -127,6 +128,7 @@ const dummyUsers: ChatUser[] = [
       behance: "behance.com/john",
       github: "github.com/john",
       website: "john.com",
+      linkedin: "linkedin.com/john",
     },
     bio: "John is a skilled developer with a strong passion for creating innovative and user-friendly applications. He enjoys building scalable and efficient systems that deliver exceptional results.",
   },
@@ -141,6 +143,7 @@ const dummyUsers: ChatUser[] = [
       behance: "behance.com/sarah",
       github: "github.com/sarah",
       website: "sarah.com",
+      linkedin: "linkedin.com/sarah",
     },
     bio: "Sarah is a talented marketer with a proven track record of driving successful campaigns. She enjoys creating engaging and effective marketing strategies that help businesses achieve their goals.",
   },
@@ -155,6 +158,7 @@ const dummyUsers: ChatUser[] = [
       behance: "behance.com/mike",
       github: "github.com/mike",
       website: "mike.com",
+      linkedin: "linkedin.com/mike",
     },
     bio: "Mike is a creative director with a proven track record of leading successful projects. He enjoys working with talented teams to deliver innovative and impactful results.",
   },
@@ -169,6 +173,7 @@ const dummyUsers: ChatUser[] = [
       behance: "behance.com/emma",
       github: "github.com/emma",
       website: "emma.com",
+      linkedin: "linkedin.com/emma",
     },
     bio: "Emma is a marketing analyst with a proven track record of analyzing market trends and identifying opportunities. She enjoys creating data-driven marketing strategies that help businesses succeed.",
   },
@@ -183,6 +188,7 @@ const dummyUsers: ChatUser[] = [
       behance: "behance.com/you",
       github: "github.com/you",
       website: "you.com",
+      linkedin: "linkedin.com/you",
     },
     bio: "I am a dummy user",
   },
@@ -377,10 +383,13 @@ const createDummyMessages = (): Record<string, ChatMessage[]> => {
 
 // Helper to convert users array to record
 const getUsersRecord = (users: ChatUser[]): Record<string, ChatUser> => {
-  return users.reduce((acc, user) => {
-    acc[user.id] = user;
-    return acc;
-  }, {} as Record<string, ChatUser>);
+  return users.reduce(
+    (acc, user) => {
+      acc[user.id] = user;
+      return acc;
+    },
+    {} as Record<string, ChatUser>,
+  );
 };
 
 // Generate unique ID
@@ -407,7 +416,7 @@ export const useChatStore = create<ChatState>()(
         setCurrentConversation: (conversationId) => {
           const state = get();
           const otherParticipant = state.getOtherParticipant(
-            conversationId || undefined
+            conversationId || undefined,
           );
 
           set({
@@ -427,7 +436,7 @@ export const useChatStore = create<ChatState>()(
         markAsRead: (conversationId) => {
           const state = get();
           const conversations = state.conversations.map((conv) =>
-            conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv
+            conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv,
           );
 
           // Also mark messages as read
@@ -469,7 +478,7 @@ export const useChatStore = create<ChatState>()(
 
           return (
             state.conversations.find(
-              (conv) => conv.id === state.currentConversationId
+              (conv) => conv.id === state.currentConversationId,
             ) || null
           );
         },
@@ -483,12 +492,12 @@ export const useChatStore = create<ChatState>()(
           if (!targetConvId) return null;
 
           const conversation = conversations.find(
-            (conv) => conv.id === targetConvId
+            (conv) => conv.id === targetConvId,
           );
           if (!conversation) return null;
 
           const participantId = conversation.participants.find(
-            (id) => id !== state.currentUserId
+            (id) => id !== state.currentUserId,
           );
 
           return participantId ? users[participantId] || null : null;
@@ -527,7 +536,7 @@ export const useChatStore = create<ChatState>()(
                       ? conv.unreadCount
                       : conv.unreadCount + 1,
                 }
-              : conv
+              : conv,
           );
 
           set({
@@ -601,7 +610,7 @@ export const useChatStore = create<ChatState>()(
                   isArchived: true,
                   updatedAt: new Date().toISOString(),
                 }
-              : conv
+              : conv,
           );
           set({ conversations });
 
@@ -622,7 +631,7 @@ export const useChatStore = create<ChatState>()(
                   isArchived: false,
                   updatedAt: new Date().toISOString(),
                 }
-              : conv
+              : conv,
           );
           set({ conversations });
         },
@@ -636,7 +645,7 @@ export const useChatStore = create<ChatState>()(
                   isBlocked: true,
                   updatedAt: new Date().toISOString(),
                 }
-              : conv
+              : conv,
           );
           set({ conversations });
 
@@ -657,7 +666,7 @@ export const useChatStore = create<ChatState>()(
                   isBlocked: false,
                   updatedAt: new Date().toISOString(),
                 }
-              : conv
+              : conv,
           );
           set({ conversations });
         },
@@ -665,7 +674,7 @@ export const useChatStore = create<ChatState>()(
         deleteConversation: (conversationId) => {
           const state = get();
           const conversations = state.conversations.filter(
-            (conv) => conv.id !== conversationId
+            (conv) => conv.id !== conversationId,
           );
 
           // Also remove messages
@@ -691,7 +700,7 @@ export const useChatStore = create<ChatState>()(
                   isMessageRequest: false,
                   updatedAt: new Date().toISOString(),
                 }
-              : conv
+              : conv,
           );
           set({ conversations });
         },
@@ -699,7 +708,7 @@ export const useChatStore = create<ChatState>()(
         rejectMessageRequest: (conversationId) => {
           const state = get();
           const conversations = state.conversations.filter(
-            (conv) => conv.id !== conversationId
+            (conv) => conv.id !== conversationId,
           );
 
           // Also remove messages
@@ -725,8 +734,8 @@ export const useChatStore = create<ChatState>()(
           messages: state.messages,
           currentUserId: state.currentUserId,
         }),
-      }
+      },
     ),
-    { name: "ChatStore" }
-  )
+    { name: "ChatStore" },
+  ),
 );

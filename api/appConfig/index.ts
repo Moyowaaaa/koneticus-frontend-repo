@@ -8,6 +8,33 @@ export interface ErrorResponse {
   path: string;
 }
 
+// Generic API Response Types
+export interface ResponseBase {
+  status?: boolean;
+  message: string;
+}
+
+export interface BaseResponse<T> extends ResponseBase {
+  data: T[];
+}
+
+export interface SingleResponse<T> extends ResponseBase {
+  data: T;
+}
+
+// For paginated responses with cursor-based pagination
+export interface PaginationMeta {
+  nextCursor: string | null;
+  hasMore: boolean;
+  limit: number;
+}
+
+export interface PaginatedResponse<T> extends ResponseBase {
+  items: T[];
+  pagination: PaginationMeta;
+  fromCache?: boolean;
+}
+
 const apiHttp = axios.create({
   baseURL: "http://localhost:4000/v1/api",
   // process.env.NEXT_PUBLIC_API_BASE_URL || "https://dingpay-be.onrender.com",
@@ -31,7 +58,7 @@ apiHttp.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiHttp;
