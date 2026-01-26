@@ -16,7 +16,6 @@ const Feed = () => {
     isError,
   } = useGetInfiniteFeed();
 
-  // Native IntersectionObserver with useCallback ref pattern (no useEffect needed)
   const loadMoreRef = useCallback(
     (node: HTMLDivElement | null) => {
       if (!node) return;
@@ -32,13 +31,11 @@ const Feed = () => {
 
       observer.observe(node);
 
-      // Cleanup on unmount or ref change
       return () => observer.disconnect();
     },
     [hasNextPage, isFetchingNextPage, fetchNextPage],
   );
 
-  // Flatten all pages into a single array
   const feedItems = data?.pages.flatMap((page) => page.items) ?? [];
 
   if (isError) {
