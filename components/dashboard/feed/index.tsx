@@ -55,7 +55,7 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col gap-4 w-full py-4">
-      <h1 className="text-[1.125rem] font-normal leading-[1.875rem]">
+      <h1 className="text-[1.125rem] font-normal leading-7.5">
         Recommended for you
       </h1>
 
