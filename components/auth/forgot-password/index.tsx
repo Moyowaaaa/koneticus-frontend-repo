@@ -9,7 +9,6 @@ import ConfirmedStep from "./steps/confirmed";
 import { useResetPassword } from "@/api/auth/auth.mutations";
 import { showToast } from "@/utils/toasts";
 
-// String-based step values
 type StepName = "email" | "newPassword" | "confirmed";
 
 const VALID_STEPS: StepName[] = ["email", "newPassword", "confirmed"];
