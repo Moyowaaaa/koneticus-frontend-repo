@@ -6,7 +6,7 @@ import TagInput from "@/components/ui-components/tag-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
-import { useFeedStore } from "@/store/useFeedStore";
+// import { useFeedStore } from "@/store/useFeedStore";
 import {
   Clock,
   Image as ImageIcon,
@@ -16,42 +16,72 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ImageUploadModal from "./image-upload-modal";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateProject } from "@/api/projects/project.mutations";
+import { toast } from "sonner";
 
 const NewIdeaModal = () => {
   const { showNewIdeaModal, setShowNewIdeaModal } = useGeneralStateStore();
-  const { addNewIdea } = useFeedStore();
+  const { mutate: createProject, isPending: isSubmitting } = useCreateProject();
 
-  const titleInputRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
-  // Role selection state
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  // Define Zod schema
+  const createProjectSchema = z.object({
+    title: z.string().min(3, "Title must be at least 3 characters"),
+    description: z
+      .string()
+      .min(10, "Description must be at least 10 characters"),
+    requiredRoles: z.array(z.string()),
+    teamSize: z.number().min(1, "Team size must be at least 1"),
+    media: z.any().optional(), // File handling is manual or via controlled input
+  });
+
+  type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<CreateProjectFormValues>({
+    resolver: zodResolver(createProjectSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      requiredRoles: [],
+      teamSize: 1,
+    },
+  });
+
+  const selectedRoles = watch("requiredRoles");
+  const teamSize = watch("teamSize");
 
   // Team size selection state
-  const [teamSize, setTeamSize] = useState<number>(1);
   const [isTeamSizeOpen, setIsTeamSizeOpen] = useState(false);
   const teamSizeOptions = [1, 2, 3, 4, 5];
 
   // Image upload modal state
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedImage(file);
+      setSelectedFile(file);
       const previewUrl = URL.createObjectURL(file);
       setImagePreviewUrl(previewUrl);
     }
   };
 
-  const handleRemoveImage = () => {
-    setSelectedImage(null);
+  const handleRemoveImage = React.useCallback(() => {
+    setSelectedFile(null);
     if (imagePreviewUrl) {
       URL.revokeObjectURL(imagePreviewUrl);
       setImagePreviewUrl(null);
@@ -59,7 +89,7 @@ const NewIdeaModal = () => {
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
     }
-  };
+  }, [imagePreviewUrl]);
 
   const handleImageButtonClick = () => {
     setShowNewIdeaModal(false);
@@ -67,86 +97,41 @@ const NewIdeaModal = () => {
   };
 
   const handleImageFromModal = (imageUrl: string, file: File) => {
-    setSelectedImage(file);
+    setSelectedFile(file);
     setImagePreviewUrl(imageUrl);
   };
 
+  // Reset form when modal opens/closes
   useEffect(() => {
-    if (showNewIdeaModal) {
-      titleInputRef.current?.focus();
+    if (!showNewIdeaModal) {
+      reset();
+      handleRemoveImage();
+      setIsTeamSizeOpen(false);
     }
-  }, [showNewIdeaModal]);
+  }, [showNewIdeaModal, reset]);
 
-  useEffect(() => {
-    if (!showNewIdeaModal) return;
-
-    const handleEnterSubmit = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (event.key !== "Enter" || target?.tagName === "TEXTAREA") {
-        return;
-      }
-
-      event.preventDefault();
-      formRef.current?.requestSubmit();
+  const onSubmit = (data: CreateProjectFormValues) => {
+    // Prepare payload
+    const payload = {
+      ...data,
+      media: selectedFile ? [selectedFile] : undefined,
     };
 
-    window.addEventListener("keydown", handleEnterSubmit);
-    return () => window.removeEventListener("keydown", handleEnterSubmit);
-  }, [showNewIdeaModal]);
-
-  const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
-
-    if (!title.trim() || !description.trim()) {
-      // Basic validation - you can enhance this
-      alert("Please fill in both title and description");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Add the new idea to the feed (pass image URL if one was selected)
-      addNewIdea(
-        title.trim(),
-        description.trim(),
-        selectedRoles,
-        teamSize,
-        imagePreviewUrl || undefined
-      );
-
-      // Reset form
-      setTitle("");
-      setDescription("");
-      setSelectedRoles([]);
-      setTeamSize(1);
-      setIsTeamSizeOpen(false);
-      setShowImageUploadModal(false);
-      handleRemoveImage();
-
-      // Close modal
-      setShowNewIdeaModal(false);
-    } catch (error) {
-      console.error("Error posting idea:", error);
-      alert("Failed to post idea. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    createProject(payload, {
+      onSuccess: () => {
+        toast.success("Project created successfully!");
+        setShowNewIdeaModal(false);
+      },
+      onError: (error) => {
+        toast.error("Failed to create project. Please try again.");
+        console.error("Submission error:", error);
+      },
+    });
   };
 
   const handleModalClose = (open: boolean) => {
     if (!isSubmitting) {
       setShowNewIdeaModal(open);
-      if (!open) {
-        // Reset form when modal closes
-        setTitle("");
-        setDescription("");
-        setSelectedRoles([]);
-        setTeamSize(1);
-        setIsTeamSizeOpen(false);
-        setShowImageUploadModal(false);
-        handleRemoveImage();
-      }
     }
   };
 
@@ -158,37 +143,40 @@ const NewIdeaModal = () => {
         title="New Idea"
         className="flex flex-col gap-4"
       >
-        <form
-          ref={formRef}
-          className="flex flex-col gap-4"
-          onSubmit={handleSubmit}
-        >
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <label className="flex flex-col gap-1">
             <span className="sr-only">Idea title</span>
             <Input
-              ref={titleInputRef}
+              {...register("title")}
               placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
               disabled={isSubmitting}
               className="h-12 outline-none 
               dark:bg-[#211E1E]
               text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9] dark:border-b-[#80808026]"
             />
+            {errors.title && (
+              <span className="text-red-500 text-sm">
+                {errors.title.message}
+              </span>
+            )}
           </label>
 
           <label className="flex flex-col gap-1">
             <span className="sr-only">Idea description</span>
             <Textarea
+              {...register("description")}
               placeholder="Write description here...."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               disabled={isSubmitting}
               className="resize-none h-40
               
               dark:bg-[#211E1E]
               outline-none border-none ring-0  shadow-none    text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9]"
             />
+            {errors.description && (
+              <span className="text-red-500 text-sm">
+                {errors.description.message}
+              </span>
+            )}
           </label>
 
           {/* Image Preview Section */}
@@ -229,7 +217,7 @@ const NewIdeaModal = () => {
 
           <TagInput
             selectedTags={selectedRoles}
-            onTagsChange={setSelectedRoles}
+            onTagsChange={(tags) => setValue("requiredRoles", tags)}
             placeholder="Enter tags e.g Designer"
             disabled={isSubmitting}
           />
@@ -241,7 +229,7 @@ const NewIdeaModal = () => {
                 min-h-[2.5rem]
                 max-h-[2.5rem]! max-w-[8.625rem]! w-[8.625rem]!"
                 type="submit"
-                disabled={isSubmitting || !title.trim() || !description.trim()}
+                disabled={isSubmitting}
               >
                 <p className="text-[0.875rem]">
                   {isSubmitting ? "Sharing..." : "Share your idea"}
@@ -325,7 +313,7 @@ const NewIdeaModal = () => {
                         key={size}
                         type="button"
                         onClick={() => {
-                          setTeamSize(size);
+                          setValue("teamSize", size);
                           setIsTeamSizeOpen(false);
                         }}
                         className={`w-full px-4 py-2 text-left text-[0.875rem]
@@ -335,7 +323,10 @@ const NewIdeaModal = () => {
                             teamSize === size
                               ? "text-brand-purple font-medium"
                               : "text-brand-black dark:text-white"
-                          }`}
+                          }
+                          ${size === 1 ? "rounded-t-[0.875rem]" : ""}
+                          ${size === 5 ? "rounded-b-[0.875rem]" : ""}
+                          `}
                         role="option"
                         aria-selected={teamSize === size}
                       >

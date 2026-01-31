@@ -39,3 +39,11 @@ export interface ProjectMedia {
   id: string;
   _id: string;
 }
+
+export interface ICreateProjectPayload {
+  title: string;
+  description: string;
+  requiredRoles: string[];
+  teamSize: number;
+  media?: File[];
+}

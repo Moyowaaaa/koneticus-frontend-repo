@@ -22,6 +22,7 @@ export interface IAuthResponse {
   data: {
     user: ILoginUserData;
   };
+  token: string;
 }
 
 export interface ISignupPayload {

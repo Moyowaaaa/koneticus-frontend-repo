@@ -35,7 +35,7 @@ const LogInPage = () => {
   const onSubmit: SubmitHandler<loginSchemaType> = async (data) => {
     try {
       const response = await loginUser(data);
-      setAuth(response.data.user);
+      setAuth(response.data.user, response.token);
       // showToast.success(`Welcome back ${response.data.user.firstname || ""}!`);
       showToast.success(`Welcome back ${response.data.user.firstname || ""}!`);
       router.push("/dashboard");
