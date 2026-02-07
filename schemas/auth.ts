@@ -83,8 +83,6 @@ export const fullOnboardingSchema = z.object({
   }),
 });
 
-// Legacy schemas
-
 export const newPasswordSchema = z
   .object({
     oldPassword: z.string(),

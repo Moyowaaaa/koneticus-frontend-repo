@@ -1,44 +1,69 @@
 import { FeedItem } from "@/api/feed/feed.model";
 import { sentenceCaseEachWord } from "@/lib/utils";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
-import { CheckCheck } from "lucide-react";
+import { CheckCheck, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
 import Image from "next/image";
 import MediaGrid from "./media-grid";
+import { formatTimeAgo } from "@/utils";
+import { useAuthStore } from "@/store/useAuthStore";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { useDeleteProject } from "@/api/projects/project.mutations";
 
 // Format relative time from ISO date string
-const formatTimeAgo = (dateString: string): string => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return "now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
-};
-
-const FeedIdeaCard = ({ idea }: { idea: FeedItem }) => {
+const FeedIdeaCard = ({
+  idea,
+  isDeleting = false,
+  onDelete,
+}: {
+  idea: FeedItem;
+  isDeleting?: boolean;
+  onDelete?: (id: string) => void;
+}) => {
   const { toggleShowInterestModal } = useGeneralStateStore();
+  const { user } = useAuthStore();
 
   // Get author from the populated author field
   const authorProfile = idea.author?.userProfile;
   const authorName = authorProfile
     ? `${authorProfile.firstname} ${authorProfile.lastname}`
-    : "Anonymous";
+    : "Unknown Author";
   const authorAvatar =
     authorProfile?.profilePicture?.url || "/images/dummy-avatar.svg";
 
   console.log(["authhguhf", authorProfile]);
+  const isAuthor = user?._id === idea.author?._id || false;
+
+  const { mutateAsync: deleteProject } = useDeleteProject(idea._id);
+
+  const handleDelete = async () => {
+    // Call parent's optimistic delete handler first
+    if (onDelete) {
+      onDelete(idea._id);
+    }
+
+    // Then call the API in background
+    try {
+      await deleteProject(idea._id);
+      console.log("Project deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      // Query invalidation in the mutation will handle restoring
+    }
+  };
 
   return (
     <div
-      className="w-full min-h-max flex flex-col gap-4 border
+      className={`w-full min-h-max flex flex-col gap-4 border
         dark:border-[#80808026]
-        border-[#e9e9e9e9] rounded-[1.25rem] p-6 px-4"
+        border-[#e9e9e9e9] rounded-[1.25rem] p-6 px-4 transition-all duration-300 ${
+          isDeleting ? "opacity-50 scale-95" : "opacity-100 scale-100"
+        }`}
     >
       <section className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -60,18 +85,54 @@ const FeedIdeaCard = ({ idea }: { idea: FeedItem }) => {
           </div>
         </div>
 
-        <div
-          onClick={toggleShowInterestModal}
-          className="p-2 px-4 flex items-center gap-2 bg-primary
+        <div className="flex items-center gap-2">
+          {isAuthor ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+                  disabled={isDeleting}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-40 p-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 disabled:opacity-50"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4 mr-2" />
+                  )}
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Button>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <div
+              onClick={toggleShowInterestModal}
+              className="p-2 px-4 flex items-center gap-2 bg-primary
             dark:bg-[#6155F5]
             min-h-[2.5rem]
             max-h-[2.5rem]
             text-white rounded-[1.25rem] cursor-pointer hover:opacity-90 transition-opacity"
-        >
-          <CheckCheck size={13} className="text-white dark:text-[#151515]" />
-          <p className="text-[0.875rem] text-white dark:text-[#151515]">
-            Show Interest
-          </p>
+            >
+              <CheckCheck
+                size={13}
+                className="text-white dark:text-[#151515]"
+              />
+              <p className="text-[0.875rem] text-white dark:text-[#151515]">
+                Show Interest
+              </p>
+            </div>
+          )}
         </div>
       </section>
 

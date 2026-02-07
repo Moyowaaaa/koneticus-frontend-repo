@@ -1,7 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiHttp from "../appConfig";
 import { ICreateProjectPayload, Project } from "./projects.model";
 import { useAuthStore } from "@/store/useAuthStore";
+import { projectsKeys } from "./projects.queries";
+import { feedKeys } from "../feed/feed.queries";
+import { FeedItem } from "../feed/feed.model";
+import { PaginatedResponse } from "../appConfig";
 
 // Create a new project
 const createProject = async (data: ICreateProjectPayload): Promise<Project> => {
@@ -25,28 +29,61 @@ const createProject = async (data: ICreateProjectPayload): Promise<Project> => {
     });
   }
 
-  // Get token from auth store
-  const { token } = useAuthStore.getState();
-
   const response = await apiHttp.post<{ data: Project }>(
     "/projects",
     formData,
     {
       headers: {
-        Authorization: token ? `Bearer ${token}` : undefined,
+        // Remove Content-Type to let browser set multipart/form-data with boundary
+        "Content-Type": undefined,
       },
     },
   );
   return response.data.data;
 };
 
-export const useCreateProject = () =>
-  useMutation({
+export const useCreateProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: createProject,
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: projectsKeys.all });
+      queryClient.invalidateQueries({ queryKey: feedKeys.all });
+      queryClient.invalidateQueries({ queryKey: feedKeys.list() });
+      queryClient.invalidateQueries({ queryKey: feedKeys.trending() });
+
       console.log("Project created successfully:", data);
     },
     onError: (error) => {
       console.error("Failed to create project:", error);
     },
   });
+};
+
+//delete project
+const deleteProject = async (id: string): Promise<{ message: string }> => {
+  await apiHttp.delete(`/projects/${id}`);
+  return { message: "Project deleted successfully" };
+};
+
+export const useDeleteProject = (id: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteProject(id),
+    onSuccess: () => {
+      // Just invalidate queries to ensure server sync
+      queryClient.invalidateQueries({ queryKey: projectsKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: projectsKeys.singleProject(id),
+      });
+      queryClient.invalidateQueries({ queryKey: projectsKeys.userProjects() });
+      queryClient.invalidateQueries({ queryKey: feedKeys.all });
+      queryClient.invalidateQueries({ queryKey: feedKeys.list() });
+      queryClient.invalidateQueries({ queryKey: feedKeys.trending() });
+    },
+    onError: (error) => {
+      console.error("Delete failed:", error);
+      // Component will handle rollback through query invalidation
+    },
+  });
+};
