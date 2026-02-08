@@ -19,7 +19,6 @@ const getUserProjects = async (
   return response.data;
 };
 
-// Single project
 const getProjectById = async (projectId: string): Promise<Project> => {
   const response = await apiHttp.get<{ project: Project }>(
     `/projects/${projectId}`,

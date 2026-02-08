@@ -28,12 +28,10 @@ export const informationStepSchema = z.object({
   password: passwordRules,
 });
 
-// Role step schema (step 2)
 export const roleStepSchema = z.object({
   roles: z.array(z.string()).min(1, "Please select at least one role"),
 });
 
-// Bio step schema (step 3)
 export const bioStepSchema = z.object({
   bio: z
     .string()
@@ -66,7 +64,6 @@ export const bioStepSchema = z.object({
   }),
 });
 
-// Full onboarding schema (all steps combined)
 export const fullOnboardingSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   firstName: z.string().min(1, "First name is required"),
