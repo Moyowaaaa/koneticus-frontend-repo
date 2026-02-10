@@ -32,7 +32,6 @@ export const useGetUserProjects = (page: number = 1, limit: number = 10) =>
     queryFn: () => getUserProjects(page, limit),
   });
 
-// Hook for infinite scrolling user's projects
 export const useGetInfiniteUserProjects = (limit: number = 10) =>
   useInfiniteQuery({
     queryKey: [...projectsKeys.userProjects(), "infinite", limit],
