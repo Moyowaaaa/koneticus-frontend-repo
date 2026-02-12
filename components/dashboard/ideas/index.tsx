@@ -156,6 +156,11 @@ const IdeasClient = () => {
     [hasNextPage, isFetchingNextPage, fetchNextPage],
   );
 
+  const draftProjects =
+    data?.pages.flatMap((page) =>
+      page.projects.filter((item) => item.status === "draft"),
+    ) ?? [];
+
   return (
     <>
       <EditIdeaModal />
@@ -167,10 +172,10 @@ const IdeasClient = () => {
           </h1>
         </TopBar>
 
-        {pendingProjects.length ? (
+        {draftProjects.length ? (
           <div className="grid grid-cols-4 gap-4">
-            {pendingProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {draftProjects.map((project) => (
+              <ProjectCard key={project._id} project={project} />
             ))}
           </div>
         ) : (

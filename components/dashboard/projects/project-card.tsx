@@ -1,6 +1,5 @@
 "use client";
 
-import { Project } from "@/types";
 import Image from "next/image";
 import React from "react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,10 @@ import ButtonV2 from "@/components/ui-components/button";
 import { useRouter } from "next/navigation";
 import { useIdeaStore } from "@/store/useIdeaStore";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
+import { Project } from "@/api/projects/projects.model";
+import { useDeleteProject } from "@/api/projects/project.mutations";
+import { toast } from "sonner";
+import { showToast } from "@/utils/toasts";
 
 interface ProjectCardProps {
   project: Project;
@@ -26,16 +29,27 @@ const ProjectCard = ({
   const router = useRouter();
   const { deleteIdea } = useIdeaStore();
   const openEditModal = useEditIdeaModalStore((state) => state.openModal);
+  const { mutateAsync: deleteProject } = useDeleteProject(project._id);
 
   const handleAction = () => {
-    if (project.status === "pending") {
-      openEditModal(project.id);
-      onEdit?.(project);
-      return;
-    }
+    // if (project.status === "pending") {
+    openEditModal(project._id);
+    onEdit?.(project);
+    return;
+    // }
 
-    onOpen?.(project);
-    router.push(`/dashboard/projects/ongoing/${project.id}`);
+    // onOpen?.(project);
+    // router.push(`/dashboard/projects/ongoing/${project._id}`);
+  };
+
+  const onDeleteProject = async () => {
+    try {
+      await deleteProject(project._id);
+      showToast.success("Project deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      showToast.error("Failed to delete project");
+    }
   };
 
   return (
@@ -43,8 +57,8 @@ const ProjectCard = ({
       {/* Project Image */}
       <div className="relative w-full h-[15rem]  rounded-t-[1.25rem] overflow-hidden">
         <Image
-          src={project.image}
-          alt={project.title}
+          src={project?.media[0]?.url}
+          alt={project?.title}
           fill
           className="object-cover"
         />
@@ -72,13 +86,13 @@ const ProjectCard = ({
             className="h-max! px-6 text-sm min-h-max"
             variant={project.status === "pending" ? "default" : "default"}
           >
-            {project.status === "pending" ? "Edit" : "Open"}
+            Edit
           </ButtonV2>
 
           {/* {onDelete && ( */}
           <Button
             // onClick={() => onDelete(project.id)}
-            onClick={() => deleteIdea(project?.id as string)}
+            onClick={() => onDeleteProject()}
             variant="ghost"
             size="icon-sm"
             className="text-red-500 hover:text-red-700 hover:bg-red-50"
