@@ -1,11 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiHttp from "../appConfig";
 import { ICreateProjectPayload, Project } from "./projects.model";
-import { useAuthStore } from "@/store/useAuthStore";
 import { projectsKeys } from "./projects.queries";
 import { feedKeys } from "../feed/feed.queries";
-import { FeedItem } from "../feed/feed.model";
-import { PaginatedResponse } from "../appConfig";
 
 // Create a new project
 const createProject = async (data: ICreateProjectPayload): Promise<Project> => {
