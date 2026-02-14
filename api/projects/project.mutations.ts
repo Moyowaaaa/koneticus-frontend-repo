@@ -13,8 +13,6 @@ const createProject = async (data: ICreateProjectPayload): Promise<Project> => {
   formData.append("description", data.description);
   formData.append("teamSize", data.teamSize.toString());
 
-  // Array fields - append each item individually or stringify based on backend expectation
-  // usually array fields in FormData are appended with the same key
   data.requiredRoles.forEach((role) => {
     formData.append("requiredRoles", role);
   });

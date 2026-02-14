@@ -1,16 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+
 import ButtonV2 from "@/components/ui-components/button";
 import { useRouter } from "next/navigation";
 import { useIdeaStore } from "@/store/useIdeaStore";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
 import { Project } from "@/api/projects/projects.model";
 import { useDeleteProject } from "@/api/projects/project.mutations";
-import { toast } from "sonner";
+
 import { showToast } from "@/utils/toasts";
 
 interface ProjectCardProps {
@@ -20,12 +20,7 @@ interface ProjectCardProps {
   onOpen?: (project: Project) => void;
 }
 
-const ProjectCard = ({
-  project,
-  onEdit,
-  onDelete,
-  onOpen,
-}: ProjectCardProps) => {
+const ProjectCard = ({ project, onEdit }: ProjectCardProps) => {
   const router = useRouter();
   const { deleteIdea } = useIdeaStore();
   const openEditModal = useEditIdeaModalStore((state) => state.openModal);

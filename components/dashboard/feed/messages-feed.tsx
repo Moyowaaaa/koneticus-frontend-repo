@@ -2,7 +2,6 @@
 
 import { useDummyStore } from "@/store/useDummyStore";
 import Image from "next/image";
-import React from "react";
 
 export const MessagesEmptyState = () => {
   return (
