@@ -4,7 +4,6 @@ import { ICreateProjectPayload, Project } from "./projects.model";
 import { projectsKeys } from "./projects.queries";
 import { feedKeys } from "../feed/feed.queries";
 
-// Create a new project
 const createProject = async (data: ICreateProjectPayload): Promise<Project> => {
   const formData = new FormData();
 
