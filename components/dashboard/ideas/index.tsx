@@ -11,6 +11,7 @@ import ProjectCard from "../projects/project-card";
 import gsap from "gsap";
 import EditIdeaModal from "../modals/edit-idea-modal";
 import { useGetInfiniteUserProjects } from "@/api/projects/projects.queries";
+import { IdeaCardSkeleton } from "./idea-card-skeleton";
 
 const IdeasClient = () => {
   const router = useRouter();
@@ -24,6 +25,9 @@ const IdeasClient = () => {
   const stringBigRef = useRef<HTMLDivElement>(null);
   const stringSmallRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
+
+  // Ref to hold the IntersectionObserver instance so we can disconnect it
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const pendingProjects = !useDummyData
     ? []
@@ -134,24 +138,33 @@ const IdeasClient = () => {
     isError,
   } = useGetInfiniteUserProjects();
 
-  // Native IntersectionObserver with useCallback ref pattern (no useEffect needed)
+  // Stable ref callback that properly manages the IntersectionObserver lifecycle.
+  // Using a ref to store the observer instance ensures we can always disconnect
+  // the previous observer before creating a new one — which is critical because
+  // useCallback recreates this function whenever its dependencies change, and
+  // React will call the old ref with null then the new ref with the node.
   const loadMoreRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (!node) return;
+      // Always disconnect any existing observer first (handles both unmount
+      // and dependency changes where React calls ref with null then re-attaches)
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
 
-      const observer = new IntersectionObserver(
+      // Don't attach a new observer if the node is gone or there's nothing left to fetch
+      if (!node || !hasNextPage) return;
+
+      observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          if (entries[0].isIntersecting && !isFetchingNextPage) {
             fetchNextPage();
           }
         },
         { threshold: 0.1 },
       );
 
-      observer.observe(node);
-
-      // Cleanup on unmount or ref change
-      return () => observer.disconnect();
+      observerRef.current.observe(node);
     },
     [hasNextPage, isFetchingNextPage, fetchNextPage],
   );
@@ -172,12 +185,32 @@ const IdeasClient = () => {
           </h1>
         </TopBar>
 
-        {draftProjects.length ? (
+        {isLoading ? (
           <div className="grid grid-cols-4 gap-4">
-            {draftProjects.map((project) => (
-              <ProjectCard key={project._id} project={project} />
+            {Array.from({ length: 4 }).map((_, i) => (
+              <IdeaCardSkeleton key={i} />
             ))}
           </div>
+        ) : draftProjects.length ? (
+          <>
+            <div className="grid grid-cols-4 gap-4">
+              {draftProjects.map((project) => (
+                <ProjectCard key={project._id} project={project} />
+              ))}
+            </div>
+
+            {/* Sentinel element — the IntersectionObserver watches this to trigger fetching the next page */}
+            <div ref={loadMoreRef} className="h-1 w-full" />
+
+            {/* Show skeleton cards while the next page is loading */}
+            {isFetchingNextPage && (
+              <div className="grid grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <IdeaCardSkeleton key={i} />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div
             ref={containerRef}
