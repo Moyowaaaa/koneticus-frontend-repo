@@ -1,12 +1,10 @@
 "use client";
 
-import ButtonV2 from "@/components/ui-components/button";
 import TopBar from "@/components/ui-components/top-bar";
 import { useDummyStore } from "@/store/useDummyStore";
 import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import ProjectCard from "../projects/project-card";
 import gsap from "gsap";
 import EditIdeaModal from "../modals/edit-idea-modal";
@@ -14,7 +12,6 @@ import { useGetInfiniteUserProjects } from "@/api/projects/projects.queries";
 import { IdeaCardSkeleton } from "./idea-card-skeleton";
 
 const IdeasClient = () => {
-  const router = useRouter();
   const { ideas } = useIdeaStore();
   const { useDummyData } = useDummyStore();
 

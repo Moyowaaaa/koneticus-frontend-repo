@@ -6,7 +6,6 @@ import { useGetErrorMessage } from "@/lib/utils";
 import { useOnboardingStore } from "@/store/useOnBoardingStore";
 import { showToast } from "@/utils/toasts";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 const VerifyEmailPage = () => {
   const router = useRouter();

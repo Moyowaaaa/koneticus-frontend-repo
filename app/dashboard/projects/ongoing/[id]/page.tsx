@@ -4,15 +4,11 @@ import { useGetProjectById } from "@/api/projects/projects.queries";
 import ChatInput from "@/components/chat/chat-input";
 import ChatMessages from "@/components/chat/chat-messages";
 import ButtonV2 from "@/components/ui-components/button";
-import CustomFormInput from "@/components/ui-components/custom-form-input";
 import TopBar from "@/components/ui-components/top-bar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
 
 const ProjectDetailsPage = () => {
   const params = useParams<{ id: string }>();

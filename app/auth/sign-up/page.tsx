@@ -11,7 +11,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupEmailSchema, signupEmailSchemaType } from "@/schemas/auth";
 import { useCheckEmail } from "@/api/auth/auth.mutations";
-import { toast } from "sonner";
 import { useGetErrorMessage } from "@/lib/utils";
 import { showToast } from "@/utils/toasts";
 

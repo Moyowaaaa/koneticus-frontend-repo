@@ -1,7 +1,5 @@
 "use client";
 
-import RecentActivities from "@/components/dashboard/projects/recent-activities";
-import ProjectFilter from "@/components/dashboard/projects/project-filter";
 import TopBar from "@/components/ui-components/top-bar";
 import { Project, ProjectStatus } from "@/types";
 import { useRouter } from "next/navigation";
