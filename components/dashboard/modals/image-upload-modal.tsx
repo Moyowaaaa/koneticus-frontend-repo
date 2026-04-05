@@ -2,14 +2,7 @@
 
 import Modal from "@/components/ui-components/modal";
 import ButtonV2 from "@/components/ui-components/button";
-import {
-  Clock,
-  Edit2,
-  Trash,
-  Crop,
-  RotateLeft,
-  RotateRight,
-} from "iconsax-reactjs";
+import { Clock, Edit2, Trash, RotateLeft, RotateRight } from "iconsax-reactjs";
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 
@@ -36,11 +29,11 @@ const ImageUploadModal = ({
   initialImage,
 }: ImageUploadModalProps) => {
   const [view, setView] = useState<ModalView>(
-    initialImage ? "preview" : "upload"
+    initialImage ? "preview" : "upload",
   );
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(
-    initialImage || null
+    initialImage || null,
   );
   const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
   const [rotation, setRotation] = useState(0);
@@ -163,7 +156,7 @@ const ImageUploadModal = ({
         -cropHeight / 2,
         -cropWidth / 2,
         cropHeight,
-        cropWidth
+        cropWidth,
       );
     } else {
       ctx.drawImage(
@@ -175,7 +168,7 @@ const ImageUploadModal = ({
         -cropWidth / 2,
         -cropHeight / 2,
         cropWidth,
-        cropHeight
+        cropHeight,
       );
     }
     ctx.restore();
@@ -196,13 +189,13 @@ const ImageUploadModal = ({
             selectedImage?.name || "cropped-image.jpg",
             {
               type: "image/jpeg",
-            }
+            },
           );
           setSelectedImage(newFile);
         }
       },
       "image/jpeg",
-      0.9
+      0.9,
     );
   }, [
     originalImageUrl,
@@ -298,7 +291,7 @@ const ImageUploadModal = ({
         setDragStart({ x: e.clientX, y: e.clientY });
       }
     },
-    [isDragging, isResizing, dragStart]
+    [isDragging, isResizing, dragStart],
   );
 
   const handleMouseUp = useCallback(() => {
