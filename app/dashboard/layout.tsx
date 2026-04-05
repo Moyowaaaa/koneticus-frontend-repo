@@ -1,4 +1,3 @@
-import React from "react";
 import TopNavBar from "@/components/navigation/topbar";
 import Sidebar from "@/components/navigation/sidebar";
 import DashboardRightSidebar from "@/components/dashboard/dashboard-right-sidebar";

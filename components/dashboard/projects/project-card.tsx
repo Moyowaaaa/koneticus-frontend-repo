@@ -1,14 +1,20 @@
 "use client";
 
-import { Project } from "@/types";
 import Image from "next/image";
-import React from "react";
+
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+
 import ButtonV2 from "@/components/ui-components/button";
 import { useRouter } from "next/navigation";
 import { useIdeaStore } from "@/store/useIdeaStore";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
+import { Project } from "@/api/projects/projects.model";
+import { useDeleteProject } from "@/api/projects/project.mutations";
+
+import { showToast } from "@/utils/toasts";
+import { useState } from "react";
+import BrokenMedia from "@/components/ui-components/BrokenMedia";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface ProjectCardProps {
   project: Project;
@@ -17,37 +23,52 @@ interface ProjectCardProps {
   onOpen?: (project: Project) => void;
 }
 
-const ProjectCard = ({
-  project,
-  onEdit,
-  onDelete,
-  onOpen,
-}: ProjectCardProps) => {
+const ProjectCard = ({ project, onEdit }: ProjectCardProps) => {
   const router = useRouter();
+  const { user } = useAuthStore();
   const { deleteIdea } = useIdeaStore();
   const openEditModal = useEditIdeaModalStore((state) => state.openModal);
+  const { mutateAsync: deleteProject } = useDeleteProject(project._id);
+  const [imageError, setImageError] = useState<boolean>(false);
+  const isOwner = project.author === user?._id;
 
   const handleAction = () => {
-    if (project.status === "pending") {
-      openEditModal(project.id);
+    if (project.status === "draft") {
+      openEditModal(project._id);
       onEdit?.(project);
       return;
+    } else {
+      router.push(`/dashboard/projects/ongoing/${project._id}`);
     }
 
-    onOpen?.(project);
-    router.push(`/dashboard/projects/ongoing/${project.id}`);
+    // onOpen?.(project);
+  };
+
+  const onDeleteProject = async () => {
+    try {
+      await deleteProject(project._id);
+      showToast.success("Project deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      showToast.error("Failed to delete project");
+    }
   };
 
   return (
     <div className="flex flex-col     ">
       {/* Project Image */}
-      <div className="relative w-full h-[15rem]  rounded-t-[1.25rem] overflow-hidden">
-        <Image
-          src={project.image}
-          alt={project.title}
-          fill
-          className="object-cover"
-        />
+      <div className="relative w-full h-[140px] md:h-[140px]  rounded-t-[1.25rem] overflow-hidden">
+        {imageError ? (
+          <BrokenMedia />
+        ) : (
+          <Image
+            src={project?.media[0]?.url}
+            alt={project?.title}
+            onError={() => setImageError(true)}
+            fill
+            className="object-cover"
+          />
+        )}
       </div>
 
       <div
@@ -72,24 +93,27 @@ const ProjectCard = ({
             className="h-max! px-6 text-sm min-h-max"
             variant={project.status === "pending" ? "default" : "default"}
           >
-            {project.status === "pending" ? "Edit" : "Open"}
+            {project.status === "draft" ? "Edit" : "Open"}
           </ButtonV2>
 
           {/* {onDelete && ( */}
-          <Button
-            // onClick={() => onDelete(project.id)}
-            onClick={() => deleteIdea(project?.id as string)}
-            variant="ghost"
-            size="icon-sm"
-            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-          >
-            <Image
-              src="/images/trash-icon.svg"
-              alt="trash"
-              width={16}
-              height={16}
-            />
-          </Button>
+          {isOwner && (
+            <Button
+              // onClick={() => onDelete(project.id)}
+              onClick={() => onDeleteProject()}
+              variant="ghost"
+              size="icon-sm"
+              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+            >
+              <Image
+                src="/images/trash-icon.svg"
+                alt="trash"
+                width={16}
+                height={16}
+              />
+            </Button>
+          )}
+
           {/* )} */}
         </div>
       </div>

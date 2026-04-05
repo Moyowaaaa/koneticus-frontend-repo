@@ -2,7 +2,6 @@
 
 import { ProjectStatus } from "@/types";
 import Image from "next/image";
-import React from "react";
 import { cn } from "@/lib/utils";
 
 interface ProjectFilterProps {
@@ -43,7 +42,7 @@ const ProjectFilter = ({
             "min-w-30 h-27.25 items-center justify-center rounded-[1.25rem] border flex flex-col gap-2 transition-all duration-200 hover:shadow-sm",
             activeFilter === filter.id || activeFilter === "all"
               ? " bg-white dark:bg-[#80808026]"
-              : "border-[#e9e9e9] bg-white dark:bg-[#80808026] hover:border-primary/30 "
+              : "border-[#e9e9e9] bg-white dark:bg-[#80808026] hover:border-primary/30 ",
           )}
         >
           <div className="h-12 relative w-17.5">
@@ -56,7 +55,7 @@ const ProjectFilter = ({
                 "text-sm font-medium",
                 activeFilter === filter.id
                   ? "text-primary dark:text-[#FFFFFF]"
-                  : "text-brand-black dark:text-[#FFFFFF]"
+                  : "text-brand-black dark:text-[#FFFFFF]",
               )}
             >
               {filter.label}

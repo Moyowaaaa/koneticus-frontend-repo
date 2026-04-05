@@ -33,6 +33,7 @@ const ChatMessages = () => {
           github: "",
           behance: "",
           website: "",
+          linkedin: "",
         },
       },
       sandra: {
@@ -44,10 +45,11 @@ const ChatMessages = () => {
           github: "",
           behance: "",
           website: "",
+          linkedin: "",
         },
       },
     }),
-    []
+    [],
   );
 
   return (

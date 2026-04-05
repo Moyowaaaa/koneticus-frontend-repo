@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 import ButtonV2 from "@/components/ui-components/button";
 import CustomFormInput from "@/components/ui-components/custom-form-input";
+import { useForgotPassword } from "@/api/auth/auth.mutations";
 
 type EmailStepProps = {
   email: string;
@@ -25,6 +26,17 @@ const EmailStep = ({
     onSubmit();
   };
 
+  const { mutateAsync: forgotPassword, isPending } = useForgotPassword();
+
+  const onForgotPassword = async () => {
+    try {
+      await forgotPassword({ email });
+      onSubmit();
+    } catch (error) {
+      console.error("Error forgot password:", error);
+    }
+  };
+
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
       <div className="space-y-2 text-left">
@@ -43,6 +55,7 @@ const EmailStep = ({
         IconPlacement="right"
         Icon={<ArrowRight size={20} color="white" />}
         disabled={isLoading}
+        onClick={onForgotPassword}
       >
         Continue
       </ButtonV2>

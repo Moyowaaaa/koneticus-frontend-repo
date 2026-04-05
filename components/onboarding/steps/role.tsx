@@ -3,7 +3,6 @@ import React, { KeyboardEvent, useState } from "react";
 import { SignUpFormData } from "@/types";
 import { LAST_STEP_INDEX, ROLE_SUGGESTIONS } from "@/types/data";
 import ButtonV2 from "@/components/ui-components/button";
-import { useRouter } from "next/navigation";
 
 const RoleStep = ({
   formData,
@@ -17,6 +16,7 @@ const RoleStep = ({
   handlePrimaryAction: () => void;
 }) => {
   const [roleInput, setRoleInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const isLastStep = currentStep === LAST_STEP_INDEX;
 
   const handleRoleAdd = (role?: string) => {
@@ -28,6 +28,7 @@ const RoleStep = ({
       roles: Array.from(new Set([...prev.roles, formattedRole])),
     }));
     setRoleInput("");
+    setError(null);
   };
 
   const handleRoleRemove = (role: string) => {
@@ -42,6 +43,15 @@ const RoleStep = ({
       event.preventDefault();
       handleRoleAdd();
     }
+  };
+
+  const handleNext = () => {
+    if (formData.roles.length === 0) {
+      setError("Please select at least one role");
+      return;
+    }
+    setError(null);
+    handlePrimaryAction();
   };
 
   return (
@@ -72,6 +82,10 @@ const RoleStep = ({
               Add
             </button>
           </div>
+
+          {error && (
+            <p className="text-[#D32F2F] text-sm text-center">{error}</p>
+          )}
         </div>
 
         {!!formData.roles.length && (
@@ -96,7 +110,7 @@ const RoleStep = ({
 
         <div className="flex flex-wrap gap-2 text-xs text-grey justify-center">
           {ROLE_SUGGESTIONS?.filter(
-            (suggestion) => !formData.roles.includes(suggestion)
+            (suggestion) => !formData.roles.includes(suggestion),
           ).map((suggestion) => (
             <button
               key={suggestion}
@@ -112,7 +126,7 @@ const RoleStep = ({
         <ButtonV2
           IconPlacement="right"
           Icon={<ArrowRight size={24} color="white" />}
-          onClick={handlePrimaryAction}
+          onClick={handleNext}
           className={`mx-auto w-75`}
         >
           {isLastStep ? "Submit" : "Next"}

@@ -1,18 +1,17 @@
 "use client";
 
-import ButtonV2 from "@/components/ui-components/button";
 import TopBar from "@/components/ui-components/top-bar";
 import { useDummyStore } from "@/store/useDummyStore";
 import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import ProjectCard from "../projects/project-card";
 import gsap from "gsap";
 import EditIdeaModal from "../modals/edit-idea-modal";
+import { useGetInfiniteUserProjects } from "@/api/projects/projects.queries";
+import { IdeaCardSkeleton } from "./idea-card-skeleton";
 
 const IdeasClient = () => {
-  const router = useRouter();
   const { ideas } = useIdeaStore();
   const { useDummyData } = useDummyStore();
 
@@ -23,6 +22,9 @@ const IdeasClient = () => {
   const stringBigRef = useRef<HTMLDivElement>(null);
   const stringSmallRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
+
+  // Ref to hold the IntersectionObserver instance so we can disconnect it
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const pendingProjects = !useDummyData
     ? []
@@ -43,7 +45,7 @@ const IdeasClient = () => {
         ],
         {
           opacity: 0,
-        }
+        },
       );
       gsap.set(textRef.current, { opacity: 0, y: 20 });
 
@@ -63,7 +65,7 @@ const IdeasClient = () => {
             opacity: 1,
             duration: 0.5,
           },
-          "-=0.4"
+          "-=0.4",
         )
         // Strings pop in with stagger
         .to(
@@ -74,7 +76,7 @@ const IdeasClient = () => {
             stagger: 0.1,
             ease: "back.out(2)",
           },
-          "-=0.3"
+          "-=0.3",
         )
         // Text fades in
         .to(
@@ -84,7 +86,7 @@ const IdeasClient = () => {
             y: 0,
             duration: 0.6,
           },
-          "-=0.2"
+          "-=0.2",
         );
 
       // Shadow pulses
@@ -124,6 +126,51 @@ const IdeasClient = () => {
     return () => ctx.revert();
   }, [pendingProjects.length]);
 
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useGetInfiniteUserProjects();
+
+  // Stable ref callback that properly manages the IntersectionObserver lifecycle.
+  // Using a ref to store the observer instance ensures we can always disconnect
+  // the previous observer before creating a new one — which is critical because
+  // useCallback recreates this function whenever its dependencies change, and
+  // React will call the old ref with null then the new ref with the node.
+  const loadMoreRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      // Always disconnect any existing observer first (handles both unmount
+      // and dependency changes where React calls ref with null then re-attaches)
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+
+      // Don't attach a new observer if the node is gone or there's nothing left to fetch
+      if (!node || !hasNextPage) return;
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        },
+        { threshold: 0.1 },
+      );
+
+      observerRef.current.observe(node);
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
+
+  const draftProjects =
+    data?.pages.flatMap((page) =>
+      page.projects.filter((item) => item.status === "draft"),
+    ) ?? [];
+
   return (
     <>
       <EditIdeaModal />
@@ -135,12 +182,32 @@ const IdeasClient = () => {
           </h1>
         </TopBar>
 
-        {pendingProjects.length ? (
+        {isLoading ? (
           <div className="grid grid-cols-4 gap-4">
-            {pendingProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {Array.from({ length: 4 }).map((_, i) => (
+              <IdeaCardSkeleton key={i} />
             ))}
           </div>
+        ) : draftProjects.length ? (
+          <>
+            <div className="grid grid-cols-4 gap-4">
+              {draftProjects.map((project) => (
+                <ProjectCard key={project._id} project={project} />
+              ))}
+            </div>
+
+            {/* Sentinel element — the IntersectionObserver watches this to trigger fetching the next page */}
+            <div ref={loadMoreRef} className="h-1 w-full" />
+
+            {/* Show skeleton cards while the next page is loading */}
+            {isFetchingNextPage && (
+              <div className="grid grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <IdeaCardSkeleton key={i} />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div
             ref={containerRef}

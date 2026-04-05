@@ -2,7 +2,6 @@ import Modal from "@/components/ui-components/modal";
 import { Input } from "@/components/ui/input";
 import { useSearchStore } from "@/store/useSearchStore";
 import { SearchNormal } from "iconsax-reactjs";
-import React from "react";
 
 const SearchModal = () => {
   const { setShowSearch, searchQuery, setSearchQuery, showSearch } =

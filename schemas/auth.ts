@@ -13,26 +13,71 @@ const passwordRules = z
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
   .regex(
     /[^A-Za-z0-9]/,
-    "Password must contain at least one special character"
+    "Password must contain at least one special character",
   );
 
-export const userSignUpSchema = z.object({
-  country: z.string().min(1, "Country is required"),
-  password: passwordRules,
-  role: z.enum(["user", "merchant"]),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
+// Email schema for signup page (step 0)
+export const signupEmailSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
 });
 
-export const merchantSignUpSchema = z.object({
-  role: z.literal("merchant"),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  businessName: z.string().min(1, "Business name is required"),
-  email: z.string().email("Invalid business email address"),
+// Information step schema (step 1)
+export const informationStepSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   password: passwordRules,
-  country: z.string().min(1, "Country is required"),
+});
+
+export const roleStepSchema = z.object({
+  roles: z.array(z.string()).min(1, "Please select at least one role"),
+});
+
+export const bioStepSchema = z.object({
+  bio: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.trim().split(/\s+/).length <= 150, {
+      message: "Bio must be 150 words or less",
+    }),
+  profileImage: z.string().optional(),
+  portfolio: z.object({
+    linkedin: z
+      .string()
+      .url("Please enter a valid URL")
+      .optional()
+      .or(z.literal("")),
+    github: z
+      .string()
+      .url("Please enter a valid URL")
+      .optional()
+      .or(z.literal("")),
+    behance: z
+      .string()
+      .url("Please enter a valid URL")
+      .optional()
+      .or(z.literal("")),
+    website: z
+      .string()
+      .url("Please enter a valid URL")
+      .optional()
+      .or(z.literal("")),
+  }),
+});
+
+export const fullOnboardingSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  password: passwordRules,
+  roles: z.array(z.string()).min(1, "Please select at least one role"),
+  bio: z.string().optional(),
+  profileImage: z.string().optional(),
+  portfolio: z.object({
+    linkedin: z.string().optional(),
+    github: z.string().optional(),
+    behance: z.string().optional(),
+    website: z.string().optional(),
+  }),
 });
 
 export const newPasswordSchema = z
@@ -43,46 +88,13 @@ export const newPasswordSchema = z
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword"], // This targets the error at the confirmPassword field
+    path: ["confirmPassword"],
   });
 
-export type userSignUpSchemaType = z.infer<typeof userSignUpSchema>;
+// Type exports
 export type loginSchemaType = z.infer<typeof loginSchema>;
-
-// Base schema with common fields for both user and merchant
-// const baseSchema = z.object({
-//   firstName: z.string().min(1, "First name is required"),
-//   lastName: z.string().min(1, "Last name is required"),
-//   country: z.string().min(1, "Country is required"),
-//   password: passwordRules,
-//   role: z.enum(["user", "merchant"]),
-// });
-
-// // User-specific schema
-// const userSchema = baseSchema.extend({
-//   role: z.literal("user"),
-//   email: z.string().email("Invalid email address"),
-//   // Fields specific to users only can be added here
-// });
-
-// // Merchant-specific schema
-// const merchantSignUpSchema = baseSchema.extend({
-//   role: z.literal("merchant"),
-//   businessName: z.string().min(1, "Business name is required"),
-//   businessEmailAddress: z.string().email("Invalid business email address"),
-//   // Fields specific to merchants only can be added here
-// });
-
-// // Combined schema using discriminated union based on role
-// export const signUpSchema = z.discriminatedUnion("role", [
-//   userSchema,
-//   merchantSchema,
-// ]);
-
-// export type signUpSchemaType = z.infer<typeof signUpSchema>;
-
-// Type inference for TypeScript
-
-// Example type for the form data
-
-// schema for singup
+export type signupEmailSchemaType = z.infer<typeof signupEmailSchema>;
+export type informationStepSchemaType = z.infer<typeof informationStepSchema>;
+export type roleStepSchemaType = z.infer<typeof roleStepSchema>;
+export type bioStepSchemaType = z.infer<typeof bioStepSchema>;
+export type fullOnboardingSchemaType = z.infer<typeof fullOnboardingSchema>;

@@ -4,25 +4,47 @@ import ButtonV2 from "@/components/ui-components/button";
 import TopBar from "@/components/ui-components/top-bar";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 import { AddCircle, SearchNormal } from "iconsax-reactjs";
-import React from "react";
+import React, { useEffect } from "react";
 import Feed from ".";
-import SpotlightFeed from "./spotlight-feed";
-import MessagesFeed from "./messages-feed";
+
 import SearchModal from "../modals/search-modal";
 import { useSearchStore } from "@/store/useSearchStore";
-import { useDummyStore } from "@/store/useDummyStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+import { showToast } from "@/utils/toasts";
 
 const FeedClient = () => {
+  const router = useRouter();
   const { toggleNewIdeaModal } = useGeneralStateStore();
   const { setShowSearch } = useSearchStore();
+  const { user } = useAuthStore();
 
+  useEffect(() => {
+    const didVerify = localStorage.getItem("didVerify");
+    if (didVerify === "true") {
+      setTimeout(() => {
+        localStorage.removeItem("didVerify");
+      }, 3000);
+    }
+  }, []);
+
+  // useEffect(() => {
+  //   if (!user?.isEmailVerified) {
+  //     router.push("/auth/verify-email");
+  //     showToast.info("you need to verify your email");
+  //   }
+  // }, [!user?.isEmailVerified]);
+
+  console.log(user?.isEmailVerified);
   return (
     <>
       <SearchModal />
       <div className=" w-full  flex items-start gap-10 pt-6">
         <div className="relative h-full w-8/12 flex flex-col gap-3">
           <TopBar className="flex items-center w-full justify-between">
-            <h1 className="text-[1.875rem] font-bold">Welcome Oba,</h1>
+            <h1 className="text-[1.875rem] font-bold">
+              Welcome {user?.firstname || ""},
+            </h1>
 
             <div className="flex items-center gap-2">
               <SearchNormal

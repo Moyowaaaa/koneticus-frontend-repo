@@ -1,23 +1,22 @@
 "use client";
 
+import { useGetProjectById } from "@/api/projects/projects.queries";
 import ChatInput from "@/components/chat/chat-input";
 import ChatMessages from "@/components/chat/chat-messages";
 import ButtonV2 from "@/components/ui-components/button";
-import CustomFormInput from "@/components/ui-components/custom-form-input";
 import TopBar from "@/components/ui-components/top-bar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
 
 const ProjectDetailsPage = () => {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const router = useRouter();
-  const project = useIdeaStore().getIdeaById(id);
+
+  const { data: project } = useGetProjectById(id);
+
   return (
     <>
       <div className="flex flex-col gap-10 w-full pt-4 px-6">
@@ -48,7 +47,7 @@ const ProjectDetailsPage = () => {
               Project Description
             </h1>
 
-            <div className="p-4 bg-lavender rounded-[1.875rem] w-max dark:bg-[#80808026]">
+            <div className="p-4  rounded-[1.875rem] w-max ">
               <p
                 className="text-sm  font-[sora-light] text-brand-black
               dark:text-white
@@ -67,7 +66,7 @@ const ProjectDetailsPage = () => {
                 Team Members
               </h1>
 
-              {project?.collaborators?.map((c, index) => (
+              {/* {project?.collaborators?.map((c, index) => (
                 <div
                   className="relative py-2 flex items-center gap-2 min-w-100 max-w-100"
                   key={index}
@@ -101,7 +100,7 @@ const ProjectDetailsPage = () => {
                     />
                   </Button>
                 </div>
-              ))}
+              ))} */}
             </div>
           </div>
 

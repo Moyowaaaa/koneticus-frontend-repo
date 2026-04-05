@@ -9,6 +9,8 @@ import { INITIAL_STATE, SignUpFormData } from "@/types";
 import RoleStep from "./steps/role";
 import BioStep from "./steps/bio";
 import Image from "next/image";
+import { useOnboardingStore } from "@/store/useOnBoardingStore";
+import { useRegisterUser } from "@/api/auth/auth.mutations";
 
 const STEP_TITLES = ["Information", "Roles", "Profile"];
 const TOTAL_STEPS = STEP_TITLES.length + 1; // include initial email capture step
@@ -18,6 +20,8 @@ function OnBoardingFlowContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const { user, setUser } = useOnboardingStore();
+  const { mutateAsync: registerUser, isPending } = useRegisterUser();
   const [currentStep, setCurrentStep] = useState(() => {
     const stepParam = searchParams.get("step");
     return clampStepValue(stepParam ? Number(stepParam) : 0, LAST_STEP_INDEX);
@@ -41,10 +45,63 @@ function OnBoardingFlowContent() {
   };
 
   const handlePrimaryAction = () => {
+    // Sync formData to store at each step
+    setUser({
+      firstname: formData.firstName,
+      lastname: formData.lastName,
+      password: formData.password,
+      role: formData.roles,
+      bio: formData.bio,
+      profileImageFile: formData.profileImageFile,
+      profileImagePreview: formData.profileImagePreview,
+      portfolio: {
+        linkedin: formData.portfolio.linkedin,
+        github: formData.portfolio.github,
+        behance: formData.portfolio.behance,
+        website: formData.portfolio.website,
+      },
+    });
+
     if (currentStep === 2) {
-      router.push("/dashboard");
+      // After the third step (step index 2), console log the store data
+      console.log("Onboarding completed! User data:", {
+        ...user,
+        firstname: formData.firstName,
+        lastname: formData.lastName,
+        password: formData.password,
+        role: formData.roles,
+        bio: formData.bio,
+        profileImageFile: formData.profileImageFile,
+        portfolio: {
+          linkedin: formData.portfolio.linkedin,
+          github: formData.portfolio.github,
+          behance: formData.portfolio.behance,
+          website: formData.portfolio.website,
+        },
+      });
+      handleRegister();
     } else {
       setStepWithUrl(currentStep + 1);
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      const response = await registerUser({
+        email: user.email,
+        password: user.password,
+        roles: user.role,
+        bio: user.bio,
+        image: formData.profileImageFile, // Use the actual File for multer upload
+        links: user.portfolio,
+        firstname: user.firstname,
+        lastname: user.lastname,
+      });
+      router.push("/auth/verify-email");
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
     }
   };
 
