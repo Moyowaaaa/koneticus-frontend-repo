@@ -2,21 +2,44 @@
 
 import ButtonV2 from "@/components/ui-components/button";
 import TopBar from "@/components/ui-components/top-bar";
-import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import ProjectCard from "../projects/project-card";
-import { useDummyStore } from "@/store/useDummyStore";
+import { useGetInfiniteUserProjects } from "@/api/projects/projects.queries";
 
 const OngoingProjectsClient = () => {
   const router = useRouter();
-  const { ideas } = useIdeaStore();
-  const { useDummyData } = useDummyStore();
 
-  const ongoingProjects = !useDummyData
-    ? []
-    : ideas.filter((p) => p.status === "ongoing");
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetInfiniteUserProjects();
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const loadMoreRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      if (!node || !hasNextPage) return;
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        },
+        { threshold: 0.1 },
+      );
+      observerRef.current.observe(node);
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
+
+  const ongoingProjects =
+    data?.pages.flatMap((page) =>
+      page.projects.filter((item) => item.status === "ongoing"),
+    ) ?? [];
 
   return (
     <>
@@ -39,11 +62,14 @@ const OngoingProjectsClient = () => {
         </TopBar>
 
         {ongoingProjects.length ? (
-          <div className="grid grid-cols-4 gap-4">
-            {ongoingProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-4 gap-4">
+              {ongoingProjects.map((project) => (
+                <ProjectCard key={project._id} project={project} />
+              ))}
+            </div>
+            <div ref={loadMoreRef} className="h-1 w-full" />
+          </>
         ) : (
           <div className="py-12 text-center text-brand-grey">
             No ongoing projects yet.
