@@ -4,19 +4,20 @@ import ButtonV2 from "@/components/ui-components/button";
 import Modal from "@/components/ui-components/modal";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useUpdateProject } from "@/api/projects/project.mutations";
+import { useGetProjectById } from "@/api/projects/projects.queries";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
-import { useIdeaStore } from "@/store/useIdeaStore";
+import { showToast } from "@/utils/toasts";
 import React from "react";
 
 const EditIdeaModal = () => {
   const { isOpen, ideaId, closeModal } = useEditIdeaModalStore();
-  const ideas = useIdeaStore((state) => state.ideas);
-  const updateIdea = useIdeaStore((state) => state.updateIdea);
-
-  const currentIdea = React.useMemo(
-    () => ideas.find((idea) => idea.id === ideaId),
-    [ideas, ideaId]
-  );
+  const { mutateAsync: updateProject } = useUpdateProject();
+  const {
+    data: project,
+    isLoading,
+    isError,
+  } = useGetProjectById(ideaId ?? "", { enabled: isOpen && !!ideaId });
 
   const titleInputRef = React.useRef<HTMLInputElement>(null);
   const [title, setTitle] = React.useState("");
@@ -24,16 +25,16 @@ const EditIdeaModal = () => {
   const [isSaving, setIsSaving] = React.useState(false);
 
   React.useEffect(() => {
-    if (isOpen && currentIdea) {
-      setTitle(currentIdea.title);
-      setDescription(currentIdea.description);
+    if (isOpen && project) {
+      setTitle(project.title);
+      setDescription(project.description);
       titleInputRef.current?.focus();
     } else if (!isOpen) {
       setTitle("");
       setDescription("");
       setIsSaving(false);
     }
-  }, [isOpen, currentIdea]);
+  }, [isOpen, project]);
 
   const handleClose = (open: boolean) => {
     if (!open || !isSaving) {
@@ -41,23 +42,33 @@ const EditIdeaModal = () => {
     }
   };
 
-  const handleSave = (event?: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
-    if (!ideaId || !title.trim() || !description.trim() || !currentIdea) return;
+    if (!ideaId || !title.trim() || !description.trim() || !project) return;
+
     setIsSaving(true);
-    updateIdea(ideaId, {
-      title: title.trim(),
-      description: description.trim(),
-    });
-    setIsSaving(false);
-    closeModal();
+    try {
+      await updateProject({
+        id: ideaId,
+        data: {
+          title: title.trim(),
+          description: description.trim(),
+        },
+      });
+      showToast.success("Idea updated successfully");
+      closeModal();
+    } catch {
+      showToast.error("Failed to update idea");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const isDisabled =
     isSaving ||
     !title.trim() ||
     !description.trim() ||
-    (title === currentIdea?.title && description === currentIdea?.description);
+    (title === project?.title && description === project?.description);
 
   return (
     <>
@@ -68,7 +79,11 @@ const EditIdeaModal = () => {
         className="flex flex-col gap-4"
         titleClassname="pt-4"
       >
-        {currentIdea ? (
+        {isLoading ? (
+          <div className="text-sm text-brand-grey py-6 text-center">
+            Loading idea...
+          </div>
+        ) : project ? (
           <form className="flex flex-col gap-4" onSubmit={handleSave}>
             <label className="flex flex-col gap-1">
               <span className="sr-only">Idea title</span>
@@ -114,7 +129,9 @@ const EditIdeaModal = () => {
           </form>
         ) : (
           <div className="text-sm text-brand-grey py-6 text-center">
-            We couldn&apos;t find this idea anymore.
+            {isError
+              ? "Something went wrong while loading this idea."
+              : "We couldn't find this idea anymore."}
           </div>
         )}
       </Modal>

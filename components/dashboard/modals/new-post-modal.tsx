@@ -92,6 +92,8 @@ const NewIdeaModal = () => {
   }, [imagePreviewUrl]);
 
   const handleImageButtonClick = () => {
+    // Temporarily hide the create modal while picking an image.
+    // Form state must be preserved across this swap.
     setShowNewIdeaModal(false);
     setShowImageUploadModal(true);
   };
@@ -101,14 +103,22 @@ const NewIdeaModal = () => {
     setImagePreviewUrl(imageUrl);
   };
 
-  // Reset form when modal opens/closes
+  // Only discard the draft when the create flow is fully dismissed —
+  // not when we briefly close New Idea to show the image picker.
   useEffect(() => {
-    if (!showNewIdeaModal) {
+    if (!showNewIdeaModal && !showImageUploadModal) {
       reset();
-      handleRemoveImage();
+      setSelectedFile(null);
+      setImagePreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
       setIsTeamSizeOpen(false);
     }
-  }, [showNewIdeaModal, reset]);
+  }, [showNewIdeaModal, showImageUploadModal, reset]);
 
   const onSubmit = (data: CreateProjectFormValues) => {
     // Prepare payload
@@ -130,7 +140,7 @@ const NewIdeaModal = () => {
   };
 
   const handleModalClose = (open: boolean) => {
-    if (!isSubmitting) {
+    if (!isSubmitting && !showImageUploadModal) {
       setShowNewIdeaModal(open);
     }
   };
@@ -352,9 +362,11 @@ const NewIdeaModal = () => {
       {/* Image Upload Modal */}
       <ImageUploadModal
         open={showImageUploadModal}
-        onOpenChange={() => {
-          setShowImageUploadModal(false);
-          setShowNewIdeaModal(true);
+        onOpenChange={(open) => {
+          setShowImageUploadModal(open);
+          if (!open) {
+            setShowNewIdeaModal(true);
+          }
         }}
         onImageSelect={handleImageFromModal}
         initialImage={imagePreviewUrl}

@@ -43,9 +43,12 @@ export const useGetInfiniteUserProjects = (limit: number = 10) =>
     },
   });
 
-export const useGetProjectById = (projectId: string) =>
+export const useGetProjectById = (
+  projectId: string,
+  options?: { enabled?: boolean },
+) =>
   useQuery({
     queryKey: projectsKeys.singleProject(projectId),
     queryFn: () => getProjectById(projectId),
-    enabled: !!projectId,
+    enabled: !!projectId && (options?.enabled ?? true),
   });

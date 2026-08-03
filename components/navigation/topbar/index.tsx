@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useDummyStore } from "@/store/useDummyStore";
 import ThemeToggle from "@/components/ui-components/theme-toggle";
-import { Bell } from "lucide-react";
+import NotificationsPopover from "@/components/navigation/topbar/notifications-popover";
 import Image from "next/image";
 import React from "react";
 import { useLogoutUser } from "@/api/auth/auth.mutations";
@@ -51,7 +51,7 @@ const TopNavBar = () => {
               {useDummyData ? "Disable Dummy data" : "Enable Dummy data"}
             </Button>
             <ThemeToggle />
-            <Bell size={20} className="text-foreground" />
+            <NotificationsPopover />
 
             <div
               onClick={() => onLogout()}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export interface ErrorResponse {
   error: string;
@@ -42,6 +43,15 @@ const apiHttp = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true, // Send cookies with every request
+});
+
+// Prefer cookie auth; also send stored Bearer token as fallback
+apiHttp.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Response interceptor

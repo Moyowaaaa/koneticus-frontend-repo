@@ -1,6 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiHttp from "../appConfig";
-import { ICreateProjectPayload, Project } from "./projects.model";
+import {
+  ICreateProjectPayload,
+  IUpdateProjectPayload,
+  Project,
+} from "./projects.model";
 import { projectsKeys } from "./projects.queries";
 import { feedKeys } from "../feed/feed.queries";
 
@@ -50,6 +54,40 @@ export const useCreateProject = () => {
     },
     onError: (error) => {
       console.error("Failed to create project:", error);
+    },
+  });
+};
+
+const updateProject = async ({
+  id,
+  data,
+}: {
+  id: string;
+  data: IUpdateProjectPayload;
+}): Promise<Project> => {
+  const response = await apiHttp.patch<{ project: Project }>(
+    `/projects/${id}`,
+    data,
+  );
+  return response.data.project;
+};
+
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateProject,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: projectsKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: projectsKeys.singleProject(variables.id),
+      });
+      queryClient.invalidateQueries({ queryKey: projectsKeys.userProjects() });
+      queryClient.invalidateQueries({ queryKey: feedKeys.all });
+      queryClient.invalidateQueries({ queryKey: feedKeys.list() });
+      queryClient.invalidateQueries({ queryKey: feedKeys.trending() });
+    },
+    onError: (error) => {
+      console.error("Failed to update project:", error);
     },
   });
 };

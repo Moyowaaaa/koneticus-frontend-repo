@@ -47,3 +47,10 @@ export interface ICreateProjectPayload {
   teamSize: number;
   media?: File[];
 }
+
+export interface IUpdateProjectPayload {
+  title?: string;
+  description?: string;
+  requiredRoles?: string[];
+  teamSize?: number;
+}
