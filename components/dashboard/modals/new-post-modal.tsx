@@ -6,7 +6,6 @@ import TagInput from "@/components/ui-components/tag-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
-// import { useFeedStore } from "@/store/useFeedStore";
 import {
   Clock,
   Image as ImageIcon,
@@ -130,13 +129,15 @@ const NewIdeaModal = () => {
     createProject(payload, {
       onSuccess: () => {
         toast.success("Project created successfully!");
-        setShowNewIdeaModal(false);
       },
       onError: (error) => {
         toast.error("Failed to create project. Please try again.");
         console.error("Submission error:", error);
       },
     });
+
+    // Close immediately — optimistic feed insert makes the post feel instant
+    setShowNewIdeaModal(false);
   };
 
   const handleModalClose = (open: boolean) => {

@@ -9,9 +9,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface MediaGridProps {
   media: FeedMedia[];
   alt?: string;
+  /** Prefer the first media tile for LCP (first feed card only). */
+  priority?: boolean;
+  sizes?: string;
 }
 
-const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
+const DEFAULT_SIZES = "(max-width: 768px) 100vw, 42rem";
+
+const MediaGrid = ({
+  media,
+  alt = "Media",
+  priority = false,
+  sizes = DEFAULT_SIZES,
+}: MediaGridProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const count = media?.length ?? 0;
@@ -31,7 +41,6 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
     }
   }, [selectedIndex, count]);
 
-  // Keyboard navigation: Arrow keys + Escape
   useEffect(() => {
     if (selectedIndex === null) return;
 
@@ -62,15 +71,36 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
   const hasPrevious = selectedIndex !== null && selectedIndex > 0;
   const hasNext = selectedIndex !== null && selectedIndex < count - 1;
 
+  const renderTile = (
+    item: FeedMedia,
+    index: number,
+    className: string,
+    tilePriority = false,
+  ) => (
+    <div key={item._id || `${item.url}-${index}`} className={className}>
+      <Image
+        src={item.url}
+        alt={`${alt} ${index + 1}`}
+        fill
+        sizes={sizes}
+        priority={tilePriority}
+        loading={tilePriority ? "eager" : "lazy"}
+        className="object-cover cursor-pointer"
+        onClick={() => openImage(index)}
+      />
+    </div>
+  );
+
   const imageModalContent = selectedIndex !== null && media[selectedIndex] && (
     <div className="relative w-full h-[60vh] flex items-center justify-center">
-      {/* Current Image */}
       <div className="relative w-full h-full">
         <Image
           src={media[selectedIndex].url}
           alt={`Image ${selectedIndex + 1}`}
           fill
+          sizes="100vw"
           className="object-contain"
+          priority
         />
       </div>
 
@@ -109,6 +139,18 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
     </div>
   );
 
+  const modal = (
+    <Modal
+      open={selectedIndex !== null}
+      onOpenChange={(open) => !open && closeImage()}
+      className="sm:max-w-4xl"
+      containerClassname="bg-black dark:bg-black"
+      childrenClassName="p-0"
+    >
+      {imageModalContent}
+    </Modal>
+  );
+
   if (count === 1) {
     return (
       <>
@@ -117,19 +159,14 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
             src={media[0].url}
             alt={alt}
             fill
-            className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+            sizes={sizes}
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
+            className="object-cover cursor-pointer"
             onClick={() => openImage(0)}
           />
         </div>
-        <Modal
-          open={selectedIndex !== null}
-          onOpenChange={(open) => !open && closeImage()}
-          className="sm:max-w-4xl"
-          containerClassname="bg-black dark:bg-black"
-          childrenClassName="p-0"
-        >
-          {imageModalContent}
-        </Modal>
+        {modal}
       </>
     );
   }
@@ -138,30 +175,16 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
     return (
       <>
         <div className="w-full mt-2 grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-          {media.map((item, index) => (
-            <div
-              key={item._id}
-              className="relative aspect-square overflow-hidden"
-            >
-              <Image
-                src={item.url}
-                alt={`${alt} ${index + 1}`}
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-                onClick={() => openImage(index)}
-              />
-            </div>
-          ))}
+          {media.map((item, index) =>
+            renderTile(
+              item,
+              index,
+              "relative aspect-square overflow-hidden",
+              priority && index === 0,
+            ),
+          )}
         </div>
-        <Modal
-          open={selectedIndex !== null}
-          onOpenChange={(open) => !open && closeImage()}
-          className="sm:max-w-4xl"
-          containerClassname="bg-black dark:bg-black"
-          childrenClassName="p-0"
-        >
-          {imageModalContent}
-        </Modal>
+        {modal}
       </>
     );
   }
@@ -170,44 +193,26 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
     return (
       <>
         <div className="w-full mt-2 grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
-          <div className="relative row-span-2 aspect-3/4 overflow-hidden">
-            <Image
-              src={media[0].url}
-              alt={`${alt} 1`}
-              fill
-              className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-              onClick={() => openImage(0)}
-            />
-          </div>
-          {/* Two images stacked on right */}
-          <div className="relative aspect-3/2 overflow-hidden">
-            <Image
-              src={media[1].url}
-              alt={`${alt} 2`}
-              fill
-              className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-              onClick={() => openImage(1)}
-            />
-          </div>
-          <div className="relative aspect-3/2 overflow-hidden">
-            <Image
-              src={media[2].url}
-              alt={`${alt} 3`}
-              fill
-              className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
-              onClick={() => openImage(2)}
-            />
-          </div>
+          {renderTile(
+            media[0],
+            0,
+            "relative row-span-2 aspect-3/4 overflow-hidden",
+            priority,
+          )}
+          {renderTile(
+            media[1],
+            1,
+            "relative aspect-3/2 overflow-hidden",
+            false,
+          )}
+          {renderTile(
+            media[2],
+            2,
+            "relative aspect-3/2 overflow-hidden",
+            false,
+          )}
         </div>
-        <Modal
-          open={selectedIndex !== null}
-          onOpenChange={(open) => !open && closeImage()}
-          className="sm:max-w-4xl"
-          containerClassname="bg-black dark:bg-black"
-          childrenClassName="p-0"
-        >
-          {imageModalContent}
-        </Modal>
+        {modal}
       </>
     );
   }
@@ -220,14 +225,17 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
       <div className="w-full mt-2 grid grid-cols-2 gap-1 rounded-xl overflow-hidden">
         {displayMedia.map((item, index) => (
           <div
-            key={item._id}
+            key={item._id || `${item.url}-${index}`}
             className="relative aspect-square overflow-hidden"
           >
             <Image
               src={item.url}
               alt={`${alt} ${index + 1}`}
               fill
-              className="object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+              sizes={sizes}
+              priority={priority && index === 0}
+              loading={priority && index === 0 ? "eager" : "lazy"}
+              className="object-cover cursor-pointer"
               onClick={() => openImage(index)}
             />
             {index === 3 && remainingCount > 0 && (
@@ -243,15 +251,7 @@ const MediaGrid = ({ media, alt = "Media" }: MediaGridProps) => {
           </div>
         ))}
       </div>
-      <Modal
-        open={selectedIndex !== null}
-        onOpenChange={(open) => !open && closeImage()}
-        className="sm:max-w-4xl"
-        containerClassname="bg-black dark:bg-black"
-        childrenClassName="p-0"
-      >
-        {imageModalContent}
-      </Modal>
+      {modal}
     </>
   );
 };

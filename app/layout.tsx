@@ -7,6 +7,7 @@ import ShowInterestModal from "@/components/dashboard/modals/show-interest-modal
 import ThemeProvider from "@/components/ui-components/theme-provider";
 import QueryProvider from "@/components/layer/QueryProvider";
 import { Toaster } from "sonner";
+import AuthBootstrap from "@/components/layer/AuthBootstrap";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
       >
         <QueryProvider>
           <ThemeProvider>
+            <AuthBootstrap />
             <Toaster position="top-center" visibleToasts={1} richColors />
             <NavigationProgressBar />
             <NewIdeaModal />

@@ -6,15 +6,13 @@ import { useChatStore } from "@/store/useChatStore";
 import MessagesInput from "../input";
 import { Messages } from "iconsax-reactjs";
 import { MesssagesBox } from "../messages-box/messages-box";
-import { useDummyStore } from "@/store/useDummyStore";
 
 const MessagesChatbox = () => {
   const illustrationRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
-  const { useDummyData } = useDummyStore();
   const conversations = useChatStore((state) => state.conversations);
 
-  const MessagesAndConversations = !useDummyData ? [] : conversations;
+  const MessagesAndConversations = conversations;
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {

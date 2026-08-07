@@ -42,13 +42,13 @@ const Sidebar = () => {
     {
       title: "Workspace",
       icon: FormatSquare,
-      route: "/dashboard/messages",
+      route: "/",
       comingSoon: true,
     },
     {
       title: "Showcase",
       icon: ShoppingCart,
-      route: "/dashboard/messages",
+      route: "/",
       comingSoon: true,
     },
   ];

@@ -1,9 +1,7 @@
 import ConversationItem from "./conversation-item";
 import { useChatStore } from "@/store/useChatStore";
-import { useDummyStore } from "@/store/useDummyStore";
 
 const MessagesSidebar = () => {
-  const { useDummyData } = useDummyStore();
   const conversations = useChatStore((state) => state.conversations);
   const users = useChatStore((state) => state.users);
   const currentConversationId = useChatStore(
@@ -13,8 +11,8 @@ const MessagesSidebar = () => {
     (state) => state.setCurrentConversation
   );
 
-  const conversationUsers = !useDummyData ? [] : users;
-  const conversationConversations = !useDummyData ? [] : conversations;
+  const conversationUsers = users;
+  const conversationConversations = conversations;
 
   //   const conversations = [];
 

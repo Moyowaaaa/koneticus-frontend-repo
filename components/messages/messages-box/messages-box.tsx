@@ -6,7 +6,6 @@ import Image from "next/image";
 import gsap from "gsap";
 import { useProfileModalStore } from "@/store/useProfileModalStore";
 import UserProfileModal from "../user-profile-modal";
-import { useDummyStore } from "@/store/useDummyStore";
 
 export const MesssagesBox = () => {
   const currentConversationId = useChatStore(
@@ -17,13 +16,10 @@ export const MesssagesBox = () => {
   const currentUserId = useChatStore((state) => state.currentUserId);
   const otherParticipant = useChatStore((state) => state.otherParticipant);
   const { openModal } = useProfileModalStore();
-  const { useDummyData } = useDummyStore();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   // Get messages for current conversation
-  const conversationMessages = !useDummyData
-    ? []
-    : currentConversationId
+  const conversationMessages = currentConversationId
     ? messages[currentConversationId] || []
     : [];
 

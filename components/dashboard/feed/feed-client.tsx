@@ -8,6 +8,7 @@ import React, { useEffect } from "react";
 import Feed from ".";
 
 import SearchModal from "../modals/search-modal";
+import EditIdeaModal from "../modals/edit-idea-modal";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -39,6 +40,7 @@ const FeedClient = () => {
   return (
     <>
       <SearchModal />
+      <EditIdeaModal />
       <div className=" w-full  flex items-start gap-10 pt-6">
         <div className="relative h-full w-8/12 flex flex-col gap-3">
           <TopBar className="flex items-center w-full justify-between">

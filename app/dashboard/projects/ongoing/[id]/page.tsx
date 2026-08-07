@@ -1,21 +1,78 @@
 "use client";
 
+import {
+  ProjectCollaborator,
+  Project,
+} from "@/api/projects/projects.model";
 import { useGetProjectById } from "@/api/projects/projects.queries";
 import ChatInput from "@/components/chat/chat-input";
 import ChatMessages from "@/components/chat/chat-messages";
+import CollaborationRequestsSection from "@/components/dashboard/projects/collaboration-requests-section";
 import ButtonV2 from "@/components/ui-components/button";
 import TopBar from "@/components/ui-components/top-bar";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+
+const getAuthorId = (author: Project["author"]) =>
+  typeof author === "string" ? author : author._id;
+
+const getMemberDisplay = (
+  member: string | ProjectCollaborator,
+  fallbackUser?: {
+    _id: string;
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+    profilePicture?: string;
+  } | null,
+) => {
+  if (typeof member === "string") {
+    if (fallbackUser && fallbackUser._id === member) {
+      const name =
+        fallbackUser.firstname || fallbackUser.lastname
+          ? `${fallbackUser.firstname ?? ""} ${fallbackUser.lastname ?? ""}`.trim()
+          : fallbackUser.email || "Creator";
+
+      return {
+        id: member,
+        name,
+        avatar: fallbackUser.profilePicture || "/images/dummy-avatar.svg",
+      };
+    }
+
+    return {
+      id: member,
+      name: "Member",
+      avatar: "/images/dummy-avatar.svg",
+    };
+  }
+
+  const profile = member.userProfile;
+  return {
+    id: member._id,
+    name: profile
+      ? `${profile.firstname} ${profile.lastname}`
+      : member.email,
+    avatar: profile?.profilePicture?.url || "/images/dummy-avatar.svg",
+  };
+};
 
 const ProjectDetailsPage = () => {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const router = useRouter();
+  const { user } = useAuthStore();
 
   const { data: project } = useGetProjectById(id);
+  const isAuthor =
+    !!project && !!user && getAuthorId(project.author) === user._id;
+
+  const collaborators = project?.collaborators ?? [];
+  const creator = project?.author
+    ? getMemberDisplay(project.author, user)
+    : null;
 
   return (
     <>
@@ -57,51 +114,61 @@ const ProjectDetailsPage = () => {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2 mt-4">
-              <h1
-                className="font-semibold text-brand-black text-[1.125rem]
-              dark:text-white
-              "
-              >
+            <div className="mt-4 flex flex-col gap-2">
+              <h1 className="text-[1.125rem] font-semibold text-brand-black dark:text-white">
                 Team Members
               </h1>
 
-              {/* {project?.collaborators?.map((c, index) => (
-                <div
-                  className="relative py-2 flex items-center gap-2 min-w-100 max-w-100"
-                  key={index}
-                >
-                  <div className="relative h-[1.5rem] w-[1.5rem]">
-                    <Image
-                      src={"/images/dummy-avatar.svg"}
-                      alt="avatar"
-                      fill
-                      className="object-cover"
-                    />
+              <div className="flex w-full min-w-0 flex-col gap-1">
+                {creator && (
+                  <div className="relative flex min-w-0 items-center gap-2 py-2">
+                    <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full">
+                      <Image
+                        src={creator.avatar}
+                        alt={creator.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <p className="truncate text-brand-black dark:text-white">
+                      {creator.name}
+                    </p>
+                    <p className="shrink-0 text-sm text-[#808080]">(Creator)</p>
                   </div>
+                )}
 
-                  <p className="text-brand-black dark:text-white">
-                    {c?.firstName} {c?.lastName}
+                {collaborators.map((collaborator) => {
+                  const member = getMemberDisplay(collaborator);
+
+                  return (
+                    <div
+                      key={member.id}
+                      className="relative flex min-w-0 items-center gap-2 py-2"
+                    >
+                      <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full">
+                        <Image
+                          src={member.avatar}
+                          alt={member.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <p className="truncate text-brand-black dark:text-white">
+                        {member.name}
+                      </p>
+                    </div>
+                  );
+                })}
+
+                {!creator && collaborators.length === 0 && (
+                  <p className="py-4 text-sm text-brand-grey dark:text-[#808080]">
+                    No team members yet.
                   </p>
-                  <p className="text-[#808080] text-sm">( {c?.role} )</p>
-
-                  <Button
-                    // onClick={() => onDelete(project.id)}
-                    // onClick={() => deleteIdea(project?.id as string)}
-                    variant="ghost"
-                    size="icon-sm"
-                    className="absolute right-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Image
-                      src="/images/trash-icon.svg"
-                      alt="trash"
-                      width={16}
-                      height={16}
-                    />
-                  </Button>
-                </div>
-              ))} */}
+                )}
+              </div>
             </div>
+
+            {isAuthor && <CollaborationRequestsSection projectId={id} />}
           </div>
 
           <div
