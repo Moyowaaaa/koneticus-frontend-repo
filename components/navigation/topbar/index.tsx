@@ -12,12 +12,14 @@ import React, { useState } from "react";
 import { useLogoutUser } from "@/api/auth/auth.mutations";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
-import { LogOut, Settings } from "lucide-react";
+import { useSearchStore } from "@/store/useSearchStore";
+import { LogOut, Search, Settings } from "lucide-react";
 
 const TopNavBar = () => {
   const router = useRouter();
   const { mutateAsync: logoutUser, isPending } = useLogoutUser();
   const { clearAuth, user } = useAuthStore();
+  const setShowSearch = useSearchStore((state) => state.setShowSearch);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const onLogout = async () => {
@@ -54,6 +56,14 @@ const TopNavBar = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => setShowSearch(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-brand-black transition hover:bg-[#E9E9E9] dark:text-white dark:hover:bg-[#2a2727]"
+            >
+              <Search size={18} />
+            </button>
             <ThemeToggle />
             <NotificationsPopover />
 

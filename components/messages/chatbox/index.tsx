@@ -1,20 +1,22 @@
-import ChatInput from "@/components/chat/chat-input";
+"use client";
+
 import Image from "next/image";
 import React, { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useChatStore } from "@/store/useChatStore";
 import MessagesInput from "../input";
-import { Messages } from "iconsax-reactjs";
 import { MesssagesBox } from "../messages-box/messages-box";
 
 const MessagesChatbox = () => {
   const illustrationRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
-  const conversations = useChatStore((state) => state.conversations);
-
-  const MessagesAndConversations = conversations;
+  const currentConversationId = useChatStore(
+    (state) => state.currentConversationId,
+  );
 
   useLayoutEffect(() => {
+    if (currentConversationId) return;
+
     const ctx = gsap.context(() => {
       gsap.fromTo(
         illustrationRef.current,
@@ -24,7 +26,7 @@ const MessagesChatbox = () => {
           opacity: 1,
           duration: 0.9,
           ease: "power2.out",
-        }
+        },
       );
 
       gsap.to(illustrationRef.current, {
@@ -44,17 +46,17 @@ const MessagesChatbox = () => {
           duration: 0.8,
           ease: "power2.out",
           delay: 0.2,
-        }
+        },
       );
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [currentConversationId]);
 
   return (
-    <div className="relative h-full w-full p-6 md:h-[calc(100dvh-190px)] ">
-      {MessagesAndConversations.length === 0 ? (
-        <div className="flex h-full w-full min-h-[30rem] flex-col items-center justify-center gap-6 text-center">
+    <div className="relative h-[calc(100dvh-190px)] w-full min-h-0 overflow-hidden p-6">
+      {!currentConversationId ? (
+        <div className="flex h-full w-full min-h-0 flex-col items-center justify-center gap-6 text-center">
           <div
             ref={illustrationRef}
             className="relative flex h-36 w-36 items-center justify-center rounded-4xl bg-linear-to-b from-lavender/50 to-white "
@@ -73,15 +75,15 @@ const MessagesChatbox = () => {
             ref={messageRef}
             className="text-sm leading-5 text-brand-black dark:text-white"
           >
-            There are no messages
+            Select a conversation to start messaging
           </p>
         </div>
       ) : (
-        <div className="w-full flex flex-col relative h-full">
+        <div className="relative flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden">
           <MesssagesBox />
+          <MessagesInput />
         </div>
       )}
-      <MessagesInput />
     </div>
   );
 };

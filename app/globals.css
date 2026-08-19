@@ -205,7 +205,8 @@ body {
 
 .purple-border {
   position: relative;
-  background: linear-gradient(#fff, #fff) padding-box,
+  background:
+    linear-gradient(#fff, #fff) padding-box,
     /* linear-gradient(
         var(--gradient-angle, 0deg),
         #6155f51a 0%,
@@ -215,7 +216,7 @@ body {
         #6155f51a 100%
       )
       border-box; */
-      linear-gradient(
+    linear-gradient(
         var(--gradient-angle, 0deg),
         #6155f5 0%,
         #e6e4ff 25%,
@@ -238,7 +239,8 @@ body {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.14),
+  box-shadow:
+    0px 1px 0px 0px rgba(0, 0, 0, 0.14),
     0px 0px 2px 0px rgba(0, 0, 0, 0.14) inset;
 }
 

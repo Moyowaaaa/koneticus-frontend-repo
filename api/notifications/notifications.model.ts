@@ -9,7 +9,9 @@ export type NotificationType =
   | "project_uncompleted"
   | "collab_request_received"
   | "collab_request_accepted"
-  | "collab_request_rejected";
+  | "collab_request_rejected"
+  | "collaboration_started"
+  | "new_message";
 
 export interface NotificationActorProfile {
   _id: string;
@@ -30,6 +32,8 @@ export interface NotificationActor {
 export interface NotificationMeta {
   projectId?: string;
   collabRequestId?: string;
+  conversationId?: string;
+  conversationType?: string;
 }
 
 export interface Notification {

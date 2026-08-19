@@ -5,12 +5,16 @@ import Modal from "@/components/ui-components/modal";
 import { Textarea } from "@/components/ui/textarea";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 import { Clock, Image as ImageIcon, CloseCircle } from "iconsax-reactjs";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import ImageUploadModal from "./image-upload-modal";
+import ImageUploadModal, {
+  type SelectedImageItem,
+} from "./image-upload-modal";
 import { useCreateCollaborationRequest } from "@/api/collaboration/collaboration.mutation";
 import { toast } from "sonner";
 import { useGetErrorMessage } from "@/lib/utils";
+
+const MAX_INTEREST_IMAGES = 4;
 
 const ShowInterestModal = () => {
   const {
@@ -24,53 +28,49 @@ const ShowInterestModal = () => {
   const getErrorMessage = useGetErrorMessage();
 
   const [proposal, setProposal] = useState("");
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedImages, setSelectedImages] = useState<SelectedImageItem[]>([]);
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
 
-  const imageInputRef = useRef<HTMLInputElement>(null);
+  const clearSelectedImages = () => {
+    setSelectedImages((prev) => {
+      prev.forEach((image) => {
+        if (image.url.startsWith("blob:")) {
+          URL.revokeObjectURL(image.url);
+        }
+      });
+      return [];
+    });
+  };
 
   const resetForm = () => {
     setProposal("");
-    setSelectedFile(null);
-    setImagePreviewUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
+    clearSelectedImages();
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setSelectedImages((prev) => {
+      const target = prev[index];
+      if (target?.url.startsWith("blob:")) {
+        URL.revokeObjectURL(target.url);
+      }
+      return prev.filter((_, i) => i !== index);
     });
-    if (imageInputRef.current) {
-      imageInputRef.current.value = "";
-    }
   };
-
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreviewUrl(previewUrl);
-    }
-  };
-
-  const handleRemoveImage = React.useCallback(() => {
-    setSelectedFile(null);
-    if (imagePreviewUrl) {
-      URL.revokeObjectURL(imagePreviewUrl);
-      setImagePreviewUrl(null);
-    }
-    if (imageInputRef.current) {
-      imageInputRef.current.value = "";
-    }
-  }, [imagePreviewUrl]);
 
   const handleImageButtonClick = () => {
-    // Briefly hide interest modal while picking/cropping an image
     setShowShowInterestModal(false);
     setShowImageUploadModal(true);
   };
 
-  const handleImageFromModal = (imageUrl: string, file: File) => {
-    setSelectedFile(file);
-    setImagePreviewUrl(imageUrl);
+  const handleImagesFromModal = (images: SelectedImageItem[]) => {
+    setSelectedImages((prev) => {
+      prev.forEach((image) => {
+        if (image.url.startsWith("blob:")) {
+          URL.revokeObjectURL(image.url);
+        }
+      });
+      return images.slice(0, MAX_INTEREST_IMAGES);
+    });
   };
 
   const handleSubmit = () => {
@@ -88,7 +88,10 @@ const ShowInterestModal = () => {
       {
         projectId: interestProjectId,
         proposal: proposal.trim(),
-        media: selectedFile ? [selectedFile] : undefined,
+        media:
+          selectedImages.length > 0
+            ? selectedImages.map((image) => image.file)
+            : undefined,
       },
       {
         onSuccess: () => {
@@ -134,40 +137,36 @@ const ShowInterestModal = () => {
             shadow-none text-[1.125rem] pb-4 border-b border-b-[#E9E9E9E9]"
           />
 
-          {imagePreviewUrl && (
-            <div className="relative w-full">
-              <div className="relative w-full h-40 rounded-lg overflow-hidden border border-[#E9E9E9]">
-                <Image
-                  src={imagePreviewUrl}
-                  alt="Selected image preview"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                disabled={isSubmitting}
-                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 transition-colors disabled:opacity-50"
-                aria-label="Remove selected image"
-              >
-                <CloseCircle
-                  size={20}
-                  className="text-red-500"
-                  variant="Bold"
-                />
-              </button>
+          {selectedImages.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {selectedImages.map((image, index) => (
+                <div
+                  key={`${image.file.name}-${index}`}
+                  className="relative aspect-square overflow-hidden rounded-lg border border-[#E9E9E9]"
+                >
+                  <Image
+                    src={image.url}
+                    alt={`Selected image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    disabled={isSubmitting}
+                    className="absolute top-1.5 right-1.5 rounded-full bg-white p-1 shadow-md transition-colors hover:bg-gray-100 disabled:opacity-50"
+                    aria-label={`Remove image ${index + 1}`}
+                  >
+                    <CloseCircle
+                      size={18}
+                      className="text-red-500"
+                      variant="Bold"
+                    />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
-
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageSelect}
-            className="hidden"
-            aria-hidden="true"
-          />
 
           <div className="w-full items-center flex justify-between">
             <div className="flex items-center gap-4">
@@ -194,7 +193,7 @@ const ShowInterestModal = () => {
                   flex flex-col items-center justify-center
                   cursor-pointer hover:bg-gray-100 transition-colors
                   disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Add image to your proposal"
+                aria-label="Add images to your proposal"
               >
                 <ImageIcon
                   size={16}
@@ -223,8 +222,10 @@ const ShowInterestModal = () => {
             setShowShowInterestModal(true);
           }
         }}
-        onImageSelect={handleImageFromModal}
-        initialImage={imagePreviewUrl}
+        onImagesSelect={handleImagesFromModal}
+        maxImages={MAX_INTEREST_IMAGES}
+        initialImages={selectedImages}
+        uploadHint="Add images to support your proposal"
       />
     </>
   );
