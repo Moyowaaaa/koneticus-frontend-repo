@@ -7,7 +7,9 @@ interface GeneralAppState {
   resetNewIdeaModal: () => void;
 
   showInterestModal: boolean;
-  setShowShowInterestModal: (showNewIdeaModal: boolean) => void;
+  interestProjectId: string | null;
+  setShowShowInterestModal: (showInterestModal: boolean) => void;
+  openShowInterestModal: (projectId: string) => void;
   toggleShowInterestModal: () => void;
   resetShowInterestModal: () => void;
 }
@@ -21,9 +23,15 @@ export const useGeneralStateStore = create<GeneralAppState>((set) => ({
 
   //   -----show interest modal
   showInterestModal: false,
-  setShowShowInterestModal: (showInterestModal) =>
-    set({ showInterestModal: showInterestModal }),
+  interestProjectId: null,
+  setShowShowInterestModal: (showInterestModal) => set({ showInterestModal }),
+  openShowInterestModal: (projectId) =>
+    set({ showInterestModal: true, interestProjectId: projectId }),
   toggleShowInterestModal: () =>
-    set((state) => ({ showInterestModal: !state.showNewIdeaModal })),
-  resetShowInterestModal: () => set({ showInterestModal: false }),
+    set((state) => ({
+      showInterestModal: !state.showInterestModal,
+      ...(state.showInterestModal ? { interestProjectId: null } : {}),
+    })),
+  resetShowInterestModal: () =>
+    set({ showInterestModal: false, interestProjectId: null }),
 }));

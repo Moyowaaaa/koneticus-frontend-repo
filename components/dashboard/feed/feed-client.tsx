@@ -7,14 +7,11 @@ import { AddCircle, SearchNormal } from "iconsax-reactjs";
 import React, { useEffect } from "react";
 import Feed from ".";
 
-import SearchModal from "../modals/search-modal";
+import EditIdeaModal from "../modals/edit-idea-modal";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
-import { showToast } from "@/utils/toasts";
 
 const FeedClient = () => {
-  const router = useRouter();
   const { toggleNewIdeaModal } = useGeneralStateStore();
   const { setShowSearch } = useSearchStore();
   const { user } = useAuthStore();
@@ -38,7 +35,7 @@ const FeedClient = () => {
   console.log(user?.isEmailVerified);
   return (
     <>
-      <SearchModal />
+      <EditIdeaModal />
       <div className=" w-full  flex items-start gap-10 pt-6">
         <div className="relative h-full w-8/12 flex flex-col gap-3">
           <TopBar className="flex items-center w-full justify-between">
@@ -50,7 +47,7 @@ const FeedClient = () => {
               <SearchNormal
                 onClick={() => setShowSearch(true)}
                 size="24"
-                className="text-[#211E1E] dark:text-[#E9E9E9E9]"
+                className="cursor-pointer text-[#211E1E] dark:text-[#E9E9E9E9]"
               />
               <ButtonV2
                 type="submit"

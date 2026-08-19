@@ -1,7 +1,13 @@
 import { FeedItem } from "@/api/feed/feed.model";
 import { sentenceCaseEachWord } from "@/lib/utils";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
-import { CheckCheck, MoreHorizontal, Trash2, Loader2 } from "lucide-react";
+import {
+  CheckCheck,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Loader2,
+} from "lucide-react";
 import Image from "next/image";
 import MediaGrid from "./media-grid";
 import { formatTimeAgo } from "@/utils";
@@ -13,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useDeleteProject } from "@/api/projects/project.mutations";
+import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
 
 // Format relative time from ISO date string
 
@@ -20,13 +27,19 @@ const FeedIdeaCard = ({
   idea,
   isDeleting = false,
   onDelete,
+  onDeleteSettled,
+  isHero = false,
 }: {
   idea: FeedItem;
   isDeleting?: boolean;
   onDelete?: (id: string) => void;
+  onDeleteSettled?: (id: string) => void;
+  /** First visible feed card — prioritize avatar + primary media. */
+  isHero?: boolean;
 }) => {
-  const { toggleShowInterestModal } = useGeneralStateStore();
+  const { openShowInterestModal } = useGeneralStateStore();
   const { user } = useAuthStore();
+  const openEditModal = useEditIdeaModalStore((state) => state.openModal);
 
   // Get author from the populated author field
   const authorProfile = idea.author?.userProfile;
@@ -36,24 +49,25 @@ const FeedIdeaCard = ({
   const authorAvatar =
     authorProfile?.profilePicture?.url || "/images/dummy-avatar.svg";
 
-  console.log(["authhguhf", authorProfile]);
   const isAuthor = user?._id === idea.author?._id || false;
+  const isDraft = idea.status === "draft";
+  const isOptimistic = idea._id.startsWith("optimistic-");
 
-  const { mutateAsync: deleteProject } = useDeleteProject(idea._id);
+  const { mutateAsync: deleteProject, isPending } = useDeleteProject(idea._id);
+
+  const handleEdit = () => {
+    openEditModal(idea._id);
+  };
 
   const handleDelete = async () => {
-    // Call parent's optimistic delete handler first
-    if (onDelete) {
-      onDelete(idea._id);
-    }
+    onDelete?.(idea._id);
 
-    // Then call the API in background
     try {
       await deleteProject(idea._id);
-      console.log("Project deleted successfully");
     } catch (error) {
       console.error("Failed to delete project:", error);
-      // Query invalidation in the mutation will handle restoring
+    } finally {
+      onDeleteSettled?.(idea._id);
     }
   };
 
@@ -62,7 +76,7 @@ const FeedIdeaCard = ({
       className={`w-full min-h-max flex flex-col gap-4 border
         dark:border-[#80808026]
         border-[#e9e9e9e9] rounded-[1.25rem] p-6 px-4 transition-all duration-300 ${
-          isDeleting ? "opacity-50 scale-95" : "opacity-100 scale-100"
+          isDeleting || isPending ? "opacity-50 scale-95" : "opacity-100 scale-100"
         }`}
     >
       <section className="w-full flex items-center justify-between">
@@ -72,6 +86,9 @@ const FeedIdeaCard = ({
               src={authorAvatar}
               alt="avatar"
               fill
+              sizes="40px"
+              priority={isHero}
+              loading={isHero ? "eager" : "lazy"}
               className="object-cover"
             />
           </div>
@@ -86,6 +103,18 @@ const FeedIdeaCard = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {isDraft && (
+            <div className="flex flex-col items-end gap-0.5">
+              <span className="rounded-full bg-[#F5F4FF] dark:bg-[#6155F5]/15 px-3 py-1 text-xs font-medium text-[#6155F5]">
+                Draft
+              </span>
+              {!isAuthor && (
+                <span className="text-[0.6875rem] text-brand-grey dark:text-[#808080]">
+                  Not active yet
+                </span>
+              )}
+            </div>
+          )}
           {isAuthor ? (
             <Popover>
               <PopoverTrigger asChild>
@@ -93,45 +122,59 @@ const FeedIdeaCard = ({
                   variant="ghost"
                   size="sm"
                   className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
-                  disabled={isDeleting}
+                  disabled={isDeleting || isPending || isOptimistic}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-40 p-2">
+                {isDraft && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-brand-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+                    onClick={handleEdit}
+                    disabled={isDeleting || isPending || isOptimistic}
+                  >
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
                   className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20 disabled:opacity-50"
                   onClick={handleDelete}
-                  disabled={isDeleting}
+                  disabled={isDeleting || isPending || isOptimistic}
                 >
-                  {isDeleting ? (
+                  {isDeleting || isPending ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <Trash2 className="h-4 w-4 mr-2" />
                   )}
-                  {isDeleting ? "Deleting..." : "Delete"}
+                  {isDeleting || isPending ? "Deleting..." : "Delete"}
                 </Button>
               </PopoverContent>
             </Popover>
           ) : (
-            <div
-              onClick={toggleShowInterestModal}
-              className="p-2 px-4 flex items-center gap-2 bg-primary
+            !isDraft && (
+              <div
+                onClick={() => openShowInterestModal(idea._id)}
+                className="p-2 px-4 flex items-center gap-2 bg-primary
             dark:bg-[#6155F5]
             min-h-[2.5rem]
             max-h-[2.5rem]
             text-white rounded-[1.25rem] cursor-pointer hover:opacity-90 transition-opacity"
-            >
-              <CheckCheck
-                size={13}
-                className="text-white dark:text-[#151515]"
-              />
-              <p className="text-[0.875rem] text-white dark:text-[#151515]">
-                Show Interest
-              </p>
-            </div>
+              >
+                <CheckCheck
+                  size={13}
+                  className="text-white dark:text-[#151515]"
+                />
+                <p className="text-[0.875rem] text-white dark:text-[#151515]">
+                  Show Interest
+                </p>
+              </div>
+            )
           )}
         </div>
       </section>
@@ -163,7 +206,11 @@ const FeedIdeaCard = ({
 
         {/* Display media grid */}
         {idea.media && idea.media.length > 0 && (
-          <MediaGrid media={idea.media} alt={idea.title} />
+          <MediaGrid
+            media={idea.media}
+            alt={idea.title}
+            priority={isHero}
+          />
         )}
       </div>
     </div>

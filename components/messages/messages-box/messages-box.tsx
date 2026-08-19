@@ -1,169 +1,336 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import React, { useEffect, useRef } from "react";
+"use client";
+
+import React, { useEffect, useMemo, useRef } from "react";
 import { useChatStore } from "@/store/useChatStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import ChatBubble from "../chat-bubble";
 import Image from "next/image";
-import gsap from "gsap";
-import { useProfileModalStore } from "@/store/useProfileModalStore";
 import UserProfileModal from "../user-profile-modal";
-import { useDummyStore } from "@/store/useDummyStore";
+import {
+  useGetConversationMessages,
+  useGetConversations,
+} from "@/api/chat/chat.queries";
+import { useMarkConversationAsRead, useVotePoll } from "@/api/chat/chat.mutations";
+import type { ChatMessage, Conversation } from "@/api/chat/chat.model";
+import ConversationMembersStack, {
+  getParticipantId,
+  mapParticipantToMemberAvatar,
+} from "../conversation-members-stack";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+const getScrollViewport = (root: HTMLElement) =>
+  root.querySelector<HTMLElement>("[data-slot='scroll-area-viewport']");
+
+const getConversationTitle = (
+  conversation: Conversation | undefined,
+  currentUserId?: string | null,
+) => {
+  if (!conversation) return "Conversation";
+
+  if (conversation.type === "group" || conversation.type === "kollaboration") {
+    return conversation.name?.trim() || "Untitled chat";
+  }
+
+  const other = conversation.participantIds
+    .map(mapParticipantToMemberAvatar)
+    .find((participant) => participant.id !== currentUserId);
+
+  return other?.name || "Direct message";
+};
+
+const isSameDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+const getDateKey = (iso: string) => {
+  const date = new Date(iso);
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+};
+
+const formatDateLabel = (iso: string) => {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (isSameDay(date, today)) return "Today";
+  if (isSameDay(date, yesterday)) return "Yesterday";
+
+  return date.toLocaleDateString([], {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    ...(date.getFullYear() !== today.getFullYear()
+      ? { year: "numeric" as const }
+      : {}),
+  });
+};
+
+type MessageDayGroup = {
+  key: string;
+  label: string;
+  messages: ChatMessage[];
+};
 
 export const MesssagesBox = () => {
   const currentConversationId = useChatStore(
-    (state) => state.currentConversationId
+    (state) => state.currentConversationId,
   );
-  const messages = useChatStore((state) => state.messages);
-  const users = useChatStore((state) => state.users);
-  const currentUserId = useChatStore((state) => state.currentUserId);
-  const otherParticipant = useChatStore((state) => state.otherParticipant);
-  const { openModal } = useProfileModalStore();
-  const { useDummyData } = useDummyStore();
+  const currentUserId = useAuthStore((state) => state.user?._id);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const { mutate: votePoll, isPending: isVoting } = useVotePoll();
+  const { mutate: markAsRead } = useMarkConversationAsRead();
 
-  // Get messages for current conversation
-  const conversationMessages = !useDummyData
-    ? []
-    : currentConversationId
-    ? messages[currentConversationId] || []
-    : [];
+  const { data: conversationsData } = useGetConversations({
+    page: 1,
+    limit: 30,
+  });
 
-  // Helper to determine if messages should be grouped (consecutive from same sender)
-  const shouldGroupMessage = (currentIndex: number) => {
+  const {
+    data: messagesData,
+    isLoading,
+    isError,
+  } = useGetConversationMessages(
+    {
+      conversationId: currentConversationId ?? "",
+      page: 1,
+      limit: 50,
+    },
+    { enabled: Boolean(currentConversationId) },
+  );
+
+  const activeConversation = conversationsData?.conversations.find(
+    (conversation) => conversation._id === currentConversationId,
+  );
+
+  useEffect(() => {
+    if (!currentConversationId) return;
+    markAsRead(currentConversationId);
+  }, [currentConversationId, markAsRead]);
+
+  // API returns newest-first; render oldest → newest in the thread
+  const conversationMessages = useMemo(() => {
+    const messages = messagesData?.messages ?? [];
+    return [...messages].reverse();
+  }, [messagesData?.messages]);
+
+  const messageGroups = useMemo(() => {
+    const groups: MessageDayGroup[] = [];
+
+    for (const message of conversationMessages) {
+      const key = getDateKey(message.createdAt);
+      const lastGroup = groups[groups.length - 1];
+
+      if (lastGroup && lastGroup.key === key) {
+        lastGroup.messages.push(message);
+      } else {
+        groups.push({
+          key,
+          label: formatDateLabel(message.createdAt),
+          messages: [message],
+        });
+      }
+    }
+
+    return groups;
+  }, [conversationMessages]);
+
+  const shouldGroupMessage = (
+    messages: ChatMessage[],
+    currentIndex: number,
+  ) => {
     if (currentIndex === 0) return false;
-    const currentMessage = conversationMessages[currentIndex];
-    const previousMessage = conversationMessages[currentIndex - 1];
+    return (
+      messages[currentIndex].senderId === messages[currentIndex - 1].senderId
+    );
+  };
 
-    return currentMessage.senderId === previousMessage.senderId;
+  const scrollToBottom = (behavior: ScrollBehavior = "auto") => {
+    bottomRef.current?.scrollIntoView({ behavior, block: "end" });
   };
 
   useEffect(() => {
-    if (!conversationMessages.length) return;
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom("auto");
   }, [conversationMessages.length, currentConversationId]);
 
-  // Show empty state if no conversation selected
-  if (
-    !currentConversationId ||
-    !otherParticipant ||
-    conversationMessages.length === 0
-  ) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-6 text-center">
-        <div className="relative flex h-36 w-36 items-center justify-center rounded-4xl bg-linear-to-b from-lavender/50 to-white ">
-          <div className="absolute inset-3 rounded-[1.7rem] bg-white/70 blur-xl" />
-          <Image
-            src={"/images/messages-empty-state.svg"}
-            alt="empty conversation illustration"
-            width={120}
-            height={152}
-            className="relative "
-          />
-        </div>
-        <p className="text-sm leading-5 text-brand-black dark:text-white">
-          Select a conversation to start messaging
-        </p>
-      </div>
-    );
+  // Re-stick to bottom when attachment images finish loading / layout grows
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root) return;
+
+    const viewport = getScrollViewport(root);
+    if (!viewport) return;
+
+    const content = viewport.firstElementChild;
+    if (!content) return;
+
+    const observer = new ResizeObserver(() => {
+      const distanceFromBottom =
+        viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+      // Keep pinned when the user is already near the latest message
+      if (distanceFromBottom < 160) {
+        scrollToBottom("auto");
+      }
+    });
+
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, [currentConversationId]);
+
+  if (!currentConversationId) {
+    return null;
   }
 
-  // Show conversation header and messages
-  return (
-    <div className="flex h-full flex-col">
-      {/* Conversation Header */}
+  const title = getConversationTitle(activeConversation, currentUserId);
+  const avatar =
+    activeConversation?.avatar?.url ||
+    (activeConversation?.type === "dm"
+      ? activeConversation.participantIds
+          .map(mapParticipantToMemberAvatar)
+          .find((participant) => participant.id !== currentUserId)?.avatar
+      : undefined);
+  const members = (activeConversation?.participantIds ?? [])
+    .filter((participant) => getParticipantId(participant) !== currentUserId)
+    .map(mapParticipantToMemberAvatar);
 
-      {otherParticipant && (
-        <div className="flex items-center gap-3 border-b border-gray-100 p-4 dark:border-[#80808026]">
-          <div className="relative h-10 w-10">
+  // For DMs keep the other person; for groups/kollabs show everyone (or all incl. me)
+  const stackMembers =
+    activeConversation?.type === "dm"
+      ? members
+      : (activeConversation?.participantIds ?? []).map(
+          mapParticipantToMemberAvatar,
+        );
+
+  return (
+    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-100 p-4 dark:border-[#80808026]">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="relative h-10 w-10 shrink-0">
             <Image
-              src={otherParticipant.profile_photo || "/images/dummy-avatar.svg"}
-              alt={`${otherParticipant.first_name} ${otherParticipant.last_name}`}
+              src={avatar || "/images/dummy-avatar.svg"}
+              alt={title}
               fill
               className="rounded-full object-cover"
             />
-            {otherParticipant.status && (
-              <span
-                className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white ${
-                  otherParticipant.status === "online"
-                    ? "bg-emerald-500"
-                    : otherParticipant.status === "away"
-                    ? "bg-amber-400"
-                    : "bg-gray-400"
-                }`}
-              />
-            )}
           </div>
-          <div>
-            <h3 className="font-semibold text-brand-black dark:text-white">
-              {otherParticipant.first_name} {otherParticipant.last_name}
+          <div className="min-w-0">
+            <h3 className="truncate font-semibold text-brand-black dark:text-white">
+              {title}
             </h3>
             <p className="text-xs text-brand-grey capitalize">
-              {otherParticipant.status || "offline"}
+              {activeConversation?.type ?? "chat"}
+              {stackMembers.length > 0
+                ? ` · ${stackMembers.length} member${stackMembers.length === 1 ? "" : "s"}`
+                : ""}
             </p>
           </div>
         </div>
-      )}
 
-      {/* Messages Area */}
-      <ScrollArea className="flex-1 px-4 max-h-[40rem] pb-4">
-        <div className="flex flex-col gap-4 py-4">
-          {conversationMessages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <p className="text-sm text-brand-grey">
-                No messages yet. Start the conversation!
+        <ConversationMembersStack members={stackMembers} maxVisible={4} />
+      </div>
+
+      <div ref={scrollRef} className="min-h-0 min-w-0 flex-1">
+        <ScrollArea className="h-full px-4">
+          <div className="flex min-h-full min-w-0 flex-col justify-end gap-3 pt-4 pb-28">
+            {isLoading ? (
+              <p className="py-12 text-center text-sm text-brand-grey">
+                Loading messages...
               </p>
-            </div>
-          ) : (
-            conversationMessages.map((message, index) => {
-              const isCurrentUser = message.senderId === currentUserId;
-              const sender = users[message.senderId as string];
-              const isGrouped = shouldGroupMessage(index);
+            ) : isError ? (
+              <p className="py-12 text-center text-sm text-brand-grey">
+                Couldn&apos;t load messages. Try again.
+              </p>
+            ) : conversationMessages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <p className="text-sm text-brand-grey">
+                  No messages yet. Start the conversation!
+                </p>
+              </div>
+            ) : (
+              messageGroups.map((group) => (
+                <div key={group.key} className="flex flex-col gap-3">
+                  <div className="sticky top-2 z-10 flex justify-center">
+                    <span className="rounded-full bg-lavender px-3 py-1 text-[0.6875rem] font-medium text-brand-black shadow-sm dark:bg-[#80808026] dark:text-white">
+                      {group.label}
+                    </span>
+                  </div>
 
-              // Handle proposal messages
-              const proposalData =
-                message.type === "proposal"
-                  ? {
-                      title: "Dear Jordan,",
-                      content: message.content || message.text || "",
-                      type: "proposal" as const,
-                      onViewProfile: () => {
-                        if (sender) {
-                          openModal(sender);
+                  {group.messages.map((message, index) => {
+                    const isCurrentUser = message.senderId === currentUserId;
+                    const isGrouped = shouldGroupMessage(group.messages, index);
+                    const hasAttachments = Boolean(message.attachments?.length);
+                    const text =
+                      message.content ||
+                      message.poll?.question ||
+                      "";
+                    const isPoll =
+                      message.type === "poll" && Boolean(message.poll);
+
+                    return (
+                      <ChatBubble
+                        key={message._id}
+                        message={text}
+                        isCurrentUser={isCurrentUser}
+                        timestamp={message.createdAt}
+                        showAvatar={!isCurrentUser}
+                        isGrouped={isGrouped}
+                        messageType={
+                          isPoll
+                            ? "poll"
+                            : hasAttachments
+                              ? "attachment"
+                              : "text"
                         }
-                      },
-                      onCollaborate: () => console.log("Collaborate clicked"),
-                      onReject: () => console.log("Reject clicked"),
-                    }
-                  : undefined;
+                        currentUserId={currentUserId}
+                        poll={message.poll}
+                        attachments={message.attachments}
+                        pollVoteDisabled={isVoting}
+                        onPollVote={(optionId) => {
+                          if (!message.poll || !currentUserId) return;
 
-              return (
-                <ChatBubble
-                  key={message.id}
-                  message={message.text || message.content || ""}
-                  isCurrentUser={isCurrentUser}
-                  senderName={
-                    !isCurrentUser && sender
-                      ? `${sender.first_name} ${sender.last_name}`
-                      : undefined
-                  }
-                  senderAvatar={
-                    !isCurrentUser ? sender?.profile_photo : undefined
-                  }
-                  timestamp={message.timestamp as string}
-                  showAvatar={!isCurrentUser}
-                  isGrouped={isGrouped}
-                  messageType={
-                    message.type === "proposal" ? "proposal" : "text"
-                  }
-                  proposalData={proposalData}
-                />
-              );
-            })
-          )}
-        </div>
-        <div ref={bottomRef} />
-      </ScrollArea>
+                          let nextOptionIds: string[];
 
-      {/* Profile Modal */}
+                          if (message.poll.allowMultiple) {
+                            const alreadySelected =
+                              message.poll.options
+                                .find((option) => option.id === optionId)
+                                ?.voterIds?.includes(currentUserId) ?? false;
+
+                            const currentIds = message.poll.options
+                              .filter((option) =>
+                                option.voterIds?.includes(currentUserId),
+                              )
+                              .map((option) => option.id);
+
+                            nextOptionIds = alreadySelected
+                              ? currentIds.filter((id) => id !== optionId)
+                              : [...currentIds, optionId];
+
+                            if (nextOptionIds.length === 0) return;
+                          } else {
+                            nextOptionIds = [optionId];
+                          }
+
+                          votePoll({
+                            messageId: message._id,
+                            payload: { optionIds: nextOptionIds },
+                          });
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              ))
+            )}
+            <div ref={bottomRef} className="h-px w-full shrink-0" aria-hidden />
+          </div>
+        </ScrollArea>
+      </div>
+
       <UserProfileModal />
     </div>
   );

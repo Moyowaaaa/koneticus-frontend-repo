@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 
 import ButtonV2 from "@/components/ui-components/button";
 import { useRouter } from "next/navigation";
-import { useIdeaStore } from "@/store/useIdeaStore";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
 import { Project } from "@/api/projects/projects.model";
 import { useDeleteProject } from "@/api/projects/project.mutations";
@@ -26,11 +25,12 @@ interface ProjectCardProps {
 const ProjectCard = ({ project, onEdit }: ProjectCardProps) => {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { deleteIdea } = useIdeaStore();
   const openEditModal = useEditIdeaModalStore((state) => state.openModal);
   const { mutateAsync: deleteProject } = useDeleteProject(project._id);
   const [imageError, setImageError] = useState<boolean>(false);
-  const isOwner = project.author === user?._id;
+  const authorId =
+    typeof project.author === "string" ? project.author : project.author?._id;
+  const isOwner = authorId === user?._id;
 
   const handleAction = () => {
     if (project.status === "draft") {

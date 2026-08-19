@@ -1,8 +1,6 @@
 "use client";
 
 import TopBar from "@/components/ui-components/top-bar";
-import { useDummyStore } from "@/store/useDummyStore";
-import { useIdeaStore } from "@/store/useIdeaStore";
 import Image from "next/image";
 import { useCallback, useEffect, useRef } from "react";
 import ProjectCard from "../projects/project-card";
@@ -12,9 +10,6 @@ import { useGetInfiniteUserProjects } from "@/api/projects/projects.queries";
 import { IdeaCardSkeleton } from "./idea-card-skeleton";
 
 const IdeasClient = () => {
-  const { ideas } = useIdeaStore();
-  const { useDummyData } = useDummyStore();
-
   // Refs for animation targets
   const containerRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -26,9 +21,18 @@ const IdeasClient = () => {
   // Ref to hold the IntersectionObserver instance so we can disconnect it
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const pendingProjects = !useDummyData
-    ? []
-    : ideas.filter((p) => p.status === "pending");
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useGetInfiniteUserProjects(10, "authored");
+
+  const draftProjects =
+    data?.pages.flatMap((page) =>
+      page.projects.filter((item) => item.status === "draft"),
+    ) ?? [];
 
   useEffect(() => {
     // Skip animations if empty state is not rendered
@@ -124,16 +128,7 @@ const IdeasClient = () => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, [pendingProjects.length]);
-
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useGetInfiniteUserProjects();
+  }, [draftProjects.length]);
 
   // Stable ref callback that properly manages the IntersectionObserver lifecycle.
   // Using a ref to store the observer instance ensures we can always disconnect
@@ -165,11 +160,6 @@ const IdeasClient = () => {
     },
     [hasNextPage, isFetchingNextPage, fetchNextPage],
   );
-
-  const draftProjects =
-    data?.pages.flatMap((page) =>
-      page.projects.filter((item) => item.status === "draft"),
-    ) ?? [];
 
   return (
     <>

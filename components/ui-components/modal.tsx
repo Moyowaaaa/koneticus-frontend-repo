@@ -15,7 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { ScrollArea } from "../ui/scroll-area";
 import { X } from "lucide-react";
 
 interface CustomModalProps {
@@ -48,15 +47,14 @@ const Modal = ({
   const isMobile = useIsMobile();
 
   const content = (
-    <div className="flex flex-col text-[#1E1E1E]">
-      <div className="">
-        {/* Title Section */}
+    <div className="flex min-w-0 flex-col text-[#1E1E1E]">
+      <div className="min-w-0">
         {title && (
-          <div className="px-6 pb-4 ">
+          <div className="px-6 pb-4">
             <h2
               className={cn(
-                "text-lg font-semibold text-center pb-2 border-b border-b-[#E9E9E9E9] dark:text-white dark:border-b-[#80808026]",
-                titleClassname
+                "border-b border-b-[#E9E9E9E9] pb-2 text-center text-lg font-semibold dark:border-b-[#80808026] dark:text-white",
+                titleClassname,
               )}
             >
               {title}
@@ -64,10 +62,10 @@ const Modal = ({
           </div>
         )}
 
-        {/* Content */}
-        <div className={cn("px-6 py-2", childrenClassName)}>{children}</div>
+        <div className={cn("min-w-0 px-6 py-2", childrenClassName)}>
+          {children}
+        </div>
 
-        {/* Actions */}
         {(primaryAction || secondaryAction) && (
           <div className="flex flex-row gap-2 px-6 pt-4">
             {primaryAction}
@@ -84,7 +82,9 @@ const Modal = ({
         {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
         <DrawerContent>
           <DrawerHeader className="relative"></DrawerHeader>
-          <div className="px-4 pb-8">{content}</div>
+          <div className="max-h-[85vh] overflow-y-auto px-4 pb-8">
+            {content}
+          </div>
         </DrawerContent>
       </Drawer>
     );
@@ -95,35 +95,31 @@ const Modal = ({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         className={cn(
-          "gap-0 p-0 sm:max-w-[570px] bg-[none] shadow-[none] md:w-[39.1875rem] ",
-          className
+          "max-h-[85vh] gap-0 overflow-hidden bg-transparent p-0 shadow-none sm:max-w-[570px] md:w-[39.1875rem]",
+          className,
         )}
-        // Hide the default close button
         showCloseButton={false}
       >
-        {/* Custom Close Button - positioned in top-right corner */}
-        <DialogClose className="glass-icon-button absolute -top-2 -right-12 z-50 h-10 w-10 max-h-10 max-w-10 rounded-[0.625rem] border-none bg-[#666666] hover:bg-[#555555] p-2 transition-colors flex items-center justify-center">
-          <X className="h-[1rem] w-[1rem] text-white" />
+        <DialogClose className="glass-icon-button absolute -top-2 -right-12 z-50 flex h-10 w-10 max-h-10 max-w-10 items-center justify-center rounded-[0.625rem] border-none bg-[#666666] p-2 transition-colors hover:bg-[#555555]">
+          <X className="h-4 w-4 text-white" />
           <span className="sr-only">Close</span>
         </DialogClose>
 
-        <ScrollArea className="max-h-[80vh] mt-10 shadow-[none] ">
-          <div
-            className={cn(
-              "flex flex-col gap-2 h-full w-full bg-[white] dark:bg-[#211E1E]  pb-4 pt-2 rounded-[1.875rem]",
-              containerClassname
-            )}
-          >
-            {title && (
-              <DialogHeader>
-                <DialogTitle className="sr-only dark:text-white!">
-                  {title}
-                </DialogTitle>
-              </DialogHeader>
-            )}
-            {content}
-          </div>
-        </ScrollArea>
+        <div
+          className={cn(
+            "max-h-[85vh] w-full min-w-0 overflow-y-auto rounded-[1.875rem] bg-white pt-2 pb-4 dark:bg-[#211E1E]",
+            containerClassname,
+          )}
+        >
+          {title && (
+            <DialogHeader>
+              <DialogTitle className="sr-only dark:text-white!">
+                {title}
+              </DialogTitle>
+            </DialogHeader>
+          )}
+          {content}
+        </div>
       </DialogContent>
     </Dialog>
   );

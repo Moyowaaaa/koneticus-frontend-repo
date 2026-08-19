@@ -6,29 +6,29 @@ import TagInput from "@/components/ui-components/tag-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
-// import { useFeedStore } from "@/store/useFeedStore";
 import {
   Clock,
   Image as ImageIcon,
   CloseCircle,
   People,
 } from "iconsax-reactjs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import ImageUploadModal from "./image-upload-modal";
+import ImageUploadModal, {
+  type SelectedImageItem,
+} from "./image-upload-modal";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateProject } from "@/api/projects/project.mutations";
 import { toast } from "sonner";
 
+const MAX_IDEA_IMAGES = 4;
+
 const NewIdeaModal = () => {
   const { showNewIdeaModal, setShowNewIdeaModal } = useGeneralStateStore();
   const { mutate: createProject, isPending: isSubmitting } = useCreateProject();
 
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-
-  // Define Zod schema
   const createProjectSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
     description: z
@@ -36,7 +36,7 @@ const NewIdeaModal = () => {
       .min(10, "Description must be at least 10 characters"),
     requiredRoles: z.array(z.string()),
     teamSize: z.number().min(1, "Team size must be at least 1"),
-    media: z.any().optional(), // File handling is manual or via controlled input
+    media: z.any().optional(),
   });
 
   type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
@@ -61,76 +61,81 @@ const NewIdeaModal = () => {
   const selectedRoles = watch("requiredRoles");
   const teamSize = watch("teamSize");
 
-  // Team size selection state
   const [isTeamSizeOpen, setIsTeamSizeOpen] = useState(false);
   const teamSizeOptions = [1, 2, 3, 4, 5];
 
-  // Image upload modal state
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedImages, setSelectedImages] = useState<SelectedImageItem[]>([]);
 
-  const imageInputRef = useRef<HTMLInputElement>(null);
+  const clearSelectedImages = React.useCallback(() => {
+    setSelectedImages((prev) => {
+      prev.forEach((image) => {
+        if (image.url.startsWith("blob:")) {
+          URL.revokeObjectURL(image.url);
+        }
+      });
+      return [];
+    });
+  }, []);
 
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreviewUrl(previewUrl);
-    }
+  const handleRemoveImage = (index: number) => {
+    setSelectedImages((prev) => {
+      const target = prev[index];
+      if (target?.url.startsWith("blob:")) {
+        URL.revokeObjectURL(target.url);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   };
-
-  const handleRemoveImage = React.useCallback(() => {
-    setSelectedFile(null);
-    if (imagePreviewUrl) {
-      URL.revokeObjectURL(imagePreviewUrl);
-      setImagePreviewUrl(null);
-    }
-    if (imageInputRef.current) {
-      imageInputRef.current.value = "";
-    }
-  }, [imagePreviewUrl]);
 
   const handleImageButtonClick = () => {
     setShowNewIdeaModal(false);
     setShowImageUploadModal(true);
   };
 
-  const handleImageFromModal = (imageUrl: string, file: File) => {
-    setSelectedFile(file);
-    setImagePreviewUrl(imageUrl);
+  const handleImagesFromModal = (images: SelectedImageItem[]) => {
+    setSelectedImages((prev) => {
+      prev.forEach((image) => {
+        if (image.url.startsWith("blob:")) {
+          URL.revokeObjectURL(image.url);
+        }
+      });
+      return images.slice(0, MAX_IDEA_IMAGES);
+    });
   };
 
-  // Reset form when modal opens/closes
   useEffect(() => {
-    if (!showNewIdeaModal) {
+    if (!showNewIdeaModal && !showImageUploadModal) {
       reset();
-      handleRemoveImage();
+      clearSelectedImages();
       setIsTeamSizeOpen(false);
     }
-  }, [showNewIdeaModal, reset]);
+  }, [showNewIdeaModal, showImageUploadModal, reset, clearSelectedImages]);
 
   const onSubmit = (data: CreateProjectFormValues) => {
-    // Prepare payload
     const payload = {
       ...data,
-      media: selectedFile ? [selectedFile] : undefined,
+      media:
+        selectedImages.length > 0
+          ? selectedImages.map((image) => image.file)
+          : undefined,
     };
 
     createProject(payload, {
       onSuccess: () => {
         toast.success("Project created successfully!");
-        setShowNewIdeaModal(false);
       },
       onError: (error) => {
         toast.error("Failed to create project. Please try again.");
         console.error("Submission error:", error);
       },
     });
+
+    setShowNewIdeaModal(false);
   };
 
   const handleModalClose = (open: boolean) => {
-    if (!isSubmitting) {
+    if (!isSubmitting && !showImageUploadModal) {
       setShowNewIdeaModal(open);
     }
   };
@@ -179,41 +184,35 @@ const NewIdeaModal = () => {
             )}
           </label>
 
-          {/* Image Preview Section */}
-          {imagePreviewUrl && (
-            <div className="relative w-full">
-              <div className="relative w-full h-40 rounded-lg overflow-hidden border border-[#E9E9E9]">
-                <Image
-                  src={imagePreviewUrl}
-                  alt="Selected image preview"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 transition-colors"
-                aria-label="Remove selected image"
-              >
-                <CloseCircle
-                  size={20}
-                  className="text-red-500"
-                  variant="Bold"
-                />
-              </button>
+          {selectedImages.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {selectedImages.map((image, index) => (
+                <div
+                  key={`${image.file.name}-${index}`}
+                  className="relative aspect-square overflow-hidden rounded-lg border border-[#E9E9E9]"
+                >
+                  <Image
+                    src={image.url}
+                    alt={`Selected image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute top-1.5 right-1.5 rounded-full bg-white p-1 shadow-md transition-colors hover:bg-gray-100"
+                    aria-label={`Remove image ${index + 1}`}
+                  >
+                    <CloseCircle
+                      size={18}
+                      className="text-red-500"
+                      variant="Bold"
+                    />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
-
-          {/* Hidden file input for image selection */}
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageSelect}
-            className="hidden"
-            aria-hidden="true"
-          />
 
           <TagInput
             selectedTags={selectedRoles}
@@ -247,7 +246,7 @@ const NewIdeaModal = () => {
                   flex flex-col items-center justify-center
                   cursor-pointer hover:bg-gray-100 transition-colors
                   disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Add image to your idea"
+                aria-label="Add images to your idea"
               >
                 <ImageIcon
                   size={16}
@@ -256,7 +255,6 @@ const NewIdeaModal = () => {
                 />
               </button>
 
-              {/* Team Size Dropdown */}
               <div className="relative">
                 <button
                   type="button"
@@ -349,15 +347,17 @@ const NewIdeaModal = () => {
         </form>
       </Modal>
 
-      {/* Image Upload Modal */}
       <ImageUploadModal
         open={showImageUploadModal}
-        onOpenChange={() => {
-          setShowImageUploadModal(false);
-          setShowNewIdeaModal(true);
+        onOpenChange={(open) => {
+          setShowImageUploadModal(open);
+          if (!open) {
+            setShowNewIdeaModal(true);
+          }
         }}
-        onImageSelect={handleImageFromModal}
-        initialImage={imagePreviewUrl}
+        onImagesSelect={handleImagesFromModal}
+        maxImages={MAX_IDEA_IMAGES}
+        initialImages={selectedImages}
       />
     </>
   );

@@ -2,14 +2,15 @@ import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import apiHttp, { PaginatedResponse } from "../appConfig";
 import { FeedItem } from "./feed.model";
 
-// Query keys
+// Query keys — keep finite and infinite list shapes on separate keys
 export const feedKeys = {
   all: ["feed"] as const,
   list: () => [...feedKeys.all, "list"] as const,
+  infinite: (limit: number = 20) =>
+    [...feedKeys.all, "list", "infinite", limit] as const,
   trending: () => [...feedKeys.all, "trending"] as const,
 };
 
-// Get feed
 const getFeed = async (
   cursor?: string,
   limit: number = 20,
@@ -32,17 +33,21 @@ export const useGetFeed = (limit: number = 20) =>
 
 export const useGetInfiniteFeed = (limit: number = 20) =>
   useInfiniteQuery({
-    queryKey: feedKeys.list(),
+    queryKey: feedKeys.infinite(limit),
     queryFn: ({ pageParam }) => getFeed(pageParam, limit),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.pagination.hasMore ? lastPage.pagination.nextCursor : undefined,
+    placeholderData: (previousData) => previousData,
   });
 
-// Trending
-const getTrendingFeed = async (): Promise<PaginatedResponse<FeedItem>> => {
-  const response =
-    await apiHttp.get<PaginatedResponse<FeedItem>>("/feed/trending");
+const getTrendingFeed = async (): Promise<{
+  items: FeedItem[];
+  type?: string;
+}> => {
+  const response = await apiHttp.get<{ items: FeedItem[]; type?: string }>(
+    "/feed/trending",
+  );
   return response.data;
 };
 

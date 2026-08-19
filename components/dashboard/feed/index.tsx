@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import FeedEmptyState from "./feed-empty-state";
 import FeedIdeaCard from "./feed-idea-card";
 import FeedIdeaCardSkeleton from "./feed-idea-card-skeleton";
@@ -16,25 +16,47 @@ const Feed = () => {
     isError,
   } = useGetInfiniteFeed();
 
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+
   const loadMoreRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (!node) return;
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
 
-      const observer = new IntersectionObserver(
+      if (!node || !hasNextPage) return;
+
+      observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          if (entries[0].isIntersecting && !isFetchingNextPage) {
             fetchNextPage();
           }
         },
-        { threshold: 0.1 },
+        { threshold: 0.1, rootMargin: "200px" },
       );
 
-      observer.observe(node);
-
-      return () => observer.disconnect();
+      observerRef.current.observe(node);
     },
     [hasNextPage, isFetchingNextPage, fetchNextPage],
   );
+
+  const handleDelete = useCallback((id: string) => {
+    setDeletingIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleDeleteSettled = useCallback((id: string) => {
+    setDeletingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }, []);
 
   const feedItems = data?.pages.flatMap((page) => page.items) ?? [];
 
@@ -67,13 +89,23 @@ const Feed = () => {
         </div>
       ) : feedItems.length > 0 ? (
         <div className="space-y-6">
-          {feedItems.map((item) => (
-            <FeedIdeaCard key={item._id} idea={item} />
+          {feedItems.map((item, index) => (
+            <FeedIdeaCard
+              key={item._id}
+              idea={item}
+              isHero={index === 0}
+              isDeleting={deletingIds.has(item._id)}
+              onDelete={handleDelete}
+              onDeleteSettled={handleDeleteSettled}
+            />
           ))}
 
-          {/* Infinite scroll trigger */}
           <div ref={loadMoreRef} className="py-4">
             {isFetchingNextPage && <FeedIdeaCardSkeleton />}
+          </div>
+
+          <div className="w-full  flex items-center absolute justify-center bottom-0">
+            <p>You are up to date</p>
           </div>
         </div>
       ) : (

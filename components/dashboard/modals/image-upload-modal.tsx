@@ -2,9 +2,18 @@
 
 import Modal from "@/components/ui-components/modal";
 import ButtonV2 from "@/components/ui-components/button";
-import { Clock, Edit2, Trash, RotateLeft, RotateRight } from "iconsax-reactjs";
+import {
+  Clock,
+  Edit2,
+  Trash,
+  RotateLeft,
+  RotateRight,
+  Refresh,
+  Add,
+} from "iconsax-reactjs";
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 type ModalView = "upload" | "preview" | "edit";
 
@@ -15,34 +24,80 @@ interface CropArea {
   height: number;
 }
 
+export type SelectedImageItem = {
+  url: string;
+  file: File;
+};
+
+type EditableImage = {
+  id: string;
+  file: File;
+  previewUrl: string;
+  originalUrl: string;
+};
+
 interface ImageUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onImageSelect: (imageUrl: string, file: File) => void;
-  initialImage?: string | null;
+  /** Prefer this for multi-image flows (ideas + chat). */
+  onImagesSelect: (images: SelectedImageItem[]) => void;
+  maxImages?: number;
+  initialImages?: SelectedImageItem[];
+  title?: string;
+  uploadHint?: string;
+  showShareQuota?: boolean;
 }
 
-const ImageUploadModal = ({
+const DEFAULT_CROP: CropArea = { x: 10, y: 10, width: 80, height: 80 };
+const MAX_IMAGES_DEFAULT = 4;
+
+let editableImageSeq = 0;
+
+const createEditableImage = (file: File): EditableImage => {
+  editableImageSeq += 1;
+  const previewUrl = URL.createObjectURL(file);
+  return {
+    id: `upload-${editableImageSeq}-${file.name}-${file.size}`,
+    file,
+    previewUrl,
+    originalUrl: previewUrl,
+  };
+};
+
+const getInitialImages = (
+  open: boolean,
+  maxImages: number,
+  initialImages?: SelectedImageItem[],
+) => {
+  if (!open || !initialImages?.length) return [];
+  return initialImages.slice(0, maxImages).map((item) =>
+    createEditableImage(item.file),
+  );
+};
+
+const ImageUploadModal = (props: ImageUploadModalProps) => (
+  <ImageUploadModalContent key={props.open ? "open" : "closed"} {...props} />
+);
+
+const ImageUploadModalContent = ({
   open,
   onOpenChange,
-  onImageSelect,
-  initialImage,
+  onImagesSelect,
+  maxImages = MAX_IMAGES_DEFAULT,
+  initialImages,
+  title = "Image upload",
+  uploadHint = "Share a pic that shows off your idea!",
+  showShareQuota = true,
 }: ImageUploadModalProps) => {
+  const [images, setImages] = useState<EditableImage[]>(() =>
+    getInitialImages(open, maxImages, initialImages),
+  );
   const [view, setView] = useState<ModalView>(
-    initialImage ? "preview" : "upload",
+    images.length > 0 ? "preview" : "upload",
   );
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(
-    initialImage || null,
-  );
-  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [rotation, setRotation] = useState(0);
-  const [cropArea, setCropArea] = useState<CropArea>({
-    x: 10,
-    y: 10,
-    width: 80,
-    height: 80,
-  });
+  const [cropArea, setCropArea] = useState<CropArea>(DEFAULT_CROP);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState<string | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -50,55 +105,119 @@ const ImageUploadModal = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imagesRef = useRef<EditableImage[]>([]);
+  const handedOffRef = useRef(false);
+
+  const activeImage = images[activeIndex] ?? null;
+  const canAddMore = images.length < maxImages;
+
+  const revokeImageUrls = useCallback((items: EditableImage[]) => {
+    for (const item of items) {
+      if (item.previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(item.previewUrl);
+      }
+      if (
+        item.originalUrl !== item.previewUrl &&
+        item.originalUrl.startsWith("blob:")
+      ) {
+        URL.revokeObjectURL(item.originalUrl);
+      }
+    }
+  }, []);
+
+  const resetCropControls = useCallback(() => {
+    setRotation(0);
+    setCropArea(DEFAULT_CROP);
+  }, []);
+
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
+
+  useEffect(() => {
+    return () => {
+      if (!handedOffRef.current) {
+        revokeImageUrls(imagesRef.current);
+      }
+    };
+  }, [revokeImageUrls]);
+
+  const appendFiles = (fileList: FileList | File[]) => {
+    const incoming = Array.from(fileList).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+    if (incoming.length === 0) return;
+
+    setImages((prev) => {
+      const remaining = maxImages - prev.length;
+      if (remaining <= 0) return prev;
+
+      const nextItems = incoming.slice(0, remaining).map(createEditableImage);
+      const next = [...prev, ...nextItems];
+      setActiveIndex(prev.length);
+      setView("preview");
+      resetCropControls();
+      return next;
+    });
+  };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreviewUrl(previewUrl);
-      setOriginalImageUrl(previewUrl);
-      setView("preview");
-      setRotation(0);
-      setCropArea({ x: 10, y: 10, width: 80, height: 80 });
+    if (event.target.files) {
+      appendFiles(event.target.files);
     }
+    event.target.value = "";
   };
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleDelete = () => {
-    if (imagePreviewUrl && !initialImage) {
-      URL.revokeObjectURL(imagePreviewUrl);
-    }
-    if (originalImageUrl && originalImageUrl !== imagePreviewUrl) {
-      URL.revokeObjectURL(originalImageUrl);
-    }
-    setSelectedImage(null);
-    setImagePreviewUrl(null);
-    setOriginalImageUrl(null);
-    setView("upload");
-    setRotation(0);
-    setCropArea({ x: 10, y: 10, width: 80, height: 80 });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  const handleDeleteActive = () => {
+    setImages((prev) => {
+      const target = prev[activeIndex];
+      if (!target) return prev;
+
+      revokeImageUrls([target]);
+      const next = prev.filter((_, index) => index !== activeIndex);
+
+      if (next.length === 0) {
+        setView("upload");
+        setActiveIndex(0);
+      } else {
+        setActiveIndex((current) =>
+          Math.min(current, Math.max(next.length - 1, 0)),
+        );
+        setView("preview");
+      }
+
+      resetCropControls();
+      return next;
+    });
   };
 
   const handleBack = () => {
     if (view === "edit") {
+      resetCropControls();
       setView("preview");
-    } else {
-      onOpenChange(false);
+      return;
     }
+    onOpenChange(false);
   };
 
   const handleContinue = () => {
-    if (imagePreviewUrl && selectedImage) {
-      onImageSelect(imagePreviewUrl, selectedImage);
-      onOpenChange(false);
-    }
+    if (images.length === 0) return;
+    handedOffRef.current = true;
+    onImagesSelect(
+      images.map((image) => ({
+        url: image.previewUrl,
+        file: image.file,
+      })),
+    );
+    setImages([]);
+    setActiveIndex(0);
+    setView("upload");
+    resetCropControls();
+    onOpenChange(false);
   };
 
   const handleRotateLeft = () => {
@@ -110,27 +229,27 @@ const ImageUploadModal = ({
   };
 
   const applyCrop = useCallback(async () => {
-    if (!originalImageUrl || !canvasRef.current) return;
+    if (!activeImage || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const sourceUrl = activeImage.originalUrl;
     const img = document.createElement("img");
     img.crossOrigin = "anonymous";
 
-    await new Promise<void>((resolve) => {
+    await new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
-      img.src = originalImageUrl;
+      img.onerror = () => reject(new Error("Failed to load image for crop"));
+      img.src = sourceUrl;
     });
 
-    // Calculate actual crop dimensions
     const cropX = (cropArea.x / 100) * img.width;
     const cropY = (cropArea.y / 100) * img.height;
     const cropWidth = (cropArea.width / 100) * img.width;
     const cropHeight = (cropArea.height / 100) * img.height;
 
-    // Handle rotation
     let outputWidth = cropWidth;
     let outputHeight = cropHeight;
 
@@ -173,43 +292,49 @@ const ImageUploadModal = ({
     }
     ctx.restore();
 
-    // Convert canvas to blob and create new preview URL
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          const newUrl = URL.createObjectURL(blob);
-          if (imagePreviewUrl && imagePreviewUrl !== originalImageUrl) {
-            URL.revokeObjectURL(imagePreviewUrl);
+    await new Promise<void>((resolve) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            resolve();
+            return;
           }
-          setImagePreviewUrl(newUrl);
 
-          // Create new file from blob
+          const newUrl = URL.createObjectURL(blob);
           const newFile = new File(
             [blob],
-            selectedImage?.name || "cropped-image.jpg",
-            {
-              type: "image/jpeg",
-            },
+            activeImage.file.name || "cropped-image.jpg",
+            { type: "image/jpeg" },
           );
-          setSelectedImage(newFile);
-        }
-      },
-      "image/jpeg",
-      0.9,
-    );
-  }, [
-    originalImageUrl,
-    cropArea,
-    rotation,
-    imagePreviewUrl,
-    selectedImage?.name,
-  ]);
+
+          setImages((prev) =>
+            prev.map((image, index) => {
+              if (index !== activeIndex) return image;
+              if (
+                image.previewUrl !== image.originalUrl &&
+                image.previewUrl.startsWith("blob:")
+              ) {
+                URL.revokeObjectURL(image.previewUrl);
+              }
+              return {
+                ...image,
+                previewUrl: newUrl,
+                file: newFile,
+              };
+            }),
+          );
+          resolve();
+        },
+        "image/jpeg",
+        0.9,
+      );
+    });
+  }, [activeImage, activeIndex, cropArea, rotation]);
 
   const handleSaveEdit = async () => {
     await applyCrop();
+    resetCropControls();
     setView("preview");
-    setRotation(0);
-    setCropArea({ x: 10, y: 10, width: 80, height: 80 });
   };
 
   const handleMouseDown = (e: React.MouseEvent, action: string) => {
@@ -237,11 +362,8 @@ const ImageUploadModal = ({
         setCropArea((prev) => {
           let newX = prev.x + deltaX;
           let newY = prev.y + deltaY;
-
-          // Constrain to bounds
           newX = Math.max(0, Math.min(100 - prev.width, newX));
           newY = Math.max(0, Math.min(100 - prev.height, newY));
-
           return { ...prev, x: newX, y: newY };
         });
         setDragStart({ x: e.clientX, y: e.clientY });
@@ -254,7 +376,7 @@ const ImageUploadModal = ({
               width = Math.max(20, Math.min(100 - x, width + deltaX));
               height = Math.max(20, Math.min(100 - y, height + deltaY));
               break;
-            case "sw":
+            case "sw": {
               const newWidthSw = Math.max(20, width - deltaX);
               const newXSw = x + (width - newWidthSw);
               if (newXSw >= 0) {
@@ -263,7 +385,8 @@ const ImageUploadModal = ({
               }
               height = Math.max(20, Math.min(100 - y, height + deltaY));
               break;
-            case "ne":
+            }
+            case "ne": {
               width = Math.max(20, Math.min(100 - x, width + deltaX));
               const newHeightNe = Math.max(20, height - deltaY);
               const newYNe = y + (height - newHeightNe);
@@ -272,7 +395,8 @@ const ImageUploadModal = ({
                 height = newHeightNe;
               }
               break;
-            case "nw":
+            }
+            case "nw": {
               const newWidthNw = Math.max(20, width - deltaX);
               const newXNw = x + (width - newWidthNw);
               const newHeightNw = Math.max(20, height - deltaY);
@@ -284,6 +408,7 @@ const ImageUploadModal = ({
                 height = newHeightNw;
               }
               break;
+            }
           }
 
           return { x, y, width, height };
@@ -312,51 +437,42 @@ const ImageUploadModal = ({
 
   const handleModalClose = (isOpen: boolean) => {
     if (!isOpen) {
-      if (!initialImage) {
-        setView("upload");
-        if (imagePreviewUrl) {
-          URL.revokeObjectURL(imagePreviewUrl);
-        }
-        if (originalImageUrl && originalImageUrl !== imagePreviewUrl) {
-          URL.revokeObjectURL(originalImageUrl);
-        }
-        setSelectedImage(null);
-        setImagePreviewUrl(null);
-        setOriginalImageUrl(null);
-        setRotation(0);
-        setCropArea({ x: 10, y: 10, width: 80, height: 80 });
+      if (!handedOffRef.current) {
+        revokeImageUrls(images);
       }
+      handedOffRef.current = false;
+      setImages([]);
+      setActiveIndex(0);
+      setView("upload");
+      resetCropControls();
     }
     onOpenChange(isOpen);
   };
 
-  const getTitle = () => {
-    return view === "edit" ? "Edit" : "Image upload";
-  };
+  const modalTitle = view === "edit" ? "Edit" : title;
 
   return (
     <Modal
       open={open}
       onOpenChange={handleModalClose}
-      title={getTitle()}
+      title={modalTitle}
       className="flex flex-col gap-4"
     >
-      <div className="flex flex-col gap-4 min-h-[300px]">
-        {/* Hidden elements */}
+      <div className="flex min-h-[300px] flex-col gap-4">
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
+          multiple
           onChange={handleFileSelect}
           className="hidden"
           aria-hidden="true"
         />
         <canvas ref={canvasRef} className="hidden" />
 
-        {/* Upload View (Empty State) */}
         {view === "upload" && (
-          <div className="flex flex-col items-center justify-center flex-1 py-8 gap-4">
-            <div className="w-20 h-20 flex items-center justify-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 py-8">
+            <div className="flex h-20 w-20 items-center justify-center">
               <svg
                 width="80"
                 height="80"
@@ -385,108 +501,133 @@ const ImageUploadModal = ({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <path
-                  d="M56.6667 53.3333L40 36.6667L23.3334 53.3333"
-                  stroke="#8B7BF4"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
               </svg>
             </div>
 
-            <p className="text-[0.875rem] text-brand-grey text-center">
-              Share a pic that shows off your idea!
+            <p className="text-center text-[0.875rem] text-brand-grey">
+              {uploadHint}
+            </p>
+            <p className="text-center text-xs text-brand-grey">
+              Up to {maxImages} images
             </p>
 
-            <ButtonV2
-              onClick={handleUploadClick}
-              className="h-10 min-h-10 px-6"
-            >
+            <ButtonV2 onClick={handleUploadClick} className="h-10 min-h-10 px-6">
               <p className="text-[0.875rem]">+ Upload</p>
             </ButtonV2>
           </div>
         )}
 
-        {/* Preview View */}
-        {view === "preview" && imagePreviewUrl && (
+        {view === "preview" && activeImage && (
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="relative w-full max-w-[400px] aspect-4/3 rounded-lg overflow-hidden bg-gray-100">
+            <div className="relative aspect-4/3 w-full max-w-[400px] overflow-hidden rounded-lg bg-gray-100">
               <Image
-                src={imagePreviewUrl}
-                alt="Selected image preview"
+                src={activeImage.previewUrl}
+                alt={`Selected image ${activeIndex + 1}`}
                 fill
                 className="object-cover"
               />
+            </div>
+
+            <div className="flex w-full max-w-[400px] items-center gap-2 overflow-x-auto pb-1">
+              {images.map((image, index) => (
+                <button
+                  key={image.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveIndex(index);
+                    resetCropControls();
+                  }}
+                  className={cn(
+                    "relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
+                    index === activeIndex
+                      ? "border-[#6155F5]"
+                      : "border-transparent opacity-80 hover:opacity-100",
+                  )}
+                  aria-label={`Select image ${index + 1}`}
+                >
+                  <Image
+                    src={image.previewUrl}
+                    alt={`Thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+
+              {canAddMore && (
+                <button
+                  type="button"
+                  onClick={handleUploadClick}
+                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-dashed border-[#C7C2FF] bg-lavender text-[#6155F5] transition-colors hover:bg-[#E6E4FF]"
+                  aria-label="Add more images"
+                >
+                  <Add size={18} />
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => {
-                  setOriginalImageUrl(imagePreviewUrl);
                   setView("edit");
+                  resetCropControls();
                 }}
-                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
-                  hover:bg-[#E0DDFF] transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
                 aria-label="Edit image"
               >
                 <Edit2 size={18} variant="Bold" className="text-[#6155F5]" />
               </button>
               <button
                 type="button"
-                onClick={handleDelete}
-                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
-                  hover:bg-[#E0DDFF] transition-colors"
+                onClick={handleDeleteActive}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
                 aria-label="Delete image"
               >
                 <Trash size={18} variant="Bold" className="text-[#6155F5]" />
               </button>
             </div>
+
+            <p className="text-xs text-brand-grey">
+              {images.length}/{maxImages} selected
+            </p>
           </div>
         )}
 
-        {/* Edit View with Crop */}
-        {view === "edit" && (originalImageUrl || imagePreviewUrl) && (
+        {view === "edit" && activeImage && (
           <div className="flex flex-col items-center gap-4 py-4">
-            {/* Image with Crop Overlay */}
             <div
               ref={imageContainerRef}
-              className="relative w-full max-w-[400px] aspect-4/3 rounded-lg overflow-hidden bg-gray-100 select-none"
+              className="relative aspect-4/3 w-full max-w-[400px] select-none overflow-hidden rounded-lg bg-gray-100"
             >
               <Image
-                src={originalImageUrl || imagePreviewUrl || ""}
+                src={activeImage.originalUrl}
                 alt="Image to edit"
                 fill
-                className="object-cover pointer-events-none"
+                className="pointer-events-none object-cover"
                 style={{ transform: `rotate(${rotation}deg)` }}
                 draggable={false}
               />
 
-              {/* Dark overlay outside crop area */}
-              <div className="absolute inset-0 pointer-events-none">
-                {/* Top */}
+              <div className="pointer-events-none absolute inset-0">
                 <div
-                  className="absolute bg-black/50 left-0 right-0 top-0"
+                  className="absolute top-0 right-0 left-0 bg-black/50"
                   style={{ height: `${cropArea.y}%` }}
                 />
-                {/* Bottom */}
                 <div
-                  className="absolute bg-black/50 left-0 right-0 bottom-0"
+                  className="absolute right-0 bottom-0 left-0 bg-black/50"
                   style={{ height: `${100 - cropArea.y - cropArea.height}%` }}
                 />
-                {/* Left */}
                 <div
-                  className="absolute bg-black/50 left-0"
+                  className="absolute left-0 bg-black/50"
                   style={{
                     top: `${cropArea.y}%`,
                     height: `${cropArea.height}%`,
                     width: `${cropArea.x}%`,
                   }}
                 />
-                {/* Right */}
                 <div
-                  className="absolute bg-black/50 right-0"
+                  className="absolute right-0 bg-black/50"
                   style={{
                     top: `${cropArea.y}%`,
                     height: `${cropArea.height}%`,
@@ -495,9 +636,8 @@ const ImageUploadModal = ({
                 />
               </div>
 
-              {/* Crop selection box */}
               <div
-                className="absolute border-2 border-white cursor-move"
+                className="absolute cursor-move border-2 border-white"
                 style={{
                   left: `${cropArea.x}%`,
                   top: `${cropArea.y}%`,
@@ -506,57 +646,54 @@ const ImageUploadModal = ({
                 }}
                 onMouseDown={(e) => handleMouseDown(e, "move")}
               >
-                {/* Grid lines */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/50" />
-                  <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/50" />
-                  <div className="absolute top-1/3 left-0 right-0 h-px bg-white/50" />
-                  <div className="absolute top-2/3 left-0 right-0 h-px bg-white/50" />
+                <div className="pointer-events-none absolute inset-0">
+                  <div className="absolute top-0 bottom-0 left-1/3 w-px bg-white/50" />
+                  <div className="absolute top-0 bottom-0 left-2/3 w-px bg-white/50" />
+                  <div className="absolute top-1/3 right-0 left-0 h-px bg-white/50" />
+                  <div className="absolute top-2/3 right-0 left-0 h-px bg-white/50" />
                 </div>
 
-                {/* Corner resize handles */}
                 <div
-                  className="absolute -top-2 -left-2 w-4 h-4 bg-white rounded-full cursor-nw-resize shadow-md"
+                  className="absolute -top-2 -left-2 h-4 w-4 cursor-nw-resize rounded-full bg-white shadow-md"
                   onMouseDown={(e) => handleMouseDown(e, "nw")}
                 />
                 <div
-                  className="absolute -top-2 -right-2 w-4 h-4 bg-white rounded-full cursor-ne-resize shadow-md"
+                  className="absolute -top-2 -right-2 h-4 w-4 cursor-ne-resize rounded-full bg-white shadow-md"
                   onMouseDown={(e) => handleMouseDown(e, "ne")}
                 />
                 <div
-                  className="absolute -bottom-2 -left-2 w-4 h-4 bg-white rounded-full cursor-sw-resize shadow-md"
+                  className="absolute -bottom-2 -left-2 h-4 w-4 cursor-sw-resize rounded-full bg-white shadow-md"
                   onMouseDown={(e) => handleMouseDown(e, "sw")}
                 />
                 <div
-                  className="absolute -bottom-2 -right-2 w-4 h-4 bg-white rounded-full cursor-se-resize shadow-md"
+                  className="absolute -right-2 -bottom-2 h-4 w-4 cursor-se-resize rounded-full bg-white shadow-md"
                   onMouseDown={(e) => handleMouseDown(e, "se")}
                 />
               </div>
             </div>
 
-            {/* Edit Tools */}
-            <div className="flex items-center  gap-[1rem]">
+            <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={handleRotateLeft}
-                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
-                  hover:bg-[#E0DDFF] transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
                 aria-label="Rotate left"
               >
                 <RotateLeft size={18} className="text-[#6155F5]" />
               </button>
-              {/* <button
+              <button
                 type="button"
-                className="w-10 h-10 rounded-full bg-brand-purple flex items-center justify-center"
-                aria-label="Crop (active)"
+                onClick={resetCropControls}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
+                aria-label="Reset crop controls"
+                title="Reset"
               >
-                <Crop size={18} className="text-[#6155F5]" />
-              </button> */}
+                <Refresh size={18} className="text-[#6155F5]" />
+              </button>
               <button
                 type="button"
                 onClick={handleRotateRight}
-                className="w-10 h-10 rounded-full bg-[#E6E4FF] flex items-center justify-center
-                  hover:bg-[#E0DDFF] transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
                 aria-label="Rotate right"
               >
                 <RotateRight size={18} className="text-[#6155F5]" />
@@ -565,19 +702,16 @@ const ImageUploadModal = ({
           </div>
         )}
 
-        {/* Footer */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#E9E9E9]">
+        <div className="mt-auto flex items-center justify-between border-t border-[#E9E9E9] pt-4">
           <button
             type="button"
             onClick={handleBack}
-            className="h-10 px-4 rounded-full border border-[#E9E9E9]
-              flex items-center gap-2 hover:bg-gray-50 transition-colors
-              text-[0.875rem] text-brand-black"
+            className="flex h-10 items-center gap-2 rounded-full border border-[#E9E9E9] px-4 text-[0.875rem] text-brand-black transition-colors hover:bg-gray-50"
           >
             <span>←</span> Back
           </button>
 
-          {view === "upload" && (
+          {view === "upload" && showShareQuota && (
             <div className="flex items-center gap-1">
               <Clock size={13} className="text-brand-grey" />
               <p className="text-[0.875rem] text-brand-grey">
@@ -590,7 +724,7 @@ const ImageUploadModal = ({
             <ButtonV2
               onClick={handleContinue}
               className="h-10 min-h-10 px-6"
-              disabled={!imagePreviewUrl}
+              disabled={images.length === 0}
             >
               <p className="text-[0.875rem]">Continue</p>
             </ButtonV2>
