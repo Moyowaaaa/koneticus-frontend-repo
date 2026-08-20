@@ -44,7 +44,7 @@ const apiHttp = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Send cookies with every request
+  withCredentials: true,
 });
 
 // Prefer cookie auth; also send stored Bearer token as fallback
