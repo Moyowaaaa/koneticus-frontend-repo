@@ -2,7 +2,9 @@ import { io, type Socket } from "socket.io-client";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+  process.env.NEXT_PUBLIC_NODE_ENV === "development"
+    ? "http://localhost:4000/"
+    : process.env.NEXT_PUBLIC_SOCKET_URL;
 
 let socket: Socket | null = null;
 

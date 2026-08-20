@@ -37,8 +37,10 @@ export interface PaginatedResponse<T> extends ResponseBase {
 }
 
 const apiHttp = axios.create({
-  baseURL: "http://localhost:4000/v1/api",
-  // process.env.NEXT_PUBLIC_API_BASE_URL || "https://dingpay-be.onrender.com",
+  baseURL:
+    process.env.NEXT_PUBLIC_NODE_ENV === "development"
+      ? "http://localhost:4000/v1/api"
+      : process.env.NEXT_PUBLIC_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
