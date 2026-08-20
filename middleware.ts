@@ -7,6 +7,12 @@ export function middleware(req: NextRequest) {
   const authToken = req.cookies.get("authToken")?.value;
   const { pathname } = req.nextUrl;
 
+  if (pathname === "/") {
+    return NextResponse.redirect(
+      new URL(authToken ? "/dashboard" : "/auth/log-in", req.url),
+    );
+  }
+
   const isProtected = PROTECTED_PREFIXES.some((route) =>
     pathname.startsWith(route),
   );
@@ -26,5 +32,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/log-in", "/auth/sign-up"],
+  matcher: ["/", "/dashboard/:path*", "/auth/log-in", "/auth/sign-up"],
 };
