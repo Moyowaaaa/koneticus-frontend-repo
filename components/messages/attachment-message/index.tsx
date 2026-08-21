@@ -1,24 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import MediaGrid from "@/components/dashboard/feed/media-grid";
+import DocumentLightbox from "@/components/messages/document-lightbox";
 import type { ChatMessageAttachment } from "@/api/chat/chat.model";
 import type { FeedMedia } from "@/api/feed/feed.model";
+import { formatChatFileSize } from "@/lib/chat-attachments";
 
 type AttachmentMessageProps = {
   attachments: ChatMessageAttachment[];
   caption?: string;
   isCurrentUser: boolean;
   className?: string;
-};
-
-const formatFileSize = (bytes?: number) => {
-  if (!bytes || bytes <= 0) return "";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
 const toFeedMedia = (attachments: ChatMessageAttachment[]): FeedMedia[] =>
@@ -37,6 +32,10 @@ const AttachmentMessage = ({
   isCurrentUser,
   className,
 }: AttachmentMessageProps) => {
+  const [selectedDocumentIndex, setSelectedDocumentIndex] = useState<
+    number | null
+  >(null);
+
   const photos = attachments.filter(
     (item) => item.kind === "photo" || item.mimeType?.startsWith("image/"),
   );
@@ -100,13 +99,12 @@ const AttachmentMessage = ({
 
       {documents.length > 0 && (
         <div className="flex w-[13.5rem] max-w-full flex-col gap-2 sm:w-[15rem]">
-          {documents.map((attachment) => (
-            <a
+          {documents.map((attachment, index) => (
+            <button
               key={attachment.id || attachment.url}
-              href={attachment.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-[#E9E9E9]/80 bg-white/80 p-3 transition-colors hover:bg-white dark:border-[#80808026] dark:bg-[#211E1E] dark:hover:bg-[#2a2727]"
+              type="button"
+              onClick={() => setSelectedDocumentIndex(index)}
+              className="flex items-center gap-3 rounded-xl border border-[#E9E9E9]/80 bg-white/80 p-3 text-left transition-colors hover:bg-white dark:border-[#80808026] dark:bg-[#211E1E] dark:hover:bg-[#2a2727]"
             >
               <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-lavender text-[#6155F5] dark:bg-[#6155F5]/20">
                 <FileText className="size-5" />
@@ -116,10 +114,10 @@ const AttachmentMessage = ({
                   {attachment.name || "Document"}
                 </p>
                 <p className="text-xs text-brand-grey">
-                  {formatFileSize(attachment.size) || attachment.mimeType}
+                  {formatChatFileSize(attachment.size) || attachment.mimeType}
                 </p>
               </div>
-            </a>
+            </button>
           ))}
         </div>
       )}
@@ -129,6 +127,13 @@ const AttachmentMessage = ({
           <p className="wrap-anywhere">{caption}</p>
         </div>
       ) : null}
+
+      <DocumentLightbox
+        documents={documents}
+        selectedIndex={selectedDocumentIndex}
+        onClose={() => setSelectedDocumentIndex(null)}
+        onSelect={setSelectedDocumentIndex}
+      />
     </div>
   );
 };
