@@ -19,6 +19,7 @@ import {
 import { chatKeys } from "./chat.queries";
 import { useAuthStore } from "@/store/useAuthStore";
 import { projectsKeys } from "../projects/projects.queries";
+import { feedKeys } from "../feed/feed.queries";
 import { useChatStore } from "@/store/useChatStore";
 
 const sendMessage = async ({
@@ -125,6 +126,12 @@ export const useCreateKollaboration = () => {
     onSuccess: (data, variables) => {
       void queryClient.invalidateQueries({
         queryKey: projectsKeys.singleProject(variables.projectId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: projectsKeys.all,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: feedKeys.all,
       });
       void queryClient.invalidateQueries({
         queryKey: [...chatKeys.all, "conversations"],

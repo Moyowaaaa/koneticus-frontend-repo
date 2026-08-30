@@ -174,6 +174,21 @@
   }
 }
 
+/* Hide scrollbars while keeping scroll (modals, drawers, etc.) */
+.scrollbar-hide,
+[data-modal-scroll] {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.scrollbar-hide::-webkit-scrollbar,
+[data-modal-scroll]::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
 body {
   font-family: "Sora";
 }

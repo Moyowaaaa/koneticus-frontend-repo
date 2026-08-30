@@ -90,7 +90,7 @@ export default function EmojiPickerButton({
           <button
             type="button"
             className={cn(
-              "flex size-[31px] items-center justify-center rounded-[10px] bg-black/5 transition-colors dark:bg-white/10",
+              "flex size-[31px] border-2 border-[red] items-center justify-center rounded-[10px] bg-black/5 transition-colors dark:bg-white/10",
               className,
             )}
           >

@@ -8,6 +8,19 @@ import ButtonV2 from "@/components/ui-components/button";
 import { ArrowRight } from "iconsax-reactjs";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 import { useGetInfiniteUserProjects } from "@/api/projects/projects.queries";
+import {
+  isSeekingCollaboratorsStatus,
+  normalizeProjectStatus,
+} from "@/lib/project-status";
+
+const isActiveProject = (status: string) => {
+  const normalized = normalizeProjectStatus(status);
+  return (
+    normalized === "ongoing" ||
+    isSeekingCollaboratorsStatus(status) ||
+    normalized === "completed"
+  );
+};
 
 const ProjectsPage = () => {
   const router = useRouter();
@@ -39,9 +52,9 @@ const ProjectsPage = () => {
     [hasNextPage, isFetchingNextPage, fetchNextPage],
   );
 
-  const onGoingProjects =
+  const projects =
     data?.pages.flatMap((page) =>
-      page.projects.filter((item) => item.status === "ongoing"),
+      page.projects.filter((item) => isActiveProject(item.status)),
     ) ?? [];
 
   return (
@@ -52,10 +65,10 @@ const ProjectsPage = () => {
             Projects
           </h1>
         </TopBar>
-        {onGoingProjects.length ? (
+        {projects.length ? (
           <>
             <div className="grid grid-cols-4 gap-4">
-              {onGoingProjects.map((project) => (
+              {projects.map((project) => (
                 <ProjectCard key={project._id} project={project} />
               ))}
             </div>
@@ -67,7 +80,7 @@ const ProjectsPage = () => {
           dark:text-white
           flex flex-col items-center gap-[1.5rem]"
           >
-            <p className="text-sm">You have no ongoing projects yet.</p>
+            <p className="text-sm">You have no projects yet.</p>
             <ButtonV2
               type="button"
               className="w-max h-max !px-6 border-none dark:bg-[#6155F5]"

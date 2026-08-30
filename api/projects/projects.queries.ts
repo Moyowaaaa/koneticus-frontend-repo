@@ -51,6 +51,9 @@ export const useGetInfiniteUserProjects = (
       const { currentPage, totalPages } = lastPage.pagination;
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
+    // Collaborator accept happens on another client — always refresh this list
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
 /** Projects where the current user is a collaborator (not author) */
@@ -65,4 +68,7 @@ export const useGetProjectById = (
     queryKey: projectsKeys.singleProject(projectId),
     queryFn: () => getProjectById(projectId),
     enabled: !!projectId && (options?.enabled ?? true),
+    // Detail pages should not sit on a 5-minute feed-era cache after edits
+    staleTime: 0,
+    refetchOnMount: "always",
   });

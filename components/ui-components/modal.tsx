@@ -80,9 +80,23 @@ const Modal = ({
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
+        <style>{`
+          [data-modal-scroll] {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+          }
+          [data-modal-scroll]::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+          }
+        `}</style>
         <DrawerContent>
           <DrawerHeader className="relative"></DrawerHeader>
-          <div className="max-h-[85vh] overflow-y-auto px-4 pb-8">
+          <div
+            data-modal-scroll
+            className="scrollbar-hide max-h-[85vh] overflow-y-auto px-4 pb-8"
+          >
             {content}
           </div>
         </DrawerContent>
@@ -93,6 +107,17 @@ const Modal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      <style>{`
+        [data-modal-scroll] {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        [data-modal-scroll]::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+      `}</style>
       <DialogContent
         className={cn(
           "max-h-[85vh] gap-0 overflow-hidden bg-transparent p-0 shadow-none sm:max-w-[570px] md:w-[39.1875rem]",
@@ -106,8 +131,9 @@ const Modal = ({
         </DialogClose>
 
         <div
+          data-modal-scroll
           className={cn(
-            "max-h-[85vh] w-full min-w-0 overflow-y-auto rounded-[1.875rem] bg-white pt-2 pb-4 dark:bg-[#211E1E]",
+            "scrollbar-hide max-h-[85vh] w-full min-w-0 overflow-y-auto rounded-[1.875rem] bg-white pt-2 pb-4 dark:bg-[#211E1E]",
             containerClassname,
           )}
         >

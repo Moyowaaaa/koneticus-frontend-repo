@@ -95,6 +95,7 @@ export const useAcceptCollaborationRequest = (projectId?: string) => {
       }
       void queryClient.invalidateQueries({
         queryKey: projectsKeys.all,
+        refetchType: "all",
       });
       void queryClient.invalidateQueries({
         queryKey: notificationKeys.all,

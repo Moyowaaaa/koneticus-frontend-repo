@@ -11,6 +11,7 @@ import ImageUploadModal, {
 import CreatePollModal, {
   type CreatePollPayload,
 } from "@/components/messages/create-poll-modal";
+import AttachMenu from "@/components/messages/attach-menu";
 import PendingAttachmentsBar from "@/components/messages/pending-attachments-bar";
 import {
   CHAT_DOCUMENT_ACCEPT,
@@ -20,8 +21,7 @@ import {
   type PendingChatFile,
 } from "@/lib/chat-attachments";
 import { showToast } from "@/utils/toasts";
-import { Chart2, Image as ImageIcon } from "iconsax-reactjs";
-import { FileText, Smile } from "lucide-react";
+import { Smile } from "lucide-react";
 import React, { useState, useRef } from "react";
 
 const MessagesInput = () => {
@@ -211,39 +211,7 @@ const MessagesInput = () => {
             className="w-full min-w-0 border-none bg-transparent text-base text-brand-black outline-none placeholder:text-brand-grey dark:bg-transparent dark:text-white dark:placeholder:text-brand-grey"
           />
 
-          <button
-            type="button"
-            aria-label="Attach images"
-            disabled={!currentConversationId || imageSlots <= 0}
-            onClick={() => setShowImageUploadModal(true)}
-            className="ml-1 flex size-9 shrink-0 items-center justify-center rounded-full text-brand-grey transition-colors hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
-          >
-            <ImageIcon size={18} />
-          </button>
-
-          <button
-            type="button"
-            aria-label="Attach documents"
-            disabled={
-              !currentConversationId || pendingFiles.length >= MAX_CHAT_ATTACHMENTS
-            }
-            onClick={() => documentInputRef.current?.click()}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full text-brand-grey transition-colors hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
-          >
-            <FileText className="size-[18px]" />
-          </button>
-
-          <button
-            type="button"
-            aria-label="Create poll"
-            disabled={!currentConversationId || isPending}
-            onClick={() => setShowPollModal(true)}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full text-brand-grey transition-colors hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
-          >
-            <Chart2 size={18} />
-          </button>
-
-          <EmojiPickerButton
+<EmojiPickerButton
             onEmojiSelect={handleEmojiSelect}
             shouldCloseOnEmojiSelect={false}
           >
@@ -255,6 +223,18 @@ const MessagesInput = () => {
               <Smile className="size-5" />
             </button>
           </EmojiPickerButton>
+
+          <AttachMenu
+            disabled={!currentConversationId}
+            canAttachImages={imageSlots > 0}
+            canAttachDocuments={pendingFiles.length < MAX_CHAT_ATTACHMENTS}
+            canCreatePoll={!isPending}
+            onAttachImages={() => setShowImageUploadModal(true)}
+            onAttachDocuments={() => documentInputRef.current?.click()}
+            onCreatePoll={() => setShowPollModal(true)}
+          />
+
+          
           <ButtonV2
             variant="default"
             className="min-h-max! shrink-0 px-6 py-3"

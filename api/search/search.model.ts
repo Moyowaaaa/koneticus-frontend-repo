@@ -17,9 +17,10 @@ export interface SearchProject {
   description?: string;
   status:
     | "draft"
-    | "pending"
+    | "seeking_collaborators"
     | "ongoing"
     | "completed"
+    | "pending" // legacy
     | "deleted"
     | "archived";
   requiredRoles?: string[];

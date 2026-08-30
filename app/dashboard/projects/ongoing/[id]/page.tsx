@@ -26,9 +26,14 @@ const PROJECT_STATUS_STYLES: Record<
       "bg-[#F4F4F5] text-brand-grey dark:bg-[#80808026] dark:text-[#C4C4C4]",
   },
   pending: {
-    label: "Pending",
+    label: "Seeking collaborators",
     className:
-      "bg-[#FFF4E5] text-[#B86E00] dark:bg-[#B86E00]/20 dark:text-[#FFC66B]",
+      "bg-[#EEF8F1] text-[#1B7A3D] dark:bg-[#1B7A3D]/20 dark:text-[#7DDB9E]",
+  },
+  seeking_collaborators: {
+    label: "Seeking collaborators",
+    className:
+      "bg-[#EEF8F1] text-[#1B7A3D] dark:bg-[#1B7A3D]/20 dark:text-[#7DDB9E]",
   },
   ongoing: {
     label: "Ongoing",

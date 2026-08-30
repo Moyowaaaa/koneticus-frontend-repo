@@ -7,22 +7,25 @@ import { cn } from "@/lib/utils";
 interface ProjectFilterProps {
   activeFilter: ProjectStatus | "all";
   onFilterChange: (filter: ProjectStatus | "all") => void;
-  pendingCount?: number;
+  seekingCount?: number;
   ongoingCount?: number;
+  /** @deprecated use seekingCount */
+  pendingCount?: number;
 }
 
 const ProjectFilter = ({
   activeFilter,
   onFilterChange,
-  pendingCount = 0,
+  seekingCount,
   ongoingCount = 0,
+  pendingCount = 0,
 }: ProjectFilterProps) => {
   const filters = [
     {
-      id: "pending" as const,
-      label: "Pending",
+      id: "seeking_collaborators" as const,
+      label: "Seeking",
       icon: "/images/pending-folder.svg",
-      count: pendingCount,
+      count: seekingCount ?? pendingCount,
     },
     {
       id: "ongoing" as const,

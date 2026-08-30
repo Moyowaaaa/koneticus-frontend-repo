@@ -28,7 +28,7 @@ const getMyCollaborationRequests = async (
   return response.data;
 };
 
-export const useGetInfiniteUserProjects = (limit: number = 15) =>
+export const useGetInfiniteMyCollaborationRequests = (limit: number = 50) =>
   useInfiniteQuery({
     queryKey: [...collaborationRequestKeys.myRequests(), "infinite", limit],
     queryFn: ({ pageParam = 1 }) =>
@@ -39,6 +39,9 @@ export const useGetInfiniteUserProjects = (limit: number = 15) =>
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
   });
+
+/** @deprecated Use useGetInfiniteMyCollaborationRequests */
+export const useGetInfiniteUserProjects = useGetInfiniteMyCollaborationRequests;
 
 const getCollaborationRequestsByProjectId = async (
   projectId: string,
