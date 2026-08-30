@@ -1,5 +1,6 @@
 "use client";
 
+import BrandLogo from "@/components/ui-components/brand-logo";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -18,14 +19,7 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
       >
         <div className="relative w-full h-full flex flex-col ">
           <div className="w-full  absolute top-24 flex items-center justify-center">
-            <div className="relative h-[2.5rem] w-[2.5rem]">
-              <Image
-                src={"/images/purple_logo.png"}
-                alt=""
-                fill
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <BrandLogo />
           </div>
 
           {children}
@@ -87,14 +81,7 @@ function AuthLayoutFallback({ children }: { children: React.ReactNode }) {
       <div className="h-screen relative p-4 w-2/6">
         <div className="relative w-full h-full flex flex-col">
           <div className="w-full absolute top-24 flex items-center justify-center">
-            <div className="relative h-[2.5rem] w-[2.5rem]">
-              <Image
-                src={"/images/purple_logo.png"}
-                alt=""
-                fill
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <BrandLogo />
           </div>
           {children}
           <div

@@ -1,6 +1,7 @@
 "use client";
 
 import ThemeToggle from "@/components/ui-components/theme-toggle";
+import BrandLogo from "@/components/ui-components/brand-logo";
 import NotificationsPopover from "@/components/navigation/topbar/notifications-popover";
 import {
   Popover,
@@ -46,14 +47,7 @@ const TopNavBar = () => {
     <>
       <nav className="fixed left-0 right-0 top-0 z-50 hidden h-[5rem] w-full border-b border-border/60 bg-background/80 backdrop-blur md:block">
         <div className="mx-auto flex h-full w-full max-w-[112rem] items-center justify-between px-4 sm:px-6 lg:px-12">
-          <div className="relative h-[2.5rem] w-[2.5rem]">
-            <Image
-              src={"/images/purple_logo.png"}
-              alt=""
-              fill
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <BrandLogo />
 
           <div className="flex items-center gap-4">
             <button
