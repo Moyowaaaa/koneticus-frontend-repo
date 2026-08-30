@@ -143,7 +143,7 @@ const DocumentLightbox = ({
               </button>
             ) : null}
 
-            {hasMultiple ? (
+            {hasMultiple && selectedIndex ? (
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-sm text-white">
                 {selectedIndex + 1} / {count}
               </div>
