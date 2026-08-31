@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import FeedEmptyState from "./feed-empty-state";
 import FeedIdeaCard from "./feed-idea-card";
 import FeedIdeaCardSkeleton from "./feed-idea-card-skeleton";
 import { useGetInfiniteFeed } from "@/api/feed/feed.queries";
+import { useGetInfiniteMyCollaborationRequests } from "@/api/collaboration/collaboration.queries";
 
 const Feed = () => {
   const {
@@ -15,6 +16,28 @@ const Feed = () => {
     isLoading,
     isError,
   } = useGetInfiniteFeed();
+
+  const { data: myRequestsData } = useGetInfiniteMyCollaborationRequests(50);
+
+  const myRequestByProjectId = useMemo(() => {
+    const map = new Map<string, "pending" | "accepted" | "rejected">();
+
+    for (const page of myRequestsData?.pages ?? []) {
+      for (const request of page.requests) {
+        const projectId =
+          typeof request.projectId === "string"
+            ? request.projectId
+            : request.projectId?._id;
+        if (!projectId) continue;
+        // Prefer accepted over pending if duplicates ever appear
+        const existing = map.get(projectId);
+        if (existing === "accepted") continue;
+        map.set(projectId, request.status);
+      }
+    }
+
+    return map;
+  }, [myRequestsData]);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
@@ -97,6 +120,7 @@ const Feed = () => {
               isDeleting={deletingIds.has(item._id)}
               onDelete={handleDelete}
               onDeleteSettled={handleDeleteSettled}
+              myRequestStatus={myRequestByProjectId.get(item._id) ?? null}
             />
           ))}
 

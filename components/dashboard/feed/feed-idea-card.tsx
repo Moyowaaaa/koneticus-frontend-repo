@@ -1,5 +1,13 @@
 import { FeedItem } from "@/api/feed/feed.model";
 import { sentenceCaseEachWord } from "@/lib/utils";
+import {
+  canShowInterest,
+  getProjectStatusLabel,
+  getProjectStatusTagClass,
+  isDraftStatus,
+  normalizeProjectStatus,
+  shouldShowFeedStatusTag,
+} from "@/lib/project-status";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 import {
   CheckCheck,
@@ -21,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { useDeleteProject } from "@/api/projects/project.mutations";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
 
-// Format relative time from ISO date string
+type MyRequestStatus = "pending" | "accepted" | "rejected";
 
 const FeedIdeaCard = ({
   idea,
@@ -29,6 +37,7 @@ const FeedIdeaCard = ({
   onDelete,
   onDeleteSettled,
   isHero = false,
+  myRequestStatus = null,
 }: {
   idea: FeedItem;
   isDeleting?: boolean;
@@ -36,12 +45,12 @@ const FeedIdeaCard = ({
   onDeleteSettled?: (id: string) => void;
   /** First visible feed card — prioritize avatar + primary media. */
   isHero?: boolean;
+  myRequestStatus?: MyRequestStatus | null;
 }) => {
   const { openShowInterestModal } = useGeneralStateStore();
   const { user } = useAuthStore();
   const openEditModal = useEditIdeaModalStore((state) => state.openModal);
 
-  // Get author from the populated author field
   const authorProfile = idea.author?.userProfile;
   const authorName = authorProfile
     ? `${authorProfile.firstname} ${authorProfile.lastname}`
@@ -50,8 +59,40 @@ const FeedIdeaCard = ({
     authorProfile?.profilePicture?.url || "/images/dummy-avatar.svg";
 
   const isAuthor = user?._id === idea.author?._id || false;
-  const isDraft = idea.status === "draft";
+  const isDraft = isDraftStatus(idea.status);
+  const collaboratorCount = idea.collaborators?.length ?? 0;
+  const isCollaborator =
+    !!user?._id &&
+    (idea.collaborators ?? []).some((c) => c._id === user._id);
+
+  const showInterest = canShowInterest(idea.status, {
+    collaboratorCount,
+    teamSize: idea.teamSize,
+    isCollaborator,
+    myRequestStatus,
+  });
+
+  const canEdit =
+    isDraft ||
+    normalizeProjectStatus(idea.status) === "seeking_collaborators" ||
+    normalizeProjectStatus(idea.status) === "ongoing";
+
   const isOptimistic = idea._id.startsWith("optimistic-");
+  const showStatusTag = shouldShowFeedStatusTag(
+    idea.status,
+    collaboratorCount,
+    idea.teamSize,
+  );
+  const statusLabel = getProjectStatusLabel(idea.status);
+  const statusTagClass = getProjectStatusTagClass(idea.status);
+
+  const membershipLabel = isCollaborator
+    ? "Joined"
+    : myRequestStatus === "pending"
+      ? "Interest sent"
+      : myRequestStatus === "accepted"
+        ? "Joined"
+        : null;
 
   const { mutateAsync: deleteProject, isPending } = useDeleteProject(idea._id);
 
@@ -103,12 +144,14 @@ const FeedIdeaCard = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {isDraft && (
+          {showStatusTag && (
             <div className="flex flex-col items-end gap-0.5">
-              <span className="rounded-full bg-[#F5F4FF] dark:bg-[#6155F5]/15 px-3 py-1 text-xs font-medium text-[#6155F5]">
-                Draft
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-medium ${statusTagClass}`}
+              >
+                {statusLabel}
               </span>
-              {!isAuthor && (
+              {isDraft && !isAuthor && (
                 <span className="text-[0.6875rem] text-brand-grey dark:text-[#808080]">
                   Not active yet
                 </span>
@@ -128,7 +171,7 @@ const FeedIdeaCard = ({
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-40 p-2">
-                {isDraft && (
+                {canEdit && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -156,24 +199,28 @@ const FeedIdeaCard = ({
                 </Button>
               </PopoverContent>
             </Popover>
-          ) : (
-            !isDraft && (
-              <div
-                onClick={() => openShowInterestModal(idea._id)}
-                className="p-2 px-4 flex items-center gap-2 bg-primary
+          ) : showInterest ? (
+            <div
+              onClick={() => openShowInterestModal(idea._id)}
+              className="p-2 px-4 flex items-center gap-2 bg-primary
             dark:bg-[#6155F5]
             min-h-[2.5rem]
             max-h-[2.5rem]
             text-white rounded-[1.25rem] cursor-pointer hover:opacity-90 transition-opacity"
-              >
-                <CheckCheck
-                  size={13}
-                  className="text-white dark:text-[#151515]"
-                />
-                <p className="text-[0.875rem] text-white dark:text-[#151515]">
-                  Show Interest
-                </p>
-              </div>
+            >
+              <CheckCheck
+                size={13}
+                className="text-white dark:text-[#151515]"
+              />
+              <p className="text-[0.875rem] text-white dark:text-[#151515]">
+                Show Interest
+              </p>
+            </div>
+          ) : (
+            membershipLabel && (
+              <span className="rounded-full bg-[#F5F4FF] px-3 py-1 text-xs font-medium text-[#6155F5] dark:bg-[#6155F5]/15 dark:text-[#A8A1FF]">
+                {membershipLabel}
+              </span>
             )
           )}
         </div>
@@ -190,7 +237,6 @@ const FeedIdeaCard = ({
           )}
         </p>
 
-        {/* Required roles as tags */}
         {idea.requiredRoles && idea.requiredRoles.length > 0 && (
           <div className="flex items-center w-full gap-2 flex-wrap">
             {idea.requiredRoles.map((role) => (
@@ -204,7 +250,6 @@ const FeedIdeaCard = ({
           </div>
         )}
 
-        {/* Display media grid */}
         {idea.media && idea.media.length > 0 && (
           <MediaGrid
             media={idea.media}

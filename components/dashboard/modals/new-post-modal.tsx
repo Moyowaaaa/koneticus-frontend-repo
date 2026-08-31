@@ -14,9 +14,7 @@ import {
 } from "iconsax-reactjs";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import ImageUploadModal, {
-  type SelectedImageItem,
-} from "./image-upload-modal";
+import ImageUploadModal, { type SelectedImageItem } from "./image-upload-modal";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,7 +52,7 @@ const NewIdeaModal = () => {
       title: "",
       description: "",
       requiredRoles: [],
-      teamSize: 1,
+      teamSize: 2,
     },
   });
 
@@ -62,7 +60,7 @@ const NewIdeaModal = () => {
   const teamSize = watch("teamSize");
 
   const [isTeamSizeOpen, setIsTeamSizeOpen] = useState(false);
-  const teamSizeOptions = [1, 2, 3, 4, 5];
+  const teamSizeOptions = [2, 3, 4, 5];
 
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [selectedImages, setSelectedImages] = useState<SelectedImageItem[]>([]);

@@ -11,9 +11,17 @@ import ImageUploadModal, {
 import CreatePollModal, {
   type CreatePollPayload,
 } from "@/components/messages/create-poll-modal";
-import { Chart2, CloseCircle, Image as ImageIcon } from "iconsax-reactjs";
+import AttachMenu from "@/components/messages/attach-menu";
+import PendingAttachmentsBar from "@/components/messages/pending-attachments-bar";
+import {
+  CHAT_DOCUMENT_ACCEPT,
+  MAX_CHAT_ATTACHMENTS,
+  isChatImageFile,
+  pickChatDocuments,
+  type PendingChatFile,
+} from "@/lib/chat-attachments";
+import { showToast } from "@/utils/toasts";
 import { Smile } from "lucide-react";
-import Image from "next/image";
 import React, { useRef, useState } from "react";
 
 type ChatInputProps = {
@@ -22,48 +30,58 @@ type ChatInputProps = {
   disabled?: boolean;
 };
 
-const MAX_CHAT_IMAGES = 4;
-
 const ChatInput = ({
   className,
   conversationId,
   disabled = false,
 }: ChatInputProps) => {
   const [messageText, setMessageText] = useState("");
-  const [pendingImages, setPendingImages] = useState<SelectedImageItem[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<PendingChatFile[]>([]);
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [showPollModal, setShowPollModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
   const { mutate: sendMessage, isPending } = useSendMessage();
 
   const canCompose = Boolean(conversationId) && !disabled;
+  const pendingImages = pendingFiles.filter((item) =>
+    isChatImageFile(item.file),
+  );
+  const pendingDocuments = pendingFiles.filter(
+    (item) => !isChatImageFile(item.file),
+  );
+  const imageSlots = MAX_CHAT_ATTACHMENTS - pendingDocuments.length;
 
-  const clearPendingImages = () => {
-    setPendingImages((prev) => {
-      prev.forEach((image) => {
-        if (image.url.startsWith("blob:")) {
-          URL.revokeObjectURL(image.url);
-        }
-      });
+  const revokePending = (items: PendingChatFile[]) => {
+    items.forEach((item) => {
+      if (item.url.startsWith("blob:")) {
+        URL.revokeObjectURL(item.url);
+      }
+    });
+  };
+
+  const clearPendingFiles = () => {
+    setPendingFiles((prev) => {
+      revokePending(prev);
       return [];
     });
   };
 
   const handleSendMessage = () => {
     const content = messageText.trim();
-    const hasImages = pendingImages.length > 0;
-    if ((!content && !hasImages) || !conversationId || !canCompose) return;
+    const hasFiles = pendingFiles.length > 0;
+    if ((!content && !hasFiles) || !conversationId || !canCompose) return;
 
-    const files = pendingImages.map((image) => image.file);
-    const previewSnapshot = pendingImages;
+    const files = pendingFiles.map((item) => item.file);
+    const previewSnapshot = pendingFiles;
 
     setMessageText("");
-    setPendingImages([]);
+    setPendingFiles([]);
 
     sendMessage(
       {
         conversationId,
-        payload: hasImages
+        payload: hasFiles
           ? {
               type: "attachment",
               content: content || undefined,
@@ -77,14 +95,10 @@ const ChatInput = ({
       {
         onError: () => {
           setMessageText(content);
-          setPendingImages(previewSnapshot);
+          setPendingFiles(previewSnapshot);
         },
         onSuccess: () => {
-          previewSnapshot.forEach((image) => {
-            if (image.url.startsWith("blob:")) {
-              URL.revokeObjectURL(image.url);
-            }
-          });
+          revokePending(previewSnapshot);
         },
       },
     );
@@ -118,18 +132,38 @@ const ChatInput = ({
   };
 
   const handleImagesSelect = (images: SelectedImageItem[]) => {
-    setPendingImages((prev) => {
-      prev.forEach((image) => {
-        if (image.url.startsWith("blob:")) {
-          URL.revokeObjectURL(image.url);
-        }
-      });
-      return images.slice(0, MAX_CHAT_IMAGES);
+    setPendingFiles((prev) => {
+      const documents = prev.filter((item) => !isChatImageFile(item.file));
+      revokePending(prev.filter((item) => isChatImageFile(item.file)));
+      return [...documents, ...images].slice(0, MAX_CHAT_ATTACHMENTS);
     });
   };
 
+  const handleDocumentsSelected = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const { accepted, error } = pickChatDocuments(
+      event.target.files ?? [],
+      MAX_CHAT_ATTACHMENTS - pendingFiles.length,
+    );
+
+    if (error) showToast.error(error);
+
+    if (accepted.length > 0) {
+      setPendingFiles((prev) => [
+        ...prev,
+        ...accepted.map((file) => ({
+          file,
+          url: URL.createObjectURL(file),
+        })),
+      ]);
+    }
+
+    event.target.value = "";
+  };
+
   const handleRemovePending = (index: number) => {
-    setPendingImages((prev) => {
+    setPendingFiles((prev) => {
       const target = prev[index];
       if (target?.url.startsWith("blob:")) {
         URL.revokeObjectURL(target.url);
@@ -162,7 +196,7 @@ const ChatInput = ({
 
   const canSend =
     canCompose &&
-    (messageText.trim().length > 0 || pendingImages.length > 0) &&
+    (messageText.trim().length > 0 || pendingFiles.length > 0) &&
     !isPending;
 
   return (
@@ -170,42 +204,11 @@ const ChatInput = ({
       <div
         className={cn("absolute bottom-0 left-0 w-full min-w-0 p-4", className)}
       >
-        {pendingImages.length > 0 && (
-          <div className="mb-2 flex max-w-full items-center gap-2 overflow-x-auto rounded-[1.25rem] border border-[#E9E9E9] bg-white p-2 dark:border-[#80808026] dark:bg-[#151515]">
-            {pendingImages.map((image, index) => (
-              <div
-                key={`${image.file.name}-${index}`}
-                className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl"
-              >
-                <Image
-                  src={image.url}
-                  alt={`Attachment ${index + 1}`}
-                  fill
-                  className="object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemovePending(index)}
-                  className="absolute top-0.5 right-0.5 rounded-full bg-white/90 p-0.5 shadow"
-                  aria-label={`Remove attachment ${index + 1}`}
-                >
-                  <CloseCircle
-                    size={14}
-                    className="text-red-500"
-                    variant="Bold"
-                  />
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={clearPendingImages}
-              className="ml-auto shrink-0 px-2 text-xs text-brand-grey hover:text-brand-black dark:hover:text-white"
-            >
-              Clear
-            </button>
-          </div>
-        )}
+        <PendingAttachmentsBar
+          items={pendingFiles}
+          onRemove={handleRemovePending}
+          onClear={clearPendingFiles}
+        />
 
         <div className="relative flex max-w-full items-center rounded-[1.875rem] border border-[#E9E9E9] bg-white p-1 transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 dark:border-[#80808026] dark:bg-[#151515]">
           <Input
@@ -219,24 +222,6 @@ const ChatInput = ({
             disabled={!canCompose}
             className="w-full min-w-0 border-none bg-transparent text-base text-brand-black outline-none placeholder:text-brand-grey dark:bg-transparent dark:text-white dark:placeholder:text-[#808080]"
           />
-          <button
-            type="button"
-            aria-label="Attach images"
-            disabled={!canCompose}
-            onClick={() => setShowImageUploadModal(true)}
-            className="ml-1 flex size-9 shrink-0 items-center justify-center rounded-full text-brand-grey transition-colors hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
-          >
-            <ImageIcon size={18} />
-          </button>
-          <button
-            type="button"
-            aria-label="Create poll"
-            disabled={!canCompose || isPending}
-            onClick={() => setShowPollModal(true)}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full text-brand-grey transition-colors hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
-          >
-            <Chart2 size={18} />
-          </button>
           <EmojiPickerButton
             onEmojiSelect={handleEmojiSelect}
             shouldCloseOnEmojiSelect={false}
@@ -250,6 +235,17 @@ const ChatInput = ({
               <Smile className="size-5" />
             </button>
           </EmojiPickerButton>
+          
+          <AttachMenu
+            disabled={!canCompose}
+            canAttachImages={imageSlots > 0}
+            canAttachDocuments={pendingFiles.length < MAX_CHAT_ATTACHMENTS}
+            canCreatePoll={!isPending}
+            onAttachImages={() => setShowImageUploadModal(true)}
+            onAttachDocuments={() => documentInputRef.current?.click()}
+            onCreatePoll={() => setShowPollModal(true)}
+          />
+          
           <ButtonV2
             variant="default"
             className="min-h-max! shrink-0 px-6 py-3"
@@ -261,11 +257,20 @@ const ChatInput = ({
         </div>
       </div>
 
+      <input
+        ref={documentInputRef}
+        type="file"
+        accept={CHAT_DOCUMENT_ACCEPT}
+        multiple
+        className="hidden"
+        onChange={handleDocumentsSelected}
+      />
+
       <ImageUploadModal
         open={showImageUploadModal}
         onOpenChange={setShowImageUploadModal}
         onImagesSelect={handleImagesSelect}
-        maxImages={MAX_CHAT_IMAGES}
+        maxImages={Math.max(imageSlots, 1)}
         initialImages={pendingImages}
         title="Chat attachments"
         uploadHint="Add up to 4 images to your message"

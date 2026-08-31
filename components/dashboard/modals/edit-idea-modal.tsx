@@ -10,6 +10,10 @@ import {
 } from "@/api/projects/project.mutations";
 import { useGetProjectById } from "@/api/projects/projects.queries";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
+import {
+  isDraftStatus,
+  normalizeProjectStatus,
+} from "@/lib/project-status";
 import { showToast } from "@/utils/toasts";
 import React from "react";
 
@@ -26,19 +30,31 @@ const EditIdeaModal = () => {
   const titleInputRef = React.useRef<HTMLInputElement>(null);
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
-  const [isOngoing, setIsOngoing] = React.useState(false);
+  /** Draft: publish as seeking. Published: mark ongoing. */
+  const [toggleOn, setToggleOn] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
+
+  const projectIsDraft = project ? isDraftStatus(project.status) : true;
+  const projectIsOngoing =
+    !!project && normalizeProjectStatus(project.status) === "ongoing";
+  /** Ongoing projects lock status — toggle only for draft / seeking. */
+  const canChangeVisibility = !projectIsOngoing;
 
   React.useEffect(() => {
     if (isOpen && project) {
       setTitle(project.title);
       setDescription(project.description);
-      setIsOngoing(project.status === "ongoing");
+      const normalized = normalizeProjectStatus(project.status);
+      if (normalized === "draft") {
+        setToggleOn(false);
+      } else {
+        setToggleOn(normalized === "ongoing");
+      }
       titleInputRef.current?.focus();
     } else if (!isOpen) {
       setTitle("");
       setDescription("");
-      setIsOngoing(false);
+      setToggleOn(false);
       setIsSaving(false);
     }
   }, [isOpen, project]);
@@ -49,13 +65,40 @@ const EditIdeaModal = () => {
     }
   };
 
+  const resolveNextStatus = ():
+    | "draft"
+    | "seeking_collaborators"
+    | "ongoing"
+    | "completed"
+    | null => {
+    if (!project) return null;
+    const current = normalizeProjectStatus(project.status);
+
+    // Ongoing stays ongoing — visibility cannot be changed from the edit modal
+    if (current === "ongoing") {
+      return "ongoing";
+    }
+
+    if (current === "draft") {
+      return toggleOn ? "seeking_collaborators" : "draft";
+    }
+
+    if (current === "completed") {
+      return toggleOn ? "ongoing" : "completed";
+    }
+
+    return toggleOn ? "ongoing" : "seeking_collaborators";
+  };
+
   const handleSave = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     if (!ideaId || !title.trim() || !description.trim() || !project) return;
 
-    const nextStatus = isOngoing ? "ongoing" : "pending";
-    const wasOngoing = project.status === "ongoing";
-    const shouldUpdateStatus = isOngoing !== wasOngoing;
+    const nextStatus = resolveNextStatus();
+    if (!nextStatus) return;
+
+    const current = normalizeProjectStatus(project.status);
+    const shouldUpdateStatus = nextStatus !== current;
 
     setIsSaving(true);
     try {
@@ -73,7 +116,7 @@ const EditIdeaModal = () => {
         });
       }
 
-      if (shouldUpdateStatus) {
+      if (shouldUpdateStatus && nextStatus !== "draft" && canChangeVisibility) {
         await updateProjectStatus({
           id: ideaId,
           data: { status: nextStatus },
@@ -81,10 +124,12 @@ const EditIdeaModal = () => {
       }
 
       showToast.success(
-        shouldUpdateStatus
-          ? isOngoing
-            ? "Idea marked as ongoing"
-            : "Idea marked as pending"
+        shouldUpdateStatus && canChangeVisibility
+          ? nextStatus === "seeking_collaborators"
+            ? "Idea is now seeking collaborators"
+            : nextStatus === "ongoing"
+              ? "Idea marked as ongoing"
+              : "Idea updated successfully"
           : "Idea updated successfully",
       );
       closeModal();
@@ -95,8 +140,11 @@ const EditIdeaModal = () => {
     }
   };
 
-  const wasOngoing = project?.status === "ongoing";
-  const statusChanged = isOngoing !== wasOngoing;
+  const nextStatus = resolveNextStatus();
+  const current = project ? normalizeProjectStatus(project.status) : null;
+  const statusChanged = Boolean(
+    canChangeVisibility && nextStatus && current && nextStatus !== current,
+  );
   const contentUnchanged =
     title === project?.title && description === project?.description;
 
@@ -105,6 +153,22 @@ const EditIdeaModal = () => {
     !title.trim() ||
     !description.trim() ||
     (contentUnchanged && !statusChanged);
+
+  const toggleTitle = projectIsDraft
+    ? toggleOn
+      ? "Seeking collaborators"
+      : "Draft"
+    : toggleOn
+      ? "Ongoing"
+      : "Seeking collaborators";
+
+  const toggleHint = projectIsDraft
+    ? toggleOn
+      ? "Publish so people can show interest"
+      : "Keep as draft — not open for interest yet"
+    : toggleOn
+      ? "Project is actively in progress"
+      : "Open for people to show interest";
 
   return (
     <>
@@ -151,39 +215,46 @@ const EditIdeaModal = () => {
               />
             </label>
 
-            <div className="flex items-center justify-between gap-4 py-1">
-              <div className="flex flex-col gap-0.5">
+            {canChangeVisibility ? (
+              <div className="flex items-center justify-between gap-4 py-1">
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-sm text-brand-black dark:text-white">
+                    {toggleTitle}
+                  </p>
+                  <p className="text-xs text-brand-grey dark:text-[#808080]">
+                    {toggleHint}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={toggleOn}
+                  aria-label={toggleTitle}
+                  disabled={isSaving}
+                  onClick={() => setToggleOn((prev) => !prev)}
+                  className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200 disabled:opacity-50 ${
+                    toggleOn
+                      ? "bg-primary dark:bg-[#6155F5]"
+                      : "bg-[#E8E8E8] dark:bg-[#333]"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${
+                      toggleOn ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-0.5 py-1">
                 <p className="text-sm text-brand-black dark:text-white">
-                  {isOngoing ? "Ongoing" : "Pending"}
+                  Ongoing
                 </p>
                 <p className="text-xs text-brand-grey dark:text-[#808080]">
-                  {isOngoing
-                    ? "Project is actively in progress"
-                    : "Waiting to start as an ongoing project"}
+                  Status is locked while the project is ongoing
                 </p>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isOngoing}
-                aria-label={
-                  isOngoing ? "Mark as pending" : "Mark as ongoing"
-                }
-                disabled={isSaving}
-                onClick={() => setIsOngoing((prev) => !prev)}
-                className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200 disabled:opacity-50 ${
-                  isOngoing
-                    ? "bg-primary dark:bg-[#6155F5]"
-                    : "bg-[#E8E8E8] dark:bg-[#333]"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${
-                    isOngoing ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
+            )}
 
             <div className="w-full items-center flex justify-start">
               <ButtonV2

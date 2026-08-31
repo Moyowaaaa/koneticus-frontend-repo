@@ -90,6 +90,44 @@ const softRefreshTrending = (queryClient: QueryClient) => {
   queryClient.invalidateQueries({ queryKey: feedKeys.trending() });
 };
 
+/** Keep project detail pages in sync after feed/list edits. */
+const syncProjectDetailCache = (
+  queryClient: QueryClient,
+  projectId: string,
+  project: Project,
+) => {
+  queryClient.setQueryData<Project>(
+    projectsKeys.singleProject(projectId),
+    (current) => {
+      if (!current) return project;
+
+      const nextAuthor =
+        typeof project.author === "object" && project.author !== null
+          ? project.author
+          : current.author;
+
+      const nextCollaborators =
+        Array.isArray(project.collaborators) &&
+        project.collaborators.length > 0 &&
+        typeof project.collaborators[0] === "object"
+          ? project.collaborators
+          : current.collaborators;
+
+      return {
+        ...current,
+        ...project,
+        author: nextAuthor,
+        collaborators: nextCollaborators,
+      };
+    },
+  );
+
+  void queryClient.invalidateQueries({
+    queryKey: projectsKeys.singleProject(projectId),
+    refetchType: "all",
+  });
+};
+
 export const useCreateProject = () => {
   const queryClient = useQueryClient();
 
@@ -182,10 +220,8 @@ export const useUpdateProject = () => {
         patchFeedItem(current, variables.id, feedItem),
       );
 
+      syncProjectDetailCache(queryClient, variables.id, project);
       queryClient.invalidateQueries({ queryKey: projectsKeys.all });
-      queryClient.invalidateQueries({
-        queryKey: projectsKeys.singleProject(variables.id),
-      });
       softRefreshTrending(queryClient);
     },
     onError: (error) => {
@@ -238,10 +274,8 @@ export const useUpdateProjectStatus = () => {
         ),
       );
 
+      syncProjectDetailCache(queryClient, variables.id, project);
       queryClient.invalidateQueries({ queryKey: projectsKeys.all });
-      queryClient.invalidateQueries({
-        queryKey: projectsKeys.singleProject(variables.id),
-      });
       softRefreshTrending(queryClient);
     },
     onError: (_error, _variables, context) => {

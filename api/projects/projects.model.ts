@@ -39,9 +39,10 @@ export interface Project {
   media: ProjectMedia[];
   status:
     | "draft"
-    | "pending"
+    | "seeking_collaborators"
     | "ongoing"
     | "completed"
+    | "pending" // legacy
     | "deleted"
     | "archived";
   teamSize: number;
@@ -75,12 +76,13 @@ export interface IUpdateProjectPayload {
 
 export type ProjectStatus =
   | "draft"
-  | "pending"
+  | "seeking_collaborators"
   | "ongoing"
   | "completed"
+  | "pending" // legacy
   | "deleted"
   | "archived";
 
 export interface IUpdateProjectStatusPayload {
-  status: Exclude<ProjectStatus, "deleted" | "archived">;
+  status: Exclude<ProjectStatus, "deleted" | "archived" | "pending">;
 }

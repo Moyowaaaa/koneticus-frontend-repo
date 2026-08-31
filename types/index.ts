@@ -51,7 +51,7 @@ export type sideBarRoute = {
   comingSoon?: boolean;
 };
 
-export type ProjectStatus = "pending" | "ongoing";
+export type ProjectStatus = "seeking_collaborators" | "ongoing";
 
 export type Project = {
   id: string;

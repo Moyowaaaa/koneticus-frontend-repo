@@ -19,6 +19,7 @@ import {
 import { chatKeys } from "./chat.queries";
 import { useAuthStore } from "@/store/useAuthStore";
 import { projectsKeys } from "../projects/projects.queries";
+import { feedKeys } from "../feed/feed.queries";
 import { useChatStore } from "@/store/useChatStore";
 
 const sendMessage = async ({
@@ -50,7 +51,12 @@ const sendMessage = async ({
     return response.data;
   }
 
-  const { files: _files, ...jsonPayload } = payload;
+  const jsonPayload = {
+    type: payload.type,
+    content: payload.content,
+    attachments: payload.attachments,
+    poll: payload.poll,
+  };
   const response = await apiHttp.post<SendMessageResponse>(
     `/chat/conversations/${conversationId}/messages`,
     jsonPayload,
@@ -120,6 +126,12 @@ export const useCreateKollaboration = () => {
     onSuccess: (data, variables) => {
       void queryClient.invalidateQueries({
         queryKey: projectsKeys.singleProject(variables.projectId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: projectsKeys.all,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: feedKeys.all,
       });
       void queryClient.invalidateQueries({
         queryKey: [...chatKeys.all, "conversations"],
@@ -274,14 +286,21 @@ export const useSendMessage = () => {
       const tempId = `temp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
       const optimisticAttachments =
-        payload.files?.map((file, index) => ({
-          url: URL.createObjectURL(file),
-          id: `temp_file_${index}`,
-          name: file.name,
-          mimeType: file.type || "image/jpeg",
-          size: file.size,
-          kind: "photo" as const,
-        })) ??
+        payload.files?.map((file, index) => {
+          const isImage = file.type.startsWith("image/");
+          return {
+            url: URL.createObjectURL(file),
+            id: `temp_file_${index}`,
+            name: file.name,
+            mimeType:
+              file.type ||
+              (isImage
+                ? "image/jpeg"
+                : "application/octet-stream"),
+            size: file.size,
+            kind: (isImage ? "photo" : "document") as "photo" | "document",
+          };
+        }) ??
         payload.attachments ??
         [];
 

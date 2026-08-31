@@ -15,7 +15,7 @@ const makeItem = (id: string, title = id): FeedItem => ({
   description: `${title} description`,
   collaborators: [],
   media: [],
-  status: "pending",
+  status: "seeking_collaborators",
   teamSize: 2,
   conversationId: null,
   author: {
