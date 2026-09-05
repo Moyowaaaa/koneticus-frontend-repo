@@ -8,7 +8,7 @@ import { InformationStep } from "./steps/info";
 import { INITIAL_STATE, SignUpFormData } from "@/types";
 import RoleStep from "./steps/role";
 import BioStep from "./steps/bio";
-import Image from "next/image";
+import BrandLogo from "@/components/ui-components/brand-logo";
 import { useOnboardingStore } from "@/store/useOnBoardingStore";
 import { useRegisterUser } from "@/api/auth/auth.mutations";
 
@@ -109,14 +109,7 @@ function OnBoardingFlowContent() {
     <>
       <div className="relative flex w-full flex-col items-center gap-8 py-10  h-full ">
         <div className="  space-y-6 flex flex-col gap-4   w-max">
-          <div className="relative h-[2.5rem] w-[2.5rem] mx-auto">
-            <Image
-              src={"/images/purple_logo.png"}
-              alt=""
-              fill
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <BrandLogo className="mx-auto" />
 
           <div className="w-[18.75rem] mx-auto pt-4">
             <StepCounter
@@ -162,14 +155,7 @@ function OnBoardingFlowFallback() {
   return (
     <div className="relative flex w-full flex-col items-center gap-8 py-10 h-full">
       <div className="space-y-6 flex flex-col gap-4 w-max">
-        <div className="relative h-[2.5rem] w-[2.5rem] mx-auto">
-          <Image
-            src={"/images/purple_logo.png"}
-            alt=""
-            fill
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <BrandLogo className="mx-auto" />
         <div className="w-[18.75rem] mx-auto pt-4">
           <div className="animate-pulse bg-muted h-8 rounded-full" />
         </div>

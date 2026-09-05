@@ -39,8 +39,15 @@ export interface SearchUser {
   bio?: string | null;
 }
 
+export interface SearchFiltersApplied {
+  role?: string | null;
+  skill?: string | null;
+  status?: string | null;
+}
+
 export interface GlobalSearchResponse {
   query: string;
+  filters?: SearchFiltersApplied;
   projects: SearchProject[];
   users: SearchUser[];
 }

@@ -9,6 +9,7 @@ import {
   Home,
   Message,
   ShoppingCart,
+  Task,
 } from "iconsax-reactjs";
 import SidebarLinks from "./sidebar-links";
 import { sideBarRoute } from "@/types";
@@ -33,7 +34,11 @@ const Sidebar = () => {
       icon: Folder,
       route: "/dashboard/projects",
     },
-
+    {
+      title: "Requests",
+      icon: Task,
+      route: "/dashboard/requests",
+    },
     {
       title: "Messages",
       icon: Message,
