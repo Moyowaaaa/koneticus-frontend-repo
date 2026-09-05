@@ -56,14 +56,24 @@ const AttachmentMessage = ({
   if (attachments.length === 0) return null;
 
   const photoMedia = toFeedMedia(photos);
+  const isDocumentsOnly =
+    documents.length > 0 &&
+    photoMedia.length === 0 &&
+    videos.length === 0 &&
+    !caption;
 
   return (
     <div
       className={cn(
-        "flex min-w-0 flex-col gap-2 rounded-[12px] p-2",
-        isCurrentUser
-          ? "rounded-br-[4px] bg-lavender text-brand-black"
-          : "rounded-bl-[4px] bg-gray-100 text-brand-black dark:bg-[#80808026] dark:text-white",
+        "flex min-w-0 flex-col gap-2",
+        isDocumentsOnly
+          ? ""
+          : cn(
+              "rounded-[12px] p-2",
+              isCurrentUser
+                ? "rounded-br-[4px] bg-lavender text-brand-black dark:bg-[#80808026] dark:text-white"
+                : "rounded-bl-[4px] bg-gray-100 text-brand-black dark:bg-[#80808026] dark:text-white",
+            ),
         className,
       )}
     >

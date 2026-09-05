@@ -9,6 +9,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useGlobalSearch } from "@/api/search/search.queries";
 import type { SearchProject, SearchUser } from "@/api/search/search.model";
+import {
+  getProjectStatusLabel,
+  getProjectStatusTagClass,
+} from "@/lib/project-status";
 import { SearchNormal } from "iconsax-reactjs";
 
 const SearchModal = () => {
@@ -75,7 +79,7 @@ const SearchModal = () => {
             autoFocus
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search people and projects"
+            placeholder="Search people, roles, projects, or status"
             className="border-none text-base text-brand-black shadow-none placeholder:text-brand-grey focus-visible:ring-0 dark:bg-[#151515] dark:text-white"
           />
         </div>
@@ -90,7 +94,7 @@ const SearchModal = () => {
           <div className="flex flex-col gap-6 p-4">
             {!hasQuery ? (
               <p className="py-16 text-center text-sm text-brand-grey">
-                Type at least 2 characters to search
+                Type a name, role, skill, or project status
               </p>
             ) : isFetching && !data ? (
               <p className="py-16 text-center text-sm text-brand-grey">
@@ -167,8 +171,10 @@ const SearchModal = () => {
                             <p className="truncate font-medium text-brand-black dark:text-white">
                               {project.title}
                             </p>
-                            <span className="shrink-0 rounded-full bg-[#E9E9E9] px-2 py-0.5 text-[0.6875rem] capitalize text-brand-grey dark:bg-[#80808026]">
-                              {project.status}
+                            <span
+                              className={`shrink-0 rounded-full px-2 py-0.5 text-[0.625rem] font-medium ${getProjectStatusTagClass(project.status)}`}
+                            >
+                              {getProjectStatusLabel(project.status)}
                             </span>
                           </div>
                           {project.description ? (
