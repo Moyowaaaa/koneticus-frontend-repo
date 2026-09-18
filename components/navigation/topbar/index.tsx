@@ -8,13 +8,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import Image from "next/image";
 import React, { useState } from "react";
 import { useLogoutUser } from "@/api/auth/auth.mutations";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSearchStore } from "@/store/useSearchStore";
 import { LogOut, Search, Settings } from "lucide-react";
+import SafeImage from "@/components/ui-components/safe-image";
 
 const TopNavBar = () => {
   const router = useRouter();
@@ -69,7 +69,7 @@ const TopNavBar = () => {
                   className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#E9E9E9] outline-none ring-offset-background transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring/50 dark:bg-[#2a2727]"
                 >
                   {user?.profilePicture ? (
-                    <Image
+                    <SafeImage
                       src={user.profilePicture}
                       alt="avatar"
                       fill

@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import CustomFormInput from "@/components/ui-components/custom-form-input";
 import ButtonV2 from "@/components/ui-components/button";
 import { PORTFOLIO_FIELDS, ROLE_SUGGESTIONS } from "@/types/data";
 import Image from "next/image";
 import { Plus, X } from "lucide-react";
+import SafeImage from "@/components/ui-components/safe-image";
 import { useGetMe } from "@/api/user/user.queries";
 import { useUpdateProfile } from "@/api/user/user.mutations";
 import { mapMeUserToAuthUser } from "@/api/user/user.model";
@@ -35,22 +36,29 @@ const ProfileSettings = () => {
   const [roleInput, setRoleInput] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [hydratedProfileId, setHydratedProfileId] = useState<string | null>(
+    null,
+  );
 
-  useEffect(() => {
-    if (!profile) return;
-    setFirstname(profile.firstname ?? "");
-    setLastname(profile.lastname ?? "");
-    setBio(profile.bio ?? "");
-    setRoles(profile.roles ?? []);
+  const applyProfile = (nextProfile: NonNullable<typeof profile>) => {
+    setFirstname(nextProfile.firstname ?? "");
+    setLastname(nextProfile.lastname ?? "");
+    setBio(nextProfile.bio ?? "");
+    setRoles(nextProfile.roles ?? []);
     setLinks({
-      github: profile.links?.github ?? "",
-      behance: profile.links?.behance ?? "",
-      linkedin: profile.links?.linkedin ?? "",
-      website: profile.links?.website ?? "",
+      github: nextProfile.links?.github ?? "",
+      behance: nextProfile.links?.behance ?? "",
+      linkedin: nextProfile.links?.linkedin ?? "",
+      website: nextProfile.links?.website ?? "",
     });
-    setImagePreview(profile.profilePicture?.url ?? null);
+    setImagePreview(nextProfile.profilePicture?.url ?? null);
     setImageFile(null);
-  }, [profile]);
+  };
+
+  if (profile && profile._id !== hydratedProfileId) {
+    setHydratedProfileId(profile._id);
+    applyProfile(profile);
+  }
 
   const handleRoleAdd = (role?: string) => {
     const newRole = (role || roleInput).trim();
@@ -113,18 +121,7 @@ const ProfileSettings = () => {
 
   const handleCancel = () => {
     if (!profile) return;
-    setFirstname(profile.firstname ?? "");
-    setLastname(profile.lastname ?? "");
-    setBio(profile.bio ?? "");
-    setRoles(profile.roles ?? []);
-    setLinks({
-      github: profile.links?.github ?? "",
-      behance: profile.links?.behance ?? "",
-      linkedin: profile.links?.linkedin ?? "",
-      website: profile.links?.website ?? "",
-    });
-    setImagePreview(profile.profilePicture?.url ?? null);
-    setImageFile(null);
+    applyProfile(profile);
   };
 
   if (isLoading) {
@@ -146,8 +143,8 @@ const ProfileSettings = () => {
         <div className="flex items-start justify-between pr-16 gap-8">
           <div className="flex flex-col gap-2">
             <div className="relative h-[7.75rem] w-[7.75rem] overflow-hidden rounded-full">
-              <Image
-                src={imagePreview || "/images/dummy-avatar.svg"}
+              <SafeImage
+                src={imagePreview}
                 alt="Profile"
                 fill
                 className="object-cover"

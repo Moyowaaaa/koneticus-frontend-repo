@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { useProfileModalStore } from "@/store/useProfileModalStore";
 import Modal from "@/components/ui-components/modal";
 import { PORTFOLIO_FIELDS } from "@/types/data";
+import Image from "next/image";
+import SafeImage from "@/components/ui-components/safe-image";
 
 const UserProfileModal = () => {
   const { isOpen, user, closeModal } = useProfileModalStore();
@@ -32,8 +33,8 @@ const UserProfileModal = () => {
         {/* Profile Image */}
         <div className="relative">
           <div className="relative h-24 w-24 rounded-full overflow-hidden">
-            <Image
-              src={user.profile_photo || "/images/dummy-avatar.svg"}
+            <SafeImage
+              src={user.profile_photo}
               alt={`${user.first_name} ${user.last_name}`}
               fill
               className="object-cover"

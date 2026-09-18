@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { SearchNormal } from "iconsax-reactjs";
 import Modal from "@/components/ui-components/modal";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import { useCreateDM } from "@/api/chat/chat.mutations";
 import type { SearchUser } from "@/api/search/search.model";
 import { useAuthStore } from "@/store/useAuthStore";
 import { showToast } from "@/utils/toasts";
+import SafeImage from "@/components/ui-components/safe-image";
 
 type NewMessageModalProps = {
   open: boolean;
@@ -111,8 +111,6 @@ const NewMessageModal = ({ open, onOpenChange }: NewMessageModalProps) => {
               ) : (
                 users.map((user) => {
                   const name = `${user.firstname} ${user.lastname}`.trim();
-                  const avatar =
-                    user.profilePicture?.url || "/images/dummy-avatar.svg";
                   const roles = user.roles?.slice(0, 2).join(" · ");
                   const isStarting = pendingUserId === user.authUserId;
 
@@ -125,8 +123,8 @@ const NewMessageModal = ({ open, onOpenChange }: NewMessageModalProps) => {
                       className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-lavender disabled:opacity-60 dark:hover:bg-[#211E1E]"
                     >
                       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        <Image
-                          src={avatar}
+                        <SafeImage
+                          src={user.profilePicture?.url}
                           alt={name}
                           fill
                           className="object-cover"

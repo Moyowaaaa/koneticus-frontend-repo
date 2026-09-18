@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +19,7 @@ import type { Notification } from "@/api/notifications/notifications.model";
 import { formatTimeAgo } from "@/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useChatStore } from "@/store/useChatStore";
+import SafeImage from "@/components/ui-components/safe-image";
 
 export type NotificationItem = {
   id: string;
@@ -288,8 +288,8 @@ const NotificationRow = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full">
-            <Image
-              src={item.avatarUrl || "/images/dummy-avatar.svg"}
+            <SafeImage
+              src={item.avatarUrl}
               alt={item.userName}
               fill
               className="object-cover"

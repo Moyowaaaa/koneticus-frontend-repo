@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { ConversationParticipant } from "@/api/chat/chat.model";
 import {
@@ -9,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import SafeImage from "@/components/ui-components/safe-image";
 
 export type MemberAvatar = {
   id: string;
@@ -34,7 +34,7 @@ export const mapParticipantToMemberAvatar = (
     return {
       id: participant,
       name: "Member",
-      avatar: "/images/dummy-avatar.svg",
+      avatar: "",
     };
   }
 
@@ -48,7 +48,7 @@ export const mapParticipantToMemberAvatar = (
   return {
     id: participant._id,
     name,
-    avatar: profile?.profilePicture?.url || "/images/dummy-avatar.svg",
+    avatar: profile?.profilePicture?.url || "",
   };
 };
 
@@ -85,8 +85,8 @@ const ConversationMembersStack = ({
                   style={{ zIndex: visible.length - index }}
                   aria-label={member.name}
                 >
-                  <Image
-                    src={member.avatar || "/images/dummy-avatar.svg"}
+                  <SafeImage
+                    src={member.avatar}
                     alt={member.name}
                     fill
                     className="object-cover"
@@ -114,7 +114,10 @@ const ConversationMembersStack = ({
                   +{overflow}
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-48 text-left leading-relaxed">
+              <TooltipContent
+                side="top"
+                className="max-w-48 text-left leading-relaxed"
+              >
                 {overflowMembers.map((member) => member.name).join(", ")}
               </TooltipContent>
             </Tooltip>

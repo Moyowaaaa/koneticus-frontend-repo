@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import SafeImage from "@/components/ui-components/safe-image";
 
 const PROJECT_STATUS_STYLES: Record<
   Project["status"],
@@ -80,14 +81,14 @@ const getMemberDisplay = (
       return {
         id: member,
         name,
-        avatar: fallbackUser.profilePicture || "/images/dummy-avatar.svg",
+        avatar: fallbackUser.profilePicture || "",
       };
     }
 
     return {
       id: member,
       name: "Member",
-      avatar: "/images/dummy-avatar.svg",
+      avatar: "",
     };
   }
 
@@ -95,7 +96,7 @@ const getMemberDisplay = (
   return {
     id: member._id,
     name: profile ? `${profile.firstname} ${profile.lastname}` : member.email,
-    avatar: profile?.profilePicture?.url || "/images/dummy-avatar.svg",
+    avatar: profile?.profilePicture?.url || "",
   };
 };
 
@@ -222,7 +223,7 @@ const ProjectDetailsPage = () => {
                 {creator && (
                   <div className="relative flex min-w-0 items-center gap-2 py-2">
                     <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full">
-                      <Image
+                      <SafeImage
                         src={creator.avatar}
                         alt={creator.name}
                         fill
@@ -245,7 +246,7 @@ const ProjectDetailsPage = () => {
                       className="relative flex min-w-0 items-center gap-2 py-2"
                     >
                       <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full">
-                        <Image
+                        <SafeImage
                           src={member.avatar}
                           alt={member.name}
                           fill

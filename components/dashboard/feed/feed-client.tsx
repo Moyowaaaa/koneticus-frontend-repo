@@ -10,6 +10,7 @@ import Feed from ".";
 import EditIdeaModal from "../modals/edit-idea-modal";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import OnboardingChecklist from "../onboarding-checklist";
 
 const FeedClient = () => {
   const { toggleNewIdeaModal } = useGeneralStateStore();
@@ -51,7 +52,7 @@ const FeedClient = () => {
               />
               <ButtonV2
                 type="submit"
-                className="w-max h-max !px-6 border-none dark:bg-[#6155F5]"
+                className="w-max h-max px-6! border-none dark:bg-[#6155F5]"
                 IconPlacement="left"
                 Icon={<AddCircle size="13" color="white" variant="Bold" />}
                 onClick={toggleNewIdeaModal}
@@ -62,6 +63,7 @@ const FeedClient = () => {
             </div>
           </TopBar>
 
+          <OnboardingChecklist />
           <Feed />
         </div>
       </div>

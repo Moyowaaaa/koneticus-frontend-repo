@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import Modal from "@/components/ui-components/modal";
 import ButtonV2 from "@/components/ui-components/button";
+import SafeImage from "@/components/ui-components/safe-image";
 import { CollaborationRequest } from "@/api/collaboration/collaboration.model";
 import { PORTFOLIO_FIELDS } from "@/types/data";
 
@@ -22,7 +23,7 @@ const getRequesterInfo = (request: CollaborationRequest | null) => {
     return {
       firstName: "Unknown",
       lastName: "user",
-      avatar: "/images/dummy-avatar.svg",
+      avatar: "",
       bio: "",
       links: undefined as
         | {
@@ -40,7 +41,7 @@ const getRequesterInfo = (request: CollaborationRequest | null) => {
   return {
     firstName: profile?.firstname ?? "Unknown",
     lastName: profile?.lastname ?? "user",
-    avatar: profile?.profilePicture?.url || "/images/dummy-avatar.svg",
+    avatar: profile?.profilePicture?.url || "",
     bio: profile?.bio ?? "",
     links: profile?.links,
   };
@@ -74,7 +75,7 @@ const CollaborationRequestReviewModal = ({
         <div className="flex w-full min-w-0 flex-col items-center gap-6 pb-4">
           <div className="relative">
             <div className="relative h-24 w-24 overflow-hidden rounded-full">
-              <Image
+              <SafeImage
                 src={requester.avatar}
                 alt={`${requester.firstName} ${requester.lastName}`}
                 fill
