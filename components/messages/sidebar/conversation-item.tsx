@@ -1,5 +1,5 @@
-import Image from "next/image";
 import React from "react";
+import SafeImage from "@/components/ui-components/safe-image";
 
 interface ConversationItemProps {
   name: string;
@@ -58,8 +58,8 @@ const ConversationItem = ({
     >
       <div className="flex items-start gap-3">
         <div className="relative h-10 w-10 min-h-10 min-w-10">
-          <Image
-            src={avatar || "/images/dummy-avatar.svg"}
+          <SafeImage
+            src={avatar}
             alt={name}
             fill
             className="rounded-full object-cover"
@@ -70,8 +70,8 @@ const ConversationItem = ({
                 status === "online"
                   ? "bg-emerald-500"
                   : status === "away"
-                  ? "bg-amber-400"
-                  : "bg-gray-400"
+                    ? "bg-amber-400"
+                    : "bg-gray-400"
               }`}
             />
           )}

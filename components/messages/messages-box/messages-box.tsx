@@ -4,13 +4,16 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { useChatStore } from "@/store/useChatStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import ChatBubble from "../chat-bubble";
-import Image from "next/image";
 import UserProfileModal from "../user-profile-modal";
+import SafeImage from "@/components/ui-components/safe-image";
 import {
   useGetConversationMessages,
   useGetConversations,
 } from "@/api/chat/chat.queries";
-import { useMarkConversationAsRead, useVotePoll } from "@/api/chat/chat.mutations";
+import {
+  useMarkConversationAsRead,
+  useVotePoll,
+} from "@/api/chat/chat.mutations";
 import type { ChatMessage, Conversation } from "@/api/chat/chat.model";
 import ConversationMembersStack, {
   getParticipantId,
@@ -210,8 +213,8 @@ export const MesssagesBox = () => {
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-100 p-4 dark:border-[#80808026]">
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative h-10 w-10 shrink-0">
-            <Image
-              src={avatar || "/images/dummy-avatar.svg"}
+            <SafeImage
+              src={avatar}
               alt={title}
               fill
               className="rounded-full object-cover"
@@ -264,9 +267,7 @@ export const MesssagesBox = () => {
                     const isGrouped = shouldGroupMessage(group.messages, index);
                     const hasAttachments = Boolean(message.attachments?.length);
                     const text =
-                      message.content ||
-                      message.poll?.question ||
-                      "";
+                      message.content || message.poll?.question || "";
                     const isPoll =
                       message.type === "poll" && Boolean(message.poll);
 

@@ -1,9 +1,9 @@
-import Image from "next/image";
 import React from "react";
 import { cn } from "@/lib/utils";
 import ProposalMessage from "../proposal-message";
 import PollMessage from "../poll-message";
 import AttachmentMessage from "../attachment-message";
+import SafeImage from "@/components/ui-components/safe-image";
 import type {
   ChatMessageAttachment,
   ChatMessagePoll,
@@ -74,8 +74,8 @@ const ChatBubble = ({
       {!isCurrentUser && showAvatar && !isGrouped && (
         <div className="flex flex-col items-center">
           <div className="relative h-10 w-10 shrink-0">
-            <Image
-              src={senderAvatar || "/images/dummy-avatar.svg"}
+            <SafeImage
+              src={senderAvatar}
               alt={senderName || "User"}
               fill
               className="rounded-full object-cover"

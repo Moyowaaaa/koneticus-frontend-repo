@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGetTrendingFeed } from "@/api/feed/feed.queries";
 import Image from "next/image";
 import React from "react";
+import SafeImage from "@/components/ui-components/safe-image";
 
 export const SpotlightEmptyState = () => {
   return (
@@ -60,9 +61,6 @@ dark:border-[#80808026]
       ) : (
         <ScrollArea className="max-h-105">
           {items.map((item) => {
-            const avatar =
-              item.author?.userProfile?.profilePicture?.url ||
-              "/images/dummy-avatar.svg";
             const tag =
               item.requiredRoles?.[0] ||
               item.author?.userProfile?.roles?.[0] ||
@@ -80,8 +78,8 @@ dark:border-[#80808026]
 
                     <div className="flex shrink-0 items-center gap-2">
                       <div className="relative h-[1.5625rem] w-[2.5625rem] overflow-hidden rounded-full">
-                        <Image
-                          src={avatar}
+                        <SafeImage
+                          src={item.author?.userProfile?.profilePicture?.url}
                           alt=""
                           fill
                           className="object-cover"

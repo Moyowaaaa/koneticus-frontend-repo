@@ -11,6 +11,7 @@ import type {
 import { useAuthStore } from "@/store/useAuthStore";
 import { useChatStore } from "@/store/useChatStore";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import SafeImage from "@/components/ui-components/safe-image";
 
 export const MessagesEmptyState = () => {
   return (
@@ -32,8 +33,7 @@ const getSenderName = (message: RecentMessage) => {
 };
 
 const getSenderAvatar = (message: RecentMessage) =>
-  message.sender?.userProfile?.profilePicture?.url ||
-  "/images/dummy-avatar.svg";
+  message.sender?.userProfile?.profilePicture?.url || "";
 
 const getPreviewText = (message: RecentMessage) => {
   if (message.type === "attachment") return "Sent an attachment";
@@ -53,8 +53,7 @@ const getConversationLabel = (
   }
 
   const other = (conversation.participantIds ?? []).find((participant) => {
-    const id =
-      typeof participant === "string" ? participant : participant._id;
+    const id = typeof participant === "string" ? participant : participant._id;
     return id !== currentUserId;
   }) as string | ConversationParticipant | undefined;
 
@@ -139,8 +138,6 @@ const MessagesFeed = () => {
             {messageItems.map((message) => {
               const title = getConversationLabel(message, currentUserId);
               const preview = getPreviewText(message);
-              const avatar = getSenderAvatar(message);
-
               return (
                 <button
                   key={message._id}
@@ -150,8 +147,8 @@ const MessagesFeed = () => {
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                      <Image
-                        src={avatar}
+                      <SafeImage
+                        src={getSenderAvatar(message)}
                         alt={title}
                         fill
                         className="object-cover"

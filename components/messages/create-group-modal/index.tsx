@@ -12,6 +12,7 @@ import { useCreateGroup } from "@/api/chat/chat.mutations";
 import type { SearchUser } from "@/api/search/search.model";
 import { useAuthStore } from "@/store/useAuthStore";
 import { showToast } from "@/utils/toasts";
+import SafeImage from "@/components/ui-components/safe-image";
 
 type CreateGroupModalProps = {
   open: boolean;
@@ -22,7 +23,10 @@ const CreateGroupModal = (props: CreateGroupModalProps) => (
   <CreateGroupModalContent key={props.open ? "open" : "closed"} {...props} />
 );
 
-const CreateGroupModalContent = ({ open, onOpenChange }: CreateGroupModalProps) => {
+const CreateGroupModalContent = ({
+  open,
+  onOpenChange,
+}: CreateGroupModalProps) => {
   const currentUserId = useAuthStore((state) => state.user?._id);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -267,8 +271,6 @@ const CreateGroupModalContent = ({ open, onOpenChange }: CreateGroupModalProps) 
               ) : (
                 users.map((user) => {
                   const label = `${user.firstname} ${user.lastname}`.trim();
-                  const avatar =
-                    user.profilePicture?.url || "/images/dummy-avatar.svg";
                   const roles = user.roles?.slice(0, 2).join(" · ");
 
                   return (
@@ -279,8 +281,8 @@ const CreateGroupModalContent = ({ open, onOpenChange }: CreateGroupModalProps) 
                       className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-lavender dark:hover:bg-[#211E1E]"
                     >
                       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        <Image
-                          src={avatar}
+                        <SafeImage
+                          src={user.profilePicture?.url}
                           alt={label}
                           fill
                           className="object-cover"

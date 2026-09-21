@@ -1,5 +1,5 @@
-import Image from "next/image";
 import ButtonV2 from "@/components/ui-components/button";
+import SafeImage from "@/components/ui-components/safe-image";
 
 interface ProposalMessageProps {
   senderName: string;
@@ -35,8 +35,8 @@ const ProposalMessage = ({
       {/* Header with sender info */}
       <div className="mb-3 flex items-center gap-3">
         <div className="relative h-8 w-8 shrink-0">
-          <Image
-            src={senderAvatar || "/images/dummy-avatar.svg"}
+          <SafeImage
+            src={senderAvatar}
             alt={senderName}
             fill
             className="rounded-full object-cover"

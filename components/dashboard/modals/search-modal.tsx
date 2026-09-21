@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/ui-components/modal";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import SafeImage from "@/components/ui-components/safe-image";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useGlobalSearch } from "@/api/search/search.queries";
 import type { SearchProject, SearchUser } from "@/api/search/search.model";
@@ -119,9 +119,6 @@ const SearchModal = () => {
                       {users.map((user) => {
                         const name =
                           `${user.firstname} ${user.lastname}`.trim();
-                        const avatar =
-                          user.profilePicture?.url ||
-                          "/images/dummy-avatar.svg";
                         const roles = user.roles?.slice(0, 2).join(" · ");
 
                         return (
@@ -132,8 +129,8 @@ const SearchModal = () => {
                             className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-lavender dark:hover:bg-[#211E1E]"
                           >
                             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                              <Image
-                                src={avatar}
+                              <SafeImage
+                                src={user.profilePicture?.url}
                                 alt={name}
                                 fill
                                 className="object-cover"

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { useGetCollaborationRequestsByProjectId } from "@/api/collaboration/collaboration.queries";
 import {
@@ -13,6 +12,7 @@ import { showToast } from "@/utils/toasts";
 import { useGetErrorMessage } from "@/lib/utils";
 import ButtonV2 from "@/components/ui-components/button";
 import CollaborationRequestReviewModal from "./collaboration-request-review-modal";
+import SafeImage from "@/components/ui-components/safe-image";
 
 type CollaborationRequestsSectionProps = {
   projectId: string;
@@ -22,16 +22,14 @@ const getRequesterDisplay = (request: CollaborationRequest) => {
   if (typeof request.requesterId === "string") {
     return {
       name: "Unknown user",
-      avatar: "/images/dummy-avatar.svg",
+      avatar: "",
     };
   }
 
   const profile = request.requesterId.userProfile;
   return {
-    name: profile
-      ? `${profile.firstname} ${profile.lastname}`
-      : "Unknown user",
-    avatar: profile?.profilePicture?.url || "/images/dummy-avatar.svg",
+    name: profile ? `${profile.firstname} ${profile.lastname}` : "Unknown user",
+    avatar: profile?.profilePicture?.url || "",
   };
 };
 
@@ -42,8 +40,11 @@ const CollaborationRequestsSection = ({
   const [selectedRequest, setSelectedRequest] =
     useState<CollaborationRequest | null>(null);
 
-  const { data: requests = [], isLoading, isError } =
-    useGetCollaborationRequestsByProjectId(projectId);
+  const {
+    data: requests = [],
+    isLoading,
+    isError,
+  } = useGetCollaborationRequestsByProjectId(projectId);
 
   const { mutateAsync: acceptRequest, isPending: isAccepting } =
     useAcceptCollaborationRequest(projectId);
@@ -116,7 +117,7 @@ const CollaborationRequestsSection = ({
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
                 >
                   <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                    <Image
+                    <SafeImage
                       src={requester.avatar}
                       alt={requester.name}
                       fill

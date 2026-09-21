@@ -16,7 +16,6 @@ import {
   Trash2,
   Loader2,
 } from "lucide-react";
-import Image from "next/image";
 import MediaGrid from "./media-grid";
 import { formatTimeAgo } from "@/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -28,6 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useDeleteProject } from "@/api/projects/project.mutations";
 import { useEditIdeaModalStore } from "@/store/useEditIdeaModalStore";
+import SafeImage from "@/components/ui-components/safe-image";
 
 type MyRequestStatus = "pending" | "accepted" | "rejected";
 
@@ -55,15 +55,11 @@ const FeedIdeaCard = ({
   const authorName = authorProfile
     ? `${authorProfile.firstname} ${authorProfile.lastname}`
     : "Unknown Author";
-  const authorAvatar =
-    authorProfile?.profilePicture?.url || "/images/dummy-avatar.svg";
-
   const isAuthor = user?._id === idea.author?._id || false;
   const isDraft = isDraftStatus(idea.status);
   const collaboratorCount = idea.collaborators?.length ?? 0;
   const isCollaborator =
-    !!user?._id &&
-    (idea.collaborators ?? []).some((c) => c._id === user._id);
+    !!user?._id && (idea.collaborators ?? []).some((c) => c._id === user._id);
 
   const showInterest = canShowInterest(idea.status, {
     collaboratorCount,
@@ -117,14 +113,16 @@ const FeedIdeaCard = ({
       className={`w-full min-h-max flex flex-col gap-4 border
         dark:border-[#80808026]
         border-[#e9e9e9e9] rounded-[1.25rem] p-6 px-4 transition-all duration-300 ${
-          isDeleting || isPending ? "opacity-50 scale-95" : "opacity-100 scale-100"
+          isDeleting || isPending
+            ? "opacity-50 scale-95"
+            : "opacity-100 scale-100"
         }`}
     >
       <section className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="h-[2.5rem] w-[2.5rem] rounded-full relative overflow-hidden">
-            <Image
-              src={authorAvatar}
+            <SafeImage
+              src={authorProfile?.profilePicture?.url}
               alt="avatar"
               fill
               sizes="40px"
@@ -251,11 +249,7 @@ const FeedIdeaCard = ({
         )}
 
         {idea.media && idea.media.length > 0 && (
-          <MediaGrid
-            media={idea.media}
-            alt={idea.title}
-            priority={isHero}
-          />
+          <MediaGrid media={idea.media} alt={idea.title} priority={isHero} />
         )}
       </div>
     </div>
