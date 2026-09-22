@@ -54,6 +54,7 @@ Run the backend locally on port **4000** (see the backend README). In developmen
 | `NEXT_PUBLIC_NODE_ENV` | Yes for local | Set to `development` to use `http://localhost:4000` |
 | `NEXT_PUBLIC_API_BASE_URL` | Yes in non-dev | Axios base URL, including `/v1/api` |
 | `NEXT_PUBLIC_SOCKET_URL` | Yes in non-dev | Socket.IO origin (same host as the API, no `/v1/api`) |
+| `NEXT_PUBLIC_SITE_URL` | Yes in prod | Public origin for canonical URLs, Open Graph, sitemap, and robots. Falls back to `VERCEL_URL` or `http://localhost:3000` |
 
 Example `.env.local` for local API:
 
@@ -61,6 +62,7 @@ Example `.env.local` for local API:
 NEXT_PUBLIC_NODE_ENV=development
 NEXT_PUBLIC_API_BASE_URL=http://localhost:4000/v1/api
 NEXT_PUBLIC_SOCKET_URL=http://localhost:4000/
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 Auth uses the `authToken` cookie and a stored Bearer token as fallback (needed when the UI and API are on different origins).

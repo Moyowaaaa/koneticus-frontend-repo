@@ -1,9 +1,14 @@
+import { pageMetadata } from "@/lib/seo";
 import TopNavBar from "@/components/navigation/topbar";
 import Sidebar from "@/components/navigation/sidebar";
 import DashboardRightSidebar from "@/components/dashboard/dashboard-right-sidebar";
 import SearchModal from "@/components/dashboard/modals/search-modal";
 import ChatSocketProvider from "@/components/layer/ChatSocketProvider";
 import NotificationSocketProvider from "@/components/layer/NotificationSocketProvider";
+
+export const metadata = pageMetadata("Dashboard", undefined, {
+  index: false,
+});
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
