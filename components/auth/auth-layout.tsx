@@ -29,7 +29,7 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
           dark:text-white
           font-semibold text-[0.875rem] font-sora"
           >
-            &copy; KoLabs {new Date().getFullYear()}
+            &copy; Koneticus {new Date().getFullYear()}
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ function AuthLayoutFallback({ children }: { children: React.ReactNode }) {
           dark:text-white
           absolute bottom-0 flex items-center justify-center text-[#211E1E] dark:text-white font-semibold text-[0.875rem] font-sora"
           >
-            &copy; KoLabs {new Date().getFullYear()}
+            &copy; Koneticus {new Date().getFullYear()}
           </div>
         </div>
       </div>

@@ -17,7 +17,7 @@ const BrandLogo = ({ className, size = "md" }: BrandLogoProps) => {
       <div className={cn("relative shrink-0", sizeMap[size])}>
         <Image
           src="/images/purple_logo.png"
-          alt="KoLabs"
+          alt="Koneticus"
           fill
           className="object-cover"
         />
