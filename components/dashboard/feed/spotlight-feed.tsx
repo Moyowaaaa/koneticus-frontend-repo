@@ -5,6 +5,7 @@ import { useGetTrendingFeed } from "@/api/feed/feed.queries";
 import Image from "next/image";
 import React from "react";
 import SafeImage from "@/components/ui-components/safe-image";
+import { useGeneralStateStore } from "@/store/useGeneralStateStore";
 
 export const SpotlightEmptyState = () => {
   return (
@@ -23,6 +24,7 @@ export const SpotlightEmptyState = () => {
 
 const SpotlightFeed = () => {
   const { data, isLoading, isError } = useGetTrendingFeed();
+  const { openProjectPreviewModal } = useGeneralStateStore();
   const items = data?.items ?? [];
 
   return (
@@ -71,7 +73,8 @@ dark:border-[#80808026]
                 <div
                   className="px-4 py-4 bg-[#CDC9FF]
                 dark:bg-[#151515]
-                flex flex-col gap-4 rounded-[1.25rem]"
+                flex flex-col gap-4 rounded-[1.25rem] cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => openProjectPreviewModal(item)}
                 >
                   <div className="flex items-center justify-between w-full">
                     <h1 className="line-clamp-1 pr-2">{item.title}</h1>

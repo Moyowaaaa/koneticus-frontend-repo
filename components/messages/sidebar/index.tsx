@@ -26,6 +26,11 @@ const getConversationAvatar = (
   conversation: Conversation,
   currentUserId?: string | null,
 ) => {
+
+   if(conversation.type === 'kollaboration') {
+    return null;
+  }
+
   if (conversation.avatar?.url) return conversation.avatar.url;
 
   if (conversation.type === "dm") {
@@ -33,6 +38,8 @@ const getConversationAvatar = (
       .map(mapParticipantToMemberAvatar)
       .find((participant) => participant.id !== currentUserId)?.avatar;
   }
+
+ 
 
   return undefined;
 };
@@ -128,6 +135,7 @@ const MessagesSidebar = ({
               lastMessageAt={
                 conversation.lastMessage?.createdAt ?? conversation.updatedAt
               }
+              type={conversation.type}
               unreadCount={getUnreadCount(conversation, currentUserId)}
               isActive={currentConversationId === conversation._id}
               onClick={() => setCurrentConversation(conversation._id)}

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { FeedItem } from "@/api/feed/feed.model";
 
 interface GeneralAppState {
   showNewIdeaModal: boolean;
@@ -12,6 +13,12 @@ interface GeneralAppState {
   openShowInterestModal: (projectId: string) => void;
   toggleShowInterestModal: () => void;
   resetShowInterestModal: () => void;
+
+  showProjectPreviewModal: boolean;
+  projectPreviewData: FeedItem | null;
+  setShowProjectPreviewModal: (showProjectPreviewModal: boolean) => void;
+  openProjectPreviewModal: (project: FeedItem) => void;
+  resetProjectPreviewModal: () => void;
 }
 
 export const useGeneralStateStore = create<GeneralAppState>((set) => ({
@@ -34,4 +41,14 @@ export const useGeneralStateStore = create<GeneralAppState>((set) => ({
     })),
   resetShowInterestModal: () =>
     set({ showInterestModal: false, interestProjectId: null }),
+
+  // -----project preview modal
+  showProjectPreviewModal: false,
+  projectPreviewData: null,
+  setShowProjectPreviewModal: (showProjectPreviewModal) =>
+    set({ showProjectPreviewModal }),
+  openProjectPreviewModal: (project) =>
+    set({ showProjectPreviewModal: true, projectPreviewData: project }),
+  resetProjectPreviewModal: () =>
+    set({ showProjectPreviewModal: false, projectPreviewData: null }),
 }));
