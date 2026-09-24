@@ -49,7 +49,7 @@ const getActorDisplay = (notification: Notification) => {
   }
 
   return {
-    userName: notification.title || "Kollabs",
+    userName: notification.title || "Koneticus",
     avatarUrl: undefined,
   };
 };

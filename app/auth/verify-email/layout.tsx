@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
   "Verify email",
-  "Confirm your email address to finish setting up Kollabs.",
+  "Confirm your email address to finish setting up Koneticus.",
   { path: "/auth/verify-email", index: false },
 );
 

@@ -200,7 +200,7 @@ export const MesssagesBox = () => {
     .filter((participant) => getParticipantId(participant) !== currentUserId)
     .map(mapParticipantToMemberAvatar);
 
-  // For DMs keep the other person; for groups/kollabs show everyone (or all incl. me)
+  // For DMs keep the other person; for groups/Koneticus show everyone (or all incl. me)
   const stackMembers =
     activeConversation?.type === "dm"
       ? members

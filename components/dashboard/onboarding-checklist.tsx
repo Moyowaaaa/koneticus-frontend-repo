@@ -36,7 +36,7 @@ const OnboardingChecklist = () => {
   const [dismissVersion, setDismissVersion] = useState(0);
 
   const storageKey = user?._id
-    ? `kollabs-onboarding-checklist-dismissed-${user._id}`
+    ? `Koneticus-onboarding-checklist-dismissed-${user._id}`
     : null;
   const isDismissed =
     dismissVersion >= 0 &&
@@ -79,7 +79,7 @@ const OnboardingChecklist = () => {
       {
         id: "profile-photo",
         label: "Add a profile photo",
-        description: "Help collaborators recognize you across Kollabs.",
+        description: "Help collaborators recognize you across Koneticus.",
         completed: Boolean(profile?.profilePicture?.url || user?.profilePicture),
         actionLabel: "Edit profile",
         onAction: () => router.push("/dashboard/settings"),

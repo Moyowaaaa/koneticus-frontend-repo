@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
   "Reset password",
-  "Choose a new password for your Kollabs account.",
+  "Choose a new password for your Koneticus account.",
   { path: "/auth/reset-password", index: false },
 );
 
