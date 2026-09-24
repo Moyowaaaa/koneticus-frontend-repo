@@ -218,6 +218,7 @@ export const MesssagesBox = () => {
               alt={title}
               fill
               className="rounded-full object-cover"
+              isKollaboration={activeConversation?.type === "kollaboration"}
             />
           </div>
           <div className="min-w-0">

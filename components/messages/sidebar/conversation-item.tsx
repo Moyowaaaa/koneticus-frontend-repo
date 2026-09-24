@@ -1,9 +1,9 @@
-import React from "react";
 import SafeImage from "@/components/ui-components/safe-image";
+import { ConversationType } from "@/api/chat/chat.model";
 
 interface ConversationItemProps {
   name: string;
-  avatar?: string;
+  avatar?: string | null;
   lastMessage?: string;
   lastMessageAt?: string;
   unreadCount?: number;
@@ -11,6 +11,7 @@ interface ConversationItemProps {
   isActive?: boolean;
   isMessageRequest?: boolean;
   onClick?: () => void;
+  type?: ConversationType;
 }
 
 const formatTimestamp = (timestamp?: string) => {
@@ -45,9 +46,10 @@ const ConversationItem = ({
   isActive,
   isMessageRequest,
   onClick,
+  type
 }: ConversationItemProps) => {
   const timestampLabel = formatTimestamp(lastMessageAt);
-
+const isKollaboration = type === "kollaboration";
   return (
     <button
       type="button"
@@ -58,11 +60,13 @@ const ConversationItem = ({
     >
       <div className="flex items-start gap-3">
         <div className="relative h-10 w-10 min-h-10 min-w-10">
+          
           <SafeImage
             src={avatar}
             alt={name}
             fill
             className="rounded-full object-cover"
+            isKollaboration={isKollaboration ? true : false}
           />
           {status && (
             <span

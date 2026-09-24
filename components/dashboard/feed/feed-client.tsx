@@ -8,6 +8,7 @@ import React, { useEffect } from "react";
 import Feed from ".";
 
 import EditIdeaModal from "../modals/edit-idea-modal";
+import ProjectPreviewModal from "../modals/project-preview-modal";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import OnboardingChecklist from "../onboarding-checklist";
@@ -37,6 +38,7 @@ const FeedClient = () => {
   return (
     <>
       <EditIdeaModal />
+      <ProjectPreviewModal />
       <div className=" w-full  flex items-start gap-10 pt-6">
         <div className="relative h-full w-8/12 flex flex-col gap-3">
           <TopBar className="flex items-center w-full justify-between">
