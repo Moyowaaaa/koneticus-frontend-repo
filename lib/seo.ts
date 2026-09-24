@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-export const SITE_NAME = "Kollabs";
+export const SITE_NAME = "Koneticus";
 export const SITE_TAGLINE = "Collaborate with creative talent";
 export const SITE_DESCRIPTION =
-  "Kollabs is a collaboration platform for creators. Post ideas, find collaborators, send requests, chat, and ship projects together.";
+  "Koneticus is a collaboration platform for creators. Post ideas, find collaborators, send requests, chat, and ship projects together.";
 
 export const getSiteUrl = () => {
   const raw =

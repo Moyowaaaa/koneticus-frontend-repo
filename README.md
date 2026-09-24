@@ -1,8 +1,8 @@
-# Kollabs Frontend
+# Koneticus Frontend
 
-Web app for **Kollabs** (also branded as Koneticus) — a collaboration platform for creators. Users sign up, post ideas, search people and projects, send collaboration requests, chat, and receive realtime notifications.
+Web app for **Koneticus** (also branded as Koneticus) — a collaboration platform for creators. Users sign up, post ideas, search people and projects, send collaboration requests, chat, and receive realtime notifications.
 
-The UI is Next.js (App Router) + React 19 + TypeScript. It talks to the [Kollabs backend](https://github.com/Moyowaaaa/Kollabs-backend-repo) over REST (`/v1/api`) and Socket.IO.
+The UI is Next.js (App Router) + React 19 + TypeScript. It talks to the [Koneticus backend](https://github.com/Moyowaaaa/Koneticus-backend-repo) over REST (`/v1/api`) and Socket.IO.
 
 Longer architecture notes live in [`DOCUMENTATION.md`](./DOCUMENTATION.md). That file is a historical snapshot; prefer this README and the `api/` + `app/` trees for current behavior.
 
@@ -28,8 +28,8 @@ Longer architecture notes live in [`DOCUMENTATION.md`](./DOCUMENTATION.md). That
 ## Local setup
 
 ```bash
-git clone https://github.com/Moyowaaaa/Kollabs-frontend-repo.git
-cd Kollabs-frontend-repo
+git clone https://github.com/Moyowaaaa/Koneticus-frontend-repo.git
+cd Koneticus-frontend-repo
 pnpm install   # or npm install
 ```
 

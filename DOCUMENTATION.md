@@ -1,8 +1,8 @@
-# Kollabs Frontend — Comprehensive Documentation
+# Koneticus Frontend — Comprehensive Documentation
 
 > **Last Updated:** April 2026
 > **Version:** 0.1.0
-> **Repository:** `Kollabs-frontend-repo`
+> **Repository:** `Koneticus-frontend-repo`
 
 ---
 
@@ -30,7 +30,7 @@
 
 ## 1. Project Overview
 
-The **Kollabs Frontend** is a modern single-page application that serves as the user interface for the Kollabs collaborative platform. It provides:
+The **Koneticus Frontend** is a modern single-page application that serves as the user interface for the Koneticus collaborative platform. It provides:
 
 - A multi-step onboarding/signup experience
 - A social-media-style feed of project ideas
@@ -39,7 +39,7 @@ The **Kollabs Frontend** is a modern single-page application that serves as the 
 - User settings and profile management
 - Dark/light theme support
 
-The frontend communicates with the Kollabs Backend API (`Express.js`) for all data persistence, authentication, and business logic.
+The frontend communicates with the Koneticus Backend API (`Express.js`) for all data persistence, authentication, and business logic.
 
 ---
 
@@ -74,7 +74,7 @@ The frontend communicates with the Kollabs Backend API (`Express.js`) for all da
 The frontend uses **Next.js App Router** with a clear separation of concerns across directories.
 
 ```
-Kollabs-frontend-repo/
+Koneticus-frontend-repo/
 ├── .husky/                       # Git hooks
 ├── .vscode/                      # VS Code settings
 ├── animations/                   # GSAP animation configs

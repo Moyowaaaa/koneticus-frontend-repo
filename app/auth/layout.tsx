@@ -3,7 +3,7 @@ import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata(
   "Account",
-  "Sign in or create a Kollabs account to collaborate with other creators.",
+  "Sign in or create a Koneticus account to collaborate with other creators.",
 );
 
 export default function AuthRouteLayout({
