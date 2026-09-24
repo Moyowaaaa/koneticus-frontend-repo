@@ -34,7 +34,6 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   keywords: [
-    "Kollabs",
     "Koneticus",
     "collaboration",
     "creators",
