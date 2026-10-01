@@ -13,9 +13,11 @@ const DashboardRightSidebar = () => {
   }
 
   return (
-    <aside className="hidden w-[28.25rem] fixed top-30 shrink-0 md:block right-10 md:flex flex-col gap-4">
-      <SpotlightFeed />
-      <MessagesFeed />
+    <aside className="sticky top-0 hidden w-[388px] shrink-0 self-start md:block">
+      <div className="flex h-[calc(100vh)] w-[388px] flex-col gap-5 overflow-y-auto pb-20 pt-24">
+        <SpotlightFeed />
+        <MessagesFeed />
+      </div>
     </aside>
   );
 };

@@ -26,12 +26,8 @@ const ProjectsPage = () => {
   const router = useRouter();
   const { toggleNewIdeaModal } = useGeneralStateStore();
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useGetInfiniteUserProjects();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetInfiniteUserProjects();
 
   const loadMoreRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -61,13 +57,13 @@ const ProjectsPage = () => {
     <>
       <div className="flex flex-col gap-10 w-full pt-6 px-6">
         <TopBar>
-          <h1 className="text-[2rem] font-semibold text-brand-black dark:text-[#FFFFFF]">
+          <h1 className="text-[1.25rem] md:text-[1.5rem] font-semibold text-brand-black dark:text-[#FFFFFF]">
             Projects
           </h1>
         </TopBar>
         {projects.length ? (
           <>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {projects.map((project) => (
                 <ProjectCard key={project._id} project={project} />
               ))}

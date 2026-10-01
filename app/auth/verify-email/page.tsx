@@ -45,7 +45,7 @@ const VerifyEmailPage = () => {
           onClick={onResendVerificationEmail}
         >
           {isPending
-            ? "Loading..."
+            ? "Resending..."
             : "Didn't get the verification email? Resend"}
         </ButtonV2>
 

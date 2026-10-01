@@ -29,6 +29,8 @@ interface CustomModalProps {
   className?: string;
   containerClassname?: string;
   childrenClassName?: string;
+  /** When true, the mobile drawer only drags from its handle (better for touch controls inside). */
+  mobileDrawerHandleOnly?: boolean;
 }
 
 const Modal = ({
@@ -43,6 +45,7 @@ const Modal = ({
   className,
   containerClassname,
   childrenClassName,
+  mobileDrawerHandleOnly = false,
 }: CustomModalProps) => {
   const isMobile = useIsMobile();
 
@@ -50,7 +53,7 @@ const Modal = ({
     <div className="flex min-w-0 flex-col text-[#1E1E1E]">
       <div className="min-w-0">
         {title && (
-          <div className="px-6 pb-4">
+          <div className="px-6 ">
             <h2
               className={cn(
                 "border-b border-b-[#E9E9E9E9] pb-2 text-center text-lg font-semibold dark:border-b-[#80808026] dark:text-white",
@@ -78,7 +81,7 @@ const Modal = ({
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
+      <Drawer open={open} onOpenChange={onOpenChange} handleOnly={mobileDrawerHandleOnly}>
         {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
         <style>{`
           [data-modal-scroll] {
@@ -92,10 +95,10 @@ const Modal = ({
           }
         `}</style>
         <DrawerContent>
-          <DrawerHeader className="relative"></DrawerHeader>
+          {/* <DrawerHeader className="relative"></DrawerHeader> */}
           <div
             data-modal-scroll
-            className="scrollbar-hide max-h-[85vh] overflow-y-auto px-4 pb-8"
+            className="scrollbar-hide max-h-[85vh] overflow-y-auto overscroll-contain px-0 pb-[calc(1rem+env(safe-area-inset-bottom))]"
           >
             {content}
           </div>
@@ -105,7 +108,7 @@ const Modal = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} >
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <style>{`
         [data-modal-scroll] {
@@ -120,12 +123,12 @@ const Modal = ({
       `}</style>
       <DialogContent
         className={cn(
-          "max-h-[85vh] gap-0 overflow-hidden bg-transparent p-0 shadow-none sm:max-w-[570px] md:w-[39.1875rem]",
+          "max-h-[85vh] gap-0 overflow-visible bg-transparent p-0 shadow-none sm:max-w-[570px] md:w-[39.1875rem]",
           className,
         )}
         showCloseButton={false}
       >
-        <DialogClose className="glass-icon-button absolute -top-2 -right-12 z-50 flex h-10 w-10 max-h-10 max-w-10 items-center justify-center rounded-[0.625rem] border-none bg-[#666666] p-2 transition-colors hover:bg-[#555555]">
+        <DialogClose className="glass-icon-button absolute -top-2 -right-12 z-50 flex h-10 w-10 max-h-10 max-w-10 items-center justify-center rounded-[0.625rem] border-none! bg-[#666666]! p-2 transition-colors hover:bg-[#555555]!">
           <X className="h-4 w-4 text-white" />
           <span className="sr-only">Close</span>
         </DialogClose>

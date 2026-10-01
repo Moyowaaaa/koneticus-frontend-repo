@@ -56,8 +56,8 @@ const RoleStep = ({
 
   return (
     <>
-      <div className="space-y-4  mx-auto  flex flex-col w-max items-center ">
-        <div className="space-y-2 w-[18.75rem] mx-auto ">
+      <div className="space-y-4  mx-auto  flex flex-col lg:w-max items-center ">
+        <div className="space-y-2 w-10/12  lg:w-[18.75rem] mx-auto ">
           <h1 className="font-semibold text-[1.125rem] text-center ">
             What is your role?
           </h1>
@@ -89,7 +89,7 @@ const RoleStep = ({
         </div>
 
         {!!formData.roles.length && (
-          <div className="flex flex-wrap gap-2 cursor-pointer justify-center w-[25rem]">
+          <div className="flex flex-wrap gap-2 cursor-pointer justify-center lg:w-[25rem]">
             {formData.roles.map((role) => (
               <span
                 key={role}
@@ -108,7 +108,7 @@ const RoleStep = ({
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2 text-xs text-grey justify-center">
+        <div className="flex flex-wrap gap-2 text-xs text-grey lg:justify-center">
           {ROLE_SUGGESTIONS?.filter(
             (suggestion) => !formData.roles.includes(suggestion),
           ).map((suggestion) => (

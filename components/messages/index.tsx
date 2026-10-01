@@ -5,12 +5,16 @@ import { Edit2, People } from "iconsax-reactjs";
 import TopBar from "../ui-components/top-bar";
 import MessagesSidebar from "./sidebar";
 import MessagesChatbox from "./chatbox";
+import { useChatStore } from "@/store/useChatStore";
 import NewMessageModal from "./new-message-modal";
 import CreateGroupModal from "./create-group-modal";
 
 const MessagesClient = () => {
   const [showNewMessage, setShowNewMessage] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const isMobileChatBoxOpened = useChatStore(
+    (state) => state.isMobileChatBoxOpened,
+  );
 
   return (
     <>
@@ -20,8 +24,8 @@ const MessagesClient = () => {
         onOpenChange={setShowCreateGroup}
       />
       <div className="relative flex w-full min-h-0 flex-col overflow-hidden pt-4 px-6">
-        <TopBar className="flex items-center justify-between gap-3">
-          <h1 className="text-[2rem] font-semibold text-brand-black dark:text-white">
+        <TopBar className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <h1 className="text-[1.25rem] md;text-[1.5rem] font-semibold text-brand-black dark:text-white">
             Messages
           </h1>
           <div className="flex items-center gap-2">
@@ -46,9 +50,17 @@ const MessagesClient = () => {
 
         <div className="flex min-h-0 items-stretch overflow-hidden">
           <MessagesSidebar onNewMessage={() => setShowNewMessage(true)} />
-          <MessagesChatbox />
+          <div className="hidden min-w-0 flex-1 lg:flex">
+            <MessagesChatbox />
+          </div>
         </div>
       </div>
+
+      {isMobileChatBoxOpened && (
+        <div className="fixed inset-0 z-[60] flex h-dvh w-full flex-col bg-white lg:hidden dark:bg-background">
+          <MessagesChatbox fill />
+        </div>
+      )}
     </>
   );
 };

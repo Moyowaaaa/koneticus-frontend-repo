@@ -15,6 +15,8 @@ import {
   useVotePoll,
 } from "@/api/chat/chat.mutations";
 import type { ChatMessage, Conversation } from "@/api/chat/chat.model";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft } from "lucide-react";
 import ConversationMembersStack, {
   getParticipantId,
   mapParticipantToMemberAvatar,
@@ -81,6 +83,9 @@ type MessageDayGroup = {
 export const MesssagesBox = () => {
   const currentConversationId = useChatStore(
     (state) => state.currentConversationId,
+  );
+  const setIsMobileChatBoxOpened = useChatStore(
+    (state) => state.setIsMobileChatBoxOpened,
   );
   const currentUserId = useAuthStore((state) => state.user?._id);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -210,8 +215,16 @@ export const MesssagesBox = () => {
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-100 p-4 dark:border-[#80808026]">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-100 pb-4 dark:border-[#80808026]">
         <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            aria-label="Back to conversations"
+            onClick={() => setIsMobileChatBoxOpened(false)}
+            className="flex size-9 shrink-0 items-center justify-center rounded-full text-brand-black lg:hidden dark:text-white"
+          >
+            <ArrowLeft size={20} />
+          </button>
           <div className="relative h-10 w-10 shrink-0">
             <SafeImage
               src={avatar}
@@ -241,9 +254,11 @@ export const MesssagesBox = () => {
         <ScrollArea className="h-full px-4">
           <div className="flex min-h-full min-w-0 flex-col justify-end gap-3 pt-4 pb-28">
             {isLoading ? (
-              <p className="py-12 text-center text-sm text-brand-grey">
-                Loading messages...
-              </p>
+              <div className="flex flex-col gap-3 py-4">
+                <Skeleton className="h-10 w-56 rounded-2xl" />
+                <Skeleton className="ml-auto h-10 w-40 rounded-2xl" />
+                <Skeleton className="h-16 w-64 rounded-2xl" />
+              </div>
             ) : isError ? (
               <p className="py-12 text-center text-sm text-brand-grey">
                 Couldn&apos;t load messages. Try again.

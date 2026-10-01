@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetCollaborationRequestsByProjectId } from "@/api/collaboration/collaboration.queries";
 import {
   useAcceptCollaborationRequest,
@@ -89,9 +89,19 @@ const CollaborationRequestsSection = ({
       </div>
 
       {isLoading ? (
-        <div className="flex min-h-24 items-center justify-center gap-2 text-sm text-brand-grey">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Loading requests...
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 rounded-[1.25rem] border border-[#E9E9E9] p-3 dark:border-[#80808026]"
+            >
+              <Skeleton className="size-10 rounded-full" />
+              <div className="flex flex-1 flex-col gap-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : isError ? (
         <p className="py-4 text-sm text-red-500">

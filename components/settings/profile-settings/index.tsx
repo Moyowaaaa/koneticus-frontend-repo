@@ -13,6 +13,7 @@ import { mapMeUserToAuthUser } from "@/api/user/user.model";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { useGetErrorMessage } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProfileSettings = () => {
   const { data: meUser, isLoading } = useGetMe();
@@ -125,7 +126,18 @@ const ProfileSettings = () => {
   };
 
   if (isLoading) {
-    return <p className="text-brand-grey text-sm pt-4">Loading profile...</p>;
+    return (
+      <div className="flex w-full flex-col gap-8 pt-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+        <Skeleton className="size-[7.75rem] rounded-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-28 w-full" />
+      </div>
+    );
   }
 
   return (

@@ -129,6 +129,7 @@ export const useChatStore = create<ChatState>()(
           set({
             currentConversationId: conversationId,
             otherParticipant,
+            isMobileChatBoxOpened: Boolean(conversationId),
           });
 
           if (conversationId) {

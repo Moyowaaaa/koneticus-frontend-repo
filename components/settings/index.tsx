@@ -16,7 +16,7 @@ const SettingsComponent = () => {
     <div className="flex flex-col w-full min-h-screen">
       <div className="flex flex-col gap-6 w-full pt-6 px-6">
         <TopBar>
-          <h1 className="text-[2rem] font-semibold text-foreground">Profile</h1>
+          <h1 className="text-[1.5rem] font-semibold text-foreground">Profile</h1>
         </TopBar>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

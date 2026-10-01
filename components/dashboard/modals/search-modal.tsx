@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/ui-components/modal";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import SafeImage from "@/components/ui-components/safe-image";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useGlobalSearch } from "@/api/search/search.queries";
@@ -14,6 +13,7 @@ import {
   getProjectStatusTagClass,
 } from "@/lib/project-status";
 import { SearchNormal } from "iconsax-reactjs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SearchModal = () => {
   const router = useRouter();
@@ -68,11 +68,12 @@ const SearchModal = () => {
   return (
     <Modal
       className="bg-[transparent]!"
-      containerClassname="bg-[transparent]! flex flex-col gap-4 bg-none!"
+      containerClassname="bg-[transparent]! flex min-h-0 flex-col gap-4 bg-none!"
+      childrenClassName="min-w-0 overflow-hidden py-2"
       open={showSearch}
       onOpenChange={handleOpenChange}
     >
-      <div className="relative rounded-[1.875rem] border-2 border-primary bg-white p-4 dark:bg-[#151515]">
+      <div className="relative rounded-[1.875rem] border-2 border-primary bg-white p-4 dark:bg-[#151515] ">
         <div className="flex items-center gap-3 rounded-full bg-white dark:bg-[#151515]">
           <SearchNormal size={20} color="#8C8C8C" />
           <Input
@@ -89,17 +90,28 @@ const SearchModal = () => {
         />
       </div>
 
-      <div className="relative mt-4 h-[30rem] w-full overflow-hidden rounded-[1.875rem] bg-white dark:bg-[#151515]">
-        <ScrollArea className="h-full">
-          <div className="flex flex-col gap-6 p-4">
+      <div className="relative mt-4 h-[30rem] max-h-[min(30rem,calc(85vh-12rem))] w-full min-w-0 shrink-0 overflow-hidden rounded-[1.875rem] bg-white dark:bg-[#151515]">
+        <div className="scrollbar-hide h-full min-h-0 overflow-x-hidden overflow-y-auto p-4">
+          <div className="flex min-w-0 flex-col gap-6">
             {!hasQuery ? (
               <p className="py-16 text-center text-sm text-brand-grey">
                 Type a name, role, skill, or project status
               </p>
             ) : isFetching && !data ? (
-              <p className="py-16 text-center text-sm text-brand-grey">
-                Searching...
-              </p>
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 px-3 py-2.5"
+                  >
+                    <Skeleton className="size-10 rounded-full" />
+                    <div className="flex flex-1 flex-col gap-2">
+                      <Skeleton className="h-4 w-36" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : isError ? (
               <p className="py-16 text-center text-sm text-brand-grey">
                 Couldn&apos;t search right now. Try again.
@@ -111,7 +123,7 @@ const SearchModal = () => {
             ) : (
               <>
                 {users.length > 0 && (
-                  <section className="flex flex-col gap-2">
+                  <section className="flex min-w-0 flex-col gap-2">
                     <h2 className="px-1 text-xs font-semibold tracking-wide text-brand-grey uppercase">
                       People
                     </h2>
@@ -152,20 +164,20 @@ const SearchModal = () => {
                 )}
 
                 {projects.length > 0 && (
-                  <section className="flex flex-col gap-2">
+                  <section className="flex min-w-0 flex-col gap-2">
                     <h2 className="px-1 text-xs font-semibold tracking-wide text-brand-grey uppercase">
                       Projects
                     </h2>
-                    <div className="flex flex-col gap-1">
+                    <div className="flex min-w-0 flex-col gap-1">
                       {projects.map((project) => (
                         <button
                           key={project._id}
                           type="button"
                           onClick={() => openProject(project)}
-                          className="flex w-full flex-col gap-1 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-lavender dark:hover:bg-[#211E1E]"
+                          className="flex w-full min-w-0 flex-col gap-1 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-lavender dark:hover:bg-[#211E1E]"
                         >
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="truncate font-medium text-brand-black dark:text-white">
+                          <div className="flex min-w-0 items-center justify-between gap-3">
+                            <p className="min-w-0 flex-1 truncate font-medium text-brand-black dark:text-white">
                               {project.title}
                             </p>
                             <span
@@ -175,7 +187,7 @@ const SearchModal = () => {
                             </span>
                           </div>
                           {project.description ? (
-                            <p className="line-clamp-2 text-xs text-brand-grey">
+                            <p className="line-clamp-2 min-w-0 text-xs text-brand-grey">
                               {project.description}
                             </p>
                           ) : null}
@@ -187,7 +199,7 @@ const SearchModal = () => {
               </>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </Modal>
   );

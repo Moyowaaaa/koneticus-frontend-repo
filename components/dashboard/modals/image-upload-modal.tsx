@@ -337,26 +337,34 @@ const ImageUploadModalContent = ({
     setView("preview");
   };
 
-  const handleMouseDown = (e: React.MouseEvent, action: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-
+  const beginCropInteraction = (clientX: number, clientY: number, action: string) => {
     if (action === "move") {
       setIsDragging(true);
     } else {
       setIsResizing(action);
     }
-
-    setDragStart({ x: e.clientX, y: e.clientY });
+    setDragStart({ x: clientX, y: clientY });
   };
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+  const handlePointerDown = (
+    e: React.MouseEvent | React.TouchEvent,
+    action: string,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const point = "touches" in e ? e.touches[0] : e;
+    if (!point) return;
+    beginCropInteraction(point.clientX, point.clientY, action);
+  };
+
+  const applyPointerMove = useCallback(
+    (clientX: number, clientY: number) => {
       if (!imageContainerRef.current) return;
 
       const rect = imageContainerRef.current.getBoundingClientRect();
-      const deltaX = ((e.clientX - dragStart.x) / rect.width) * 100;
-      const deltaY = ((e.clientY - dragStart.y) / rect.height) * 100;
+      const deltaX = ((clientX - dragStart.x) / rect.width) * 100;
+      const deltaY = ((clientY - dragStart.y) / rect.height) * 100;
 
       if (isDragging) {
         setCropArea((prev) => {
@@ -366,7 +374,7 @@ const ImageUploadModalContent = ({
           newY = Math.max(0, Math.min(100 - prev.height, newY));
           return { ...prev, x: newX, y: newY };
         });
-        setDragStart({ x: e.clientX, y: e.clientY });
+        setDragStart({ x: clientX, y: clientY });
       } else if (isResizing) {
         setCropArea((prev) => {
           let { x, y, width, height } = prev;
@@ -413,27 +421,43 @@ const ImageUploadModalContent = ({
 
           return { x, y, width, height };
         });
-        setDragStart({ x: e.clientX, y: e.clientY });
+        setDragStart({ x: clientX, y: clientY });
       }
     },
     [isDragging, isResizing, dragStart],
   );
 
-  const handleMouseUp = useCallback(() => {
+  const endCropInteraction = useCallback(() => {
     setIsDragging(false);
     setIsResizing(null);
   }, []);
 
   useEffect(() => {
-    if (isDragging || isResizing) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
-      return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-        window.removeEventListener("mouseup", handleMouseUp);
-      };
-    }
-  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
+    if (!isDragging && !isResizing) return;
+
+    const onMove = (event: MouseEvent | TouchEvent) => {
+      const point = "touches" in event ? event.touches[0] : event;
+      if (!point) return;
+      if ("touches" in event) {
+        event.preventDefault();
+      }
+      applyPointerMove(point.clientX, point.clientY);
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", endCropInteraction);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", endCropInteraction);
+    window.addEventListener("touchcancel", endCropInteraction);
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", endCropInteraction);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", endCropInteraction);
+      window.removeEventListener("touchcancel", endCropInteraction);
+    };
+  }, [isDragging, isResizing, applyPointerMove, endCropInteraction]);
 
   const handleModalClose = (isOpen: boolean) => {
     if (!isOpen) {
@@ -450,6 +474,10 @@ const ImageUploadModalContent = ({
   };
 
   const modalTitle = view === "edit" ? "Edit" : title;
+  const imageStageClassName =
+    "relative w-full max-w-[400px] select-none overflow-hidden rounded-lg bg-gray-100 max-md:h-[220px] max-md:max-h-[38vh] md:aspect-4/3";
+  const cropHandleClassName =
+    "absolute z-10 h-6 w-6 touch-none rounded-full bg-white shadow-md md:h-4 md:w-4";
 
   return (
     <Modal
@@ -457,8 +485,10 @@ const ImageUploadModalContent = ({
       onOpenChange={handleModalClose}
       title={modalTitle}
       className="flex flex-col gap-4"
+      mobileDrawerHandleOnly
+      childrenClassName="flex min-h-0 flex-col"
     >
-      <div className="flex min-h-[300px] flex-col gap-4">
+      <div className="flex min-h-0 flex-col gap-4">
         <input
           ref={fileInputRef}
           type="file"
@@ -518,8 +548,8 @@ const ImageUploadModalContent = ({
         )}
 
         {view === "preview" && activeImage && (
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="relative aspect-4/3 w-full max-w-[400px] overflow-hidden rounded-lg bg-gray-100">
+          <div className="flex flex-col items-center gap-4 py-2 md:py-4">
+            <div className={cn(imageStageClassName, "overflow-hidden")}>
               <Image
                 src={activeImage.previewUrl}
                 alt={`Selected image ${activeIndex + 1}`}
@@ -573,7 +603,7 @@ const ImageUploadModalContent = ({
                   setView("edit");
                   resetCropControls();
                 }}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF] md:h-10 md:w-10"
                 aria-label="Edit image"
               >
                 <Edit2 size={18} variant="Bold" className="text-[#6155F5]" />
@@ -581,7 +611,7 @@ const ImageUploadModalContent = ({
               <button
                 type="button"
                 onClick={handleDeleteActive}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF] md:h-10 md:w-10"
                 aria-label="Delete image"
               >
                 <Trash size={18} variant="Bold" className="text-[#6155F5]" />
@@ -595,11 +625,8 @@ const ImageUploadModalContent = ({
         )}
 
         {view === "edit" && activeImage && (
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div
-              ref={imageContainerRef}
-              className="relative aspect-4/3 w-full max-w-[400px] select-none overflow-hidden rounded-lg bg-gray-100"
-            >
+          <div className="flex min-h-0 flex-col items-center gap-4 py-2 md:py-4">
+            <div ref={imageContainerRef} className={imageStageClassName}>
               <Image
                 src={activeImage.originalUrl}
                 alt="Image to edit"
@@ -637,14 +664,15 @@ const ImageUploadModalContent = ({
               </div>
 
               <div
-                className="absolute cursor-move border-2 border-white"
+                className="absolute touch-none cursor-move border-2 border-white"
                 style={{
                   left: `${cropArea.x}%`,
                   top: `${cropArea.y}%`,
                   width: `${cropArea.width}%`,
                   height: `${cropArea.height}%`,
                 }}
-                onMouseDown={(e) => handleMouseDown(e, "move")}
+                onMouseDown={(e) => handlePointerDown(e, "move")}
+                onTouchStart={(e) => handlePointerDown(e, "move")}
               >
                 <div className="pointer-events-none absolute inset-0">
                   <div className="absolute top-0 bottom-0 left-1/3 w-px bg-white/50" />
@@ -654,20 +682,24 @@ const ImageUploadModalContent = ({
                 </div>
 
                 <div
-                  className="absolute -top-2 -left-2 h-4 w-4 cursor-nw-resize rounded-full bg-white shadow-md"
-                  onMouseDown={(e) => handleMouseDown(e, "nw")}
+                  className={cn(cropHandleClassName, "-top-3 -left-3 cursor-nw-resize")}
+                  onMouseDown={(e) => handlePointerDown(e, "nw")}
+                  onTouchStart={(e) => handlePointerDown(e, "nw")}
                 />
                 <div
-                  className="absolute -top-2 -right-2 h-4 w-4 cursor-ne-resize rounded-full bg-white shadow-md"
-                  onMouseDown={(e) => handleMouseDown(e, "ne")}
+                  className={cn(cropHandleClassName, "-top-3 -right-3 cursor-ne-resize")}
+                  onMouseDown={(e) => handlePointerDown(e, "ne")}
+                  onTouchStart={(e) => handlePointerDown(e, "ne")}
                 />
                 <div
-                  className="absolute -bottom-2 -left-2 h-4 w-4 cursor-sw-resize rounded-full bg-white shadow-md"
-                  onMouseDown={(e) => handleMouseDown(e, "sw")}
+                  className={cn(cropHandleClassName, "-bottom-3 -left-3 cursor-sw-resize")}
+                  onMouseDown={(e) => handlePointerDown(e, "sw")}
+                  onTouchStart={(e) => handlePointerDown(e, "sw")}
                 />
                 <div
-                  className="absolute -right-2 -bottom-2 h-4 w-4 cursor-se-resize rounded-full bg-white shadow-md"
-                  onMouseDown={(e) => handleMouseDown(e, "se")}
+                  className={cn(cropHandleClassName, "-right-3 -bottom-3 cursor-se-resize")}
+                  onMouseDown={(e) => handlePointerDown(e, "se")}
+                  onTouchStart={(e) => handlePointerDown(e, "se")}
                 />
               </div>
             </div>
@@ -676,7 +708,7 @@ const ImageUploadModalContent = ({
               <button
                 type="button"
                 onClick={handleRotateLeft}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF] md:h-10 md:w-10"
                 aria-label="Rotate left"
               >
                 <RotateLeft size={18} className="text-[#6155F5]" />
@@ -684,7 +716,7 @@ const ImageUploadModalContent = ({
               <button
                 type="button"
                 onClick={resetCropControls}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF] md:h-10 md:w-10"
                 aria-label="Reset crop controls"
                 title="Reset"
               >
@@ -693,7 +725,7 @@ const ImageUploadModalContent = ({
               <button
                 type="button"
                 onClick={handleRotateRight}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E6E4FF] transition-colors hover:bg-[#E0DDFF] md:h-10 md:w-10"
                 aria-label="Rotate right"
               >
                 <RotateRight size={18} className="text-[#6155F5]" />
@@ -702,7 +734,7 @@ const ImageUploadModalContent = ({
           </div>
         )}
 
-        <div className="mt-auto flex items-center justify-between border-t border-[#E9E9E9] pt-4">
+        <div className="sticky bottom-0 z-10 mt-auto flex shrink-0 items-center justify-between border-t border-[#E9E9E9] bg-white pt-4 pb-1 dark:border-[#80808026] dark:bg-[#211E1E]">
           <button
             type="button"
             onClick={handleBack}

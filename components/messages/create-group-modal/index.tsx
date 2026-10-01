@@ -13,6 +13,7 @@ import type { SearchUser } from "@/api/search/search.model";
 import { useAuthStore } from "@/store/useAuthStore";
 import { showToast } from "@/utils/toasts";
 import SafeImage from "@/components/ui-components/safe-image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type CreateGroupModalProps = {
   open: boolean;
@@ -257,9 +258,17 @@ const CreateGroupModalContent = ({
                   Search and add at least one person
                 </p>
               ) : isFetching && !data ? (
-                <p className="px-3 py-10 text-center text-sm text-brand-grey">
-                  Searching...
-                </p>
+                <div className="flex flex-col gap-1">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="flex items-center gap-3 px-3 py-2.5">
+                      <Skeleton className="size-10 rounded-full" />
+                      <div className="flex flex-1 flex-col gap-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : isError ? (
                 <p className="px-3 py-10 text-center text-sm text-brand-grey">
                   Couldn&apos;t search right now. Try again.
