@@ -167,7 +167,7 @@ const IdeasClient = () => {
 
       <div className="flex flex-col gap-10 w-full pt-6 px-6">
         <TopBar className="flex items-center gap-6">
-          <h1 className="text-[2rem] font-semibold text-brand-black dark:text-[#FFFFFF]">
+          <h1 className="text-[1.5rem] font-semibold text-brand-black dark:text-[#FFFFFF]">
             Ideas
           </h1>
         </TopBar>

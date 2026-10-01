@@ -102,14 +102,14 @@ const BioStep = ({
 
   return (
     <>
-      <div className="space-y-6 w-[30rem] mx-auto">
+      <div className="space-y-6 lg:w-[30rem] mx-auto">
         <h1 className="font-semibold text-[1.125rem] text-center ">
           Tell us about yourself
         </h1>
-        <div className="w-full flex items-start gap-4">
+        <div className="w-full flex-col md:flex-row flex items-start gap-4">
           <div
             onClick={handleImageClick}
-            className="min-h-28 min-w-28 h-28 w-28 border border-[#e9e9e9] rounded-full flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#827AE1] transition-colors"
+            className="min-h-28 mx-auto min-w-28 h-28 w-28 border border-[#e9e9e9] rounded-full flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#827AE1] transition-colors"
           >
             {formData.profileImagePreview ? (
               <Image

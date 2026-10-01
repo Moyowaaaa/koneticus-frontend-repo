@@ -86,7 +86,7 @@ const Feed = () => {
   if (isError) {
     return (
       <div className="flex flex-col gap-4 w-full py-4">
-        <h1 className="text-[1.125rem] font-normal leading-[1.875rem]">
+        <h1 className="font-sora text-[18px] leading-7 font-normal text-[#211E1E] dark:text-white">
           Recommended for you
         </h1>
         <div className="flex items-center justify-center min-h-80">
@@ -99,8 +99,8 @@ const Feed = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 w-full py-4">
-      <h1 className="text-[1.125rem] font-normal leading-7.5">
+    <div className="flex w-full flex-col gap-4 py-6 max-md:pt-6">
+      <h1 className="font-sora text-[18px] leading-7 font-normal text-[#211E1E] dark:text-white">
         Recommended for you
       </h1>
 
@@ -111,7 +111,7 @@ const Feed = () => {
           ))}
         </div>
       ) : feedItems.length > 0 ? (
-        <div className="space-y-6">
+        <div className="relative space-y-5 pb-4 md:space-y-6">
           {feedItems.map((item, index) => (
             <FeedIdeaCard
               key={item._id}

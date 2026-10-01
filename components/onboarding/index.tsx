@@ -108,10 +108,10 @@ function OnBoardingFlowContent() {
   return (
     <>
       <div className="relative flex w-full flex-col items-center gap-8 py-10  h-full ">
-        <div className="  space-y-6 flex flex-col gap-4   w-max">
+        <div className="flex w-full min-w-0 flex-col gap-4 space-y-6">
           <BrandLogo className="mx-auto" />
 
-          <div className="w-[18.75rem] mx-auto pt-4">
+          <div className="w-10/12 lg:w-[18.75rem] mx-auto pt-4">
             <StepCounter
               steps={STEP_TITLES}
               stepCount={currentStep}

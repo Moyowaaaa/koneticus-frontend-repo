@@ -1,24 +1,12 @@
 "use client";
 
-import ButtonV2 from "@/components/ui-components/button";
 import { useGeneralStateStore } from "@/store/useGeneralStateStore";
-import {
-  AddCircle,
-  Folder,
-  FormatSquare,
-  Home,
-  Message,
-  ShoppingCart,
-  Task,
-} from "iconsax-reactjs";
+import { Folder, Home, Message, ShoppingCart, Task } from "iconsax-reactjs";
 import SidebarLinks from "./sidebar-links";
 import { sideBarRoute } from "@/types";
 import { Lightbulb } from "lucide-react";
 
-const Sidebar = () => {
-  const { toggleNewIdeaModal } = useGeneralStateStore();
-
-  const mainDashBoardRoutes: sideBarRoute[] = [
+export const mainDashBoardRoutes: sideBarRoute[] = [
     {
       title: "Home",
       icon: Home,
@@ -46,7 +34,7 @@ const Sidebar = () => {
     },
     {
       title: "Workspace",
-      icon: FormatSquare,
+      icon: Task,
       route: "/",
       comingSoon: true,
     },
@@ -58,25 +46,24 @@ const Sidebar = () => {
     },
   ];
 
+const Sidebar = () => {
+  const { toggleNewIdeaModal } = useGeneralStateStore();
+
   return (
     <div
       // className="flex h-[calc(100vh-9rem)] flex-col gap-4 border-r border-[#E9E9E9] pr-4"
-      className="flex h-[calc(100vh-5rem)] flex-col gap-4 border-r border-[#E9E9E9] dark:border-[#80808026] pr-2 pt-8"
+      className="flex h-[calc(100vh-96px)] w-[234px] flex-col overflow-y-auto border-r border-[rgba(233,233,233,0.91)] bg-white pt-[13px] pl-4 dark:border-[#80808026] dark:bg-transparent"
     >
-      <div className="rounded-2xl bg-white/80  dark:bg-[#151515] ">
-        <ButtonV2
-          IconPlacement="left"
-          className="h-[2.625rem] w-full min-w-[12rem] rounded-[6.25rem] border-none bg-brand-black
-          dark:bg-[#6155F5]
-          outline-none"
-          Icon={<AddCircle size="13" color="white" variant="Bold" />}
-          onClick={toggleNewIdeaModal}
-        >
-          New idea
-        </ButtonV2>
-      </div>
+      <button
+        type="button"
+        onClick={toggleNewIdeaModal}
+        className="flex h-[42px] w-[205px] cursor-pointer items-center justify-center gap-2 rounded-[100px] bg-[#211E1E] text-sm font-normal leading-5 text-white dark:bg-[#6155F5]"
+      >
+        <img src="/images/sidebar/new-idea.svg" alt="" />
+        New idea
+      </button>
 
-      <div className="flex flex-col gap-2">
+      <div className="mt-6 flex flex-col gap-2">
         {mainDashBoardRoutes.map((route) => (
           <SidebarLinks key={route.title} route={route} />
         ))}

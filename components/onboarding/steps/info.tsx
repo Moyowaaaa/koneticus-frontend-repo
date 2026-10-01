@@ -53,14 +53,14 @@ export const InformationStep = ({
     <>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4 w-[18.75rem] mx-auto"
+        className="mx-auto w-10/12 min-w-0 space-y-4 lg:w-[18.75rem]"
       >
-        <div className="grid gap-4">
+        <div className="grid min-w-0 gap-4">
           <h1 className="font-semibold text-[1.125rem] text-center ">
             Fill in your information
           </h1>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex min-w-0 flex-col gap-1">
             <CustomFormInput
               label="First name *"
               {...register("firstName")}
@@ -73,7 +73,7 @@ export const InformationStep = ({
             )}
           </div>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex min-w-0 flex-col gap-1">
             <CustomFormInput
               label="Last name *"
               {...register("lastName")}
@@ -86,7 +86,7 @@ export const InformationStep = ({
             )}
           </div>
 
-          <div className="flex flex-col gap-1">
+          <div className="flex min-w-0 flex-col gap-1">
             <CustomFormInput
               label="Password *"
               type="password"
@@ -105,7 +105,7 @@ export const InformationStep = ({
             IconPlacement="right"
             Icon={<ArrowRight size={24} color="white" />}
             type="submit"
-            className={`mx-auto w-75`}
+            className="mx-auto w-full max-w-full"
           >
             {isLastStep ? "Submit" : "Next"}
           </ButtonV2>

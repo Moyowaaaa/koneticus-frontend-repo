@@ -35,7 +35,7 @@ const TokenVerificationPage = () => {
       }
     } catch (error) {
       const errorMessage = getErrorMessage(error);
-      showToast.error(errorMessage);
+      showToast.info(errorMessage);
       localStorage.setItem("didVerify", "false");
       onNavigateToLogin();
     }

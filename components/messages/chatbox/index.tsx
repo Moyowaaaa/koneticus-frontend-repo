@@ -7,7 +7,7 @@ import { useChatStore } from "@/store/useChatStore";
 import MessagesInput from "../input";
 import { MesssagesBox } from "../messages-box/messages-box";
 
-const MessagesChatbox = () => {
+const MessagesChatbox = ({ fill = false }: { fill?: boolean }) => {
   const illustrationRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
   const currentConversationId = useChatStore(
@@ -54,7 +54,13 @@ const MessagesChatbox = () => {
   }, [currentConversationId]);
 
   return (
-    <div className="relative h-[calc(100dvh-190px)] w-full min-h-0 overflow-hidden p-6">
+    <div
+      className={
+        fill
+          ? "relative flex h-full min-h-0 w-full flex-col overflow-hidden px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+          : "relative h-[calc(100dvh-190px)] w-full min-h-0 overflow-hidden p-6"
+      }
+    >
       {!currentConversationId ? (
         <div className="flex h-full w-full min-h-0 flex-col items-center justify-center gap-6 text-center">
           <div

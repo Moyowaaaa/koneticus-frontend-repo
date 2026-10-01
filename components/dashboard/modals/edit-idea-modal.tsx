@@ -15,6 +15,7 @@ import {
   normalizeProjectStatus,
 } from "@/lib/project-status";
 import { showToast } from "@/utils/toasts";
+import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
 
 const EditIdeaModal = () => {
@@ -180,8 +181,10 @@ const EditIdeaModal = () => {
         titleClassname="pt-4"
       >
         {isLoading ? (
-          <div className="text-sm text-brand-grey py-6 text-center">
-            Loading idea...
+          <div className="flex flex-col gap-4 py-2">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-28 w-full" />
+            <Skeleton className="h-10 w-36 rounded-full" />
           </div>
         ) : project ? (
           <form className="flex flex-col gap-4" onSubmit={handleSave}>

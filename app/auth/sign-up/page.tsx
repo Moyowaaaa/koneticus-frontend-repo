@@ -43,10 +43,14 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="relative flex flex-col gap-4 items-center justify-center top-0 h-full  py-10 h-full relative">
+    <div
+      className="relative flex flex-col gap-4 items-center justify-center top-0 h-full  py-10 h-full relative
+     w-full  lg:max-w-[30rem] mx-auto
+    "
+    >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-8/12 flex flex-col gap-4"
+        className="w-10/12 lg:w-8/12  flex flex-col gap-4"
       >
         <h1 className="text-[1.875rem] text-center font-bold">
           Create account
@@ -68,7 +72,7 @@ export default function SignUpPage() {
           {isPending ? "Loading..." : "Continue"}
         </ButtonV2>
 
-        <div className="flex items-center gap-6 w-full">
+        {/* <div className="flex items-center gap-6 w-full">
           <div className="w-full border border-[#E9E9E9]"></div>
           <p>Or</p>
           <div className="w-full border border-[#E9E9E9]"></div>
@@ -125,7 +129,7 @@ export default function SignUpPage() {
           >
             Continue with Microsoft
           </ButtonV2>
-        </div>
+        </div> */}
 
         <p className="text-center">
           Already have an account?{" "}

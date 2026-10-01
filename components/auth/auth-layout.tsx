@@ -14,11 +14,11 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen flex-col  lg:flex-row relative justify-between">
       <div
         className={` h-screen relative p-4 ${
-          Number(step) < 1 ? "w-2/6" : "w-full"
+          Number(step) < 1 ? "w-full lg:w-2/6" : "w-full"
         }`}
       >
         <div className="relative w-full h-full flex flex-col ">
-          <div className="w-full  absolute top-24 flex items-center justify-center">
+          <div className="w-full  absolute top-10 flex items-center justify-center">
             <BrandLogo />
           </div>
 
@@ -35,14 +35,14 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
       </div>
 
       {Number(step) < 1 && (
-        <div className="relative hidden  w-7/12 flex-1 flex-col justify-between overflow-hidden bg-primary px-12 py-14 text-brand-white lg:flex">
+        <div className="relative hidden  w-7/12 flex-1 flex-col justify-between overflow-hidden bg-primary px-12 py-14 text-brand-white lg:flex ">
           <Image
             src={
               pathname === "/auth/sign-up"
                 ? "/images/auth-bg-signup.webp"
                 : pathname === "/auth/forgot-password"
-                ? "/images/auth-bg-forgot.webp"
-                : "/images/auth-bg-login.webp"
+                  ? "/images/auth-bg-forgot.webp"
+                  : "/images/auth-bg-login.webp"
             }
             fill
             alt="auth-bg-1"
@@ -54,8 +54,8 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
               {pathname === "/auth/sign-up"
                 ? "Collaborate With Top-Tier Creative Talent"
                 : pathname === "/auth/forgot-password"
-                ? "Let's help you get back in."
-                : "Join a Community of High-Performing Creatives"}
+                  ? "Let's help you get back in."
+                  : "Join a Community of High-Performing Creatives"}
             </h1>
             <p
               className={`text-white ${
@@ -65,8 +65,8 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
               {pathname === "/auth/sign-up"
                 ? "Find collaborators who share your passion, vision, and commitment to creating meaningful, high-quality work."
                 : pathname === "/auth/forgot-password"
-                ? "Type in your email address and we'll send you a secure reset link in a moment."
-                : "Meet experienced collaborators who are passionate about working together to build original, impactful projects."}
+                  ? "Type in your email address and we'll send you a secure reset link in a moment."
+                  : "Meet experienced collaborators who are passionate about working together to build original, impactful projects."}
             </p>
           </div>
         </div>
@@ -77,10 +77,10 @@ function AuthLayoutContent({ children }: { children: React.ReactNode }) {
 
 function AuthLayoutFallback({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row relative justify-between">
+    <div className="flex min-h-screen flex-col lg:flex-row relative justify-between ">
       <div className="h-screen relative p-4 w-2/6">
         <div className="relative w-full h-full flex flex-col">
-          <div className="w-full absolute top-24 flex items-center justify-center">
+          <div className="w-full absolute top-10 flex items-center justify-center">
             <BrandLogo />
           </div>
           {children}

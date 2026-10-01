@@ -46,21 +46,20 @@ const ConversationItem = ({
   isActive,
   isMessageRequest,
   onClick,
-  type
+  type,
 }: ConversationItemProps) => {
   const timestampLabel = formatTimestamp(lastMessageAt);
-const isKollaboration = type === "kollaboration";
+  const isKollaboration = type === "kollaboration";
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-between gap-3 rounded-[0.9375rem] p-4 text-left transition-all hover:bg-lavender ${
+      className={`w-full flex items-start justify-between gap-3 rounded-[0.9375rem] p-4 text-left transition-all hover:bg-lavender ${
         isActive ? "bg-lavender dark:bg-[#80808026]" : ""
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className="relative h-10 w-10 min-h-10 min-w-10">
-          
+        <div className="relative h-8 w-8 min-h-8 min-w-8">
           <SafeImage
             src={avatar}
             alt={name}
@@ -83,7 +82,7 @@ const isKollaboration = type === "kollaboration";
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <h1
-              className="text-base font-semibold text-brand-black 
+              className="text-base  text-brand-black 
             dark:text-white
             line-clamp-1"
             >
@@ -95,15 +94,15 @@ const isKollaboration = type === "kollaboration";
               </span>
             )}
           </div>
-          <p className="text-sm text-brand-grey line-clamp-1">
+          <p className="text-sm text-brand-grey line-clamp-1 font-[300]">
             {lastMessage || "Send the first message"}
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col items-end gap-2 min-w-max">
+      <div className="flex flex-col items-end gap-2 min-w-max pt-1">
         {timestampLabel && (
-          <p className="text-xs text-brand-grey">{timestampLabel}</p>
+          <p className="text-xs text-brand-black">{timestampLabel}</p>
         )}
         {unreadCount > 0 && (
           <span className="min-w-6 rounded-full bg-brand-black px-2 py-0.5 text-center text-[0.625rem] font-semibold text-white">

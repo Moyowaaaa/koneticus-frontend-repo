@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { EmojiPicker } from "frimousse";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Popover,
   PopoverContent,
@@ -144,8 +145,10 @@ export default function EmojiPickerButton({
                 containIntrinsicSize: "auto none",
               }}
             >
-              <EmojiPicker.Loading className="absolute inset-0 flex items-center justify-center text-sm text-neutral-400 dark:text-neutral-500">
-                Loading emojis...
+              <EmojiPicker.Loading className="absolute inset-0 grid grid-cols-8 content-start gap-2 p-3">
+                {Array.from({ length: 32 }).map((_, index) => (
+                  <Skeleton key={index} className="size-8 rounded-md" />
+                ))}
               </EmojiPicker.Loading>
               <EmojiPicker.Empty className="absolute inset-0 flex items-center justify-center text-sm text-neutral-400 dark:text-neutral-500">
                 No emoji found

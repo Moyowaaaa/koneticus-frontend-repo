@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Loader2 } from "lucide-react";
 import TopBar from "@/components/ui-components/top-bar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetInfiniteMyCollaborationRequests } from "@/api/collaboration/collaboration.queries";
 import type { CollaborationRequest } from "@/api/collaboration/collaboration.model";
 import {
@@ -95,7 +95,7 @@ const RequestsClient = () => {
     <div className="flex w-full flex-col gap-8 pt-6 px-6">
       <TopBar>
         <div className="flex flex-col gap-1">
-          <h1 className="text-[2rem] font-semibold text-brand-black dark:text-white">
+          <h1 className="text-[1.5rem] font-semibold text-brand-black dark:text-white">
             Requests
           </h1>
           <p className="text-sm text-brand-grey">
@@ -129,9 +129,18 @@ const RequestsClient = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex min-h-40 items-center justify-center gap-2 text-sm text-brand-grey">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Loading your requests...
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex flex-col gap-3 rounded-[1.25rem] border border-[#E9E9E9] p-4 dark:border-[#80808026]"
+            >
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-2/3" />
+              <Skeleton className="h-5 w-24 rounded-full" />
+            </div>
+          ))}
         </div>
       ) : isError ? (
         <p className="py-12 text-center text-sm text-red-500">
@@ -194,9 +203,10 @@ const RequestsClient = () => {
           </div>
           <div ref={loadMoreRef} className="h-1 w-full" />
           {isFetchingNextPage ? (
-            <div className="flex items-center justify-center gap-2 pb-4 text-sm text-brand-grey">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading more...
+            <div className="flex flex-col gap-3 rounded-[1.25rem] border border-[#E9E9E9] p-4 dark:border-[#80808026]">
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-2/3" />
             </div>
           ) : null}
         </>

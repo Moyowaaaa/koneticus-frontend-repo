@@ -144,9 +144,13 @@ const NewIdeaModal = () => {
         open={showNewIdeaModal}
         onOpenChange={handleModalClose}
         title="New Idea"
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-4 "
+        titleClassname="py-4"
       >
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="flex flex-col gap-4 "
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <label className="flex flex-col gap-1">
             <span className="sr-only">Idea title</span>
             <Input
@@ -219,7 +223,7 @@ const NewIdeaModal = () => {
             disabled={isSubmitting}
           />
 
-          <div className="w-full items-center flex justify-between">
+          <div className="w-full items-center flex justify-between ">
             <div className="flex items-center gap-4">
               <ButtonV2
                 className="h-[2.5rem] 
@@ -334,13 +338,13 @@ const NewIdeaModal = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-1" aria-live="polite">
+            {/* <div className="flex items-center gap-1" aria-live="polite">
               <Clock size={13} className="text-brand-grey" />
               <p className="text-[0.875rem] text-brand-grey">
                 <span className="text-brand-black dark:text-white">3</span>{" "}
                 Monthly shares left
               </p>
-            </div>
+            </div> */}
           </div>
         </form>
       </Modal>

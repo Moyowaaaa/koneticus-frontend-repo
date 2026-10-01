@@ -56,9 +56,9 @@ const LogInPage = () => {
   }, []);
 
   return (
-    <div className="relative flex flex-col gap-4 items-center justify-center top-0 h-full  py-10 h-full relative">
+    <div className="relative flex flex-col gap-4 items-center justify-center top-0 h-full  py-10 h-full relative  w-full  lg:max-w-[30rem] mx-auto">
       <form
-        className="flex flex-col gap-[1.5rem] w-8/12  mx-auto"
+        className="flex flex-col gap-[1.5rem] w-10/12 lg:w-8/12  mx-auto"
         onSubmit={handleSubmit(onSubmit)}
         id="login-form"
       >
@@ -108,7 +108,7 @@ const LogInPage = () => {
           >
             {isPending ? "Logging in..." : "Continue"}
           </ButtonV2>
-
+          {/* 
           <div className="flex items-center gap-6 w-full">
             <div className="w-full border border-[#E9E9E9]"></div>
             <p>Or</p>
@@ -167,7 +167,7 @@ const LogInPage = () => {
             >
               Continue with Microsoft
             </ButtonV2>
-          </div>
+          </div> */}
 
           <p className="text-center">
             Don&apos;t have an account?{" "}

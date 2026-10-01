@@ -95,9 +95,7 @@ const MessagesSidebar = ({
 
   return (
     <div
-      className="relative w-[30rem] border-r border-[#e9e9e9e9] 
-    dark:border-[#80808026]
-    pt-6 md:h-[calc(100dvh-200px)] pr-4"
+      className="relative w-full pt-6 pr-0 lg:h-[calc(100dvh-200px)] lg:w-[30rem] lg:border-r lg:border-[#e9e9e9e9] lg:pr-4 lg:dark:border-[#80808026]"
     >
       {isLoading ? (
         <div className="flex h-full w-full flex-col gap-2 pr-4">
