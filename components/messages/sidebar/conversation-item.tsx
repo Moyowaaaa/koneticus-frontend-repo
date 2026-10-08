@@ -102,10 +102,16 @@ const ConversationItem = ({
 
       <div className="flex flex-col items-end gap-2 min-w-max pt-1">
         {timestampLabel && (
-          <p className="text-xs text-brand-black">{timestampLabel}</p>
+          <p className="text-xs text-brand-black dark:text-white">
+            {timestampLabel}
+          </p>
         )}
         {unreadCount > 0 && (
-          <span className="min-w-6 rounded-full bg-brand-black px-2 py-0.5 text-center text-[0.625rem] font-semibold text-white">
+          <span
+            className="min-w-6 rounded-full bg-brand-black px-2 py-0.5 text-center text-[0.625rem] font-semibold text-brand-black
+          dark:text-white
+          "
+          >
             {unreadCount}
           </span>
         )}

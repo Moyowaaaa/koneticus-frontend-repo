@@ -241,7 +241,6 @@ const FeedIdeaCard = ({
                 className="flex h-6 w-max items-center gap-1 rounded-[30px] bg-purple-light px-3 text-[10px] leading-[1.62] text-brand-black"
               >
                 {sentenceCaseEachWord(role)}
-                <img src="/images/feed/role-close.svg" alt="" aria-hidden />
               </div>
             ))}
           </div>
