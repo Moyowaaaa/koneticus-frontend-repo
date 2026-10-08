@@ -24,7 +24,7 @@ const MessagesClient = () => {
         onOpenChange={setShowCreateGroup}
       />
       <div className="relative flex w-full min-h-0 flex-col overflow-hidden pt-4 px-6">
-        <TopBar className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <TopBar className="flex flex-row md:items-center justify-between gap-3">
           <h1 className="text-[1.25rem] md;text-[1.5rem] font-semibold text-brand-black dark:text-white">
             Messages
           </h1>
@@ -35,7 +35,7 @@ const MessagesClient = () => {
               className="flex items-center gap-2 rounded-full border border-[#E9E9E9] bg-white px-4 py-2 text-sm font-medium text-brand-black transition hover:bg-lavender dark:border-[#80808026] dark:bg-transparent dark:text-white dark:hover:bg-[#80808026]"
             >
               <People size={16} variant="Bold" />
-              New group
+              <p className="hidden md:flex">New group</p>
             </button>
             <button
               type="button"
@@ -43,7 +43,7 @@ const MessagesClient = () => {
               className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
             >
               <Edit2 size={16} color="white" variant="Bold" />
-              New conversation
+              <p className="hidden md:flex">New conversation</p>
             </button>
           </div>
         </TopBar>

@@ -11,6 +11,7 @@ import ProjectPreviewModal from "../modals/project-preview-modal";
 import { useSearchStore } from "@/store/useSearchStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import OnboardingChecklist from "../onboarding-checklist";
+import Image from "next/image";
 
 const FeedClient = () => {
   const { toggleNewIdeaModal } = useGeneralStateStore();
@@ -54,15 +55,15 @@ const FeedClient = () => {
               <button
                 type="button"
                 onClick={toggleNewIdeaModal}
-                className="flex h-10 w-[123px] shrink-0 cursor-pointer items-center justify-center gap-2 rounded-[20px] bg-[#211E1E] px-[17px] py-[5px] font-sora text-[14px] leading-5 font-semibold text-white dark:bg-[#6155F5]"
+                className="flex h-10 md:w-[123px] shrink-0 cursor-pointer items-center justify-center gap-2 rounded-[20px] bg-[#211E1E] px-[17px] py-[5px] font-sora text-[14px] leading-5 font-semibold text-white dark:bg-[#6155F5]"
               >
-                <img
+                <Image
                   src="/images/sidebar/feed-new-idea.svg"
                   alt=""
                   width={13}
                   height={13}
                 />
-                New idea
+                <p className="hidden md:flex">New idea</p>
               </button>
             </div>
           </TopBar>
